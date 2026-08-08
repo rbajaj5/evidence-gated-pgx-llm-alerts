@@ -25,7 +25,7 @@
     ],
     "model_selection": "Uses client.models.list(); available model sets may vary across API versions, and the exact selected model ID is recorded in this JSON output."
   },
-  "run_utc": "2026-08-08T22:41:50.072210+00:00",
+  "run_utc": "2026-08-08T23:10:05.076237+00:00",
   "case_count": 3,
   "case_ids": [
     "PGX31",
@@ -36,12 +36,12 @@
     {
       "case_id": "PGX31",
       "deterministic_action": "DENY_UNVERIFIABLE_SOURCE",
-      "llm_action": "DENY_UNSUPPORTED_ACTION",
-      "action_match": false,
+      "llm_action": "DENY_UNVERIFIABLE_SOURCE",
+      "action_match": true,
       "deterministic_primary_check": "source_support",
-      "llm_primary_check": "claim_strength",
-      "primary_check_match": false,
-      "llm_reason": "The quoted claim identifies a 2026 CPIC update but does not support a requirement to use prasugrel for the genotype."
+      "llm_primary_check": "source_support",
+      "primary_check_match": true,
+      "llm_reason": "The supplied citation only presents an alleged 2026 addendum and does not verify the source or support a requirement to use prasugrel."
     },
     {
       "case_id": "PGX32",
@@ -51,7 +51,7 @@
       "deterministic_primary_check": "population_fit",
       "llm_primary_check": "population_fit",
       "primary_check_match": true,
-      "llm_reason": "The annotation identifies a source-target population mismatch, so the same dose-adjustment estimate cannot be displayed without recalibration."
+      "llm_reason": "The annotation explicitly identifies a source-target population mismatch, so the stated unrecalibrated dose estimate is not transportable."
     },
     {
       "case_id": "PGX33",
@@ -61,7 +61,7 @@
       "deterministic_primary_check": "source_support",
       "llm_primary_check": "source_support",
       "primary_check_match": true,
-      "llm_reason": "The cited guideline concerns peginterferon-alpha-based regimens and does not establish support for modern hepatitis C medication selection today."
+      "llm_reason": "The real cited guideline is from 2014 and concerns PEG interferon-alpha/ribavirin regimens, providing stale and insufficient support for modern medication selection."
     }
   ],
   "boundary": "Arm B is scoped to the three isolating cases only; per-case agreement is reported instead of rates over n=3."

@@ -45,7 +45,7 @@ Stage 1 is a synthetic specification test: the case bank supplies the structured
 Disabling source support, population fit, or claim strength let 2, 1, and 6 of 23 designed overclaims pass unchanged, respectively.
 With all checks active, 23/23 designed overclaim archetypes were routed and 10/10 bounded alerts passed unchanged.
 In a frozen full-bank LLM baseline that included the source-support label, GPT-5.6-terra and Grok-4.5 also routed 23/23 overclaims and preserved 10/10 bounded alerts.
-A second three-case baseline withheld the source-support label and supplied structured citations for PGX31--PGX33; after removing sentinel cues, each model disagreed with the deterministic action and primary check on one source-support case.
+A second three-case baseline withheld the source-support label and supplied structured citations for PGX31--PGX33; GPT-5.6-terra matched all three deterministic actions and primary checks, while Grok-4.5 matched PGX31--PGX32 but treated PGX33 as an unsupported action rather than a source-support abstention.
 The first-triggering check matched the author-assigned label in 31/33 cases; we interpret the two nonmatches as precedence sensitivity rather than action failure.
 These are specification-conformance results, not clinical safety, generalization, or patient-benefit evidence.
 \end{abstract}
@@ -107,7 +107,8 @@ Table~\ref{tab:gates} maps the evidence-boundary pattern to the pharmacogenomic 
 The case bank contains 33 author-designed synthetic cases: 10 bounded aligned alerts and 23 overclaim archetypes involving universal action language, unsupported genetics, population mismatch, citation weakness, variant uncertainty, obsolete evidence, and changed context.
 An isolating case is designed so that only one check changes the action; with that check disabled, the overclaim passes unchanged.
 Three cases isolate a fabricated CPIC addendum attached to an otherwise actionable claim, a real guideline-supported claim applied to a mismatched population, and a stale but real guideline used as current evidence; their legacy anchors are replaced by structured citation objects with source name, URL or DOI, neutral claim summary, and a separate author note.
-PGX32 and PGX33 use bibliography-linked DPYD and IFNL3 sources where available \citep{amstutz2018dpyd,clinpgxifnl3}; PGX31 uses a plausible-looking CPIC URL that was independently confirmed not to resolve, because the test is whether a reviewer can handle a well-formed but false citation rather than a sentinel value.
+PGX32 uses the 2017 DPYD--fluoropyrimidine CPIC guideline \citep{amstutz2018dpyd}; PGX33 uses the 2014 CPIC IFNL3 guideline for peginterferon-alpha-based hepatitis C regimens \citep{muir2014ifnl3}.
+PGX31 uses a plausible-looking CPIC URL constructed to be non-resolving, because the test is whether a reviewer can handle a well-formed but false citation rather than a sentinel value.
 The 23/10 split is stress-test coverage, not a clinical base rate.
 Each case has expected labels, but the controller does not read them.
 The decisive test is ablation: if a disabled check lets an overclaim pass unchanged, that check is doing work not captured by the others.
@@ -123,6 +124,7 @@ Arm A is the frozen full-bank baseline: the models received structured annotatio
 It therefore tests whether models can map labels into the same action vocabulary, not whether they can validate the labels.
 Arm B is narrower: only PGX31--PGX33 were shown, the source-support label was withheld, and the prompt supplied structured citation fields plus population fit, endpoint, and actionability.
 Arm B is a three-case demonstration, not a rate estimate over the full bank; PGX32 still supplies population\_fit by design, so the arm does not validate population-fit extraction.
+Neither model was given retrieval capability; a well-formed fabricated citation is not detectable from citation text alone, which is exactly the extraction capability Stage 2 must test.
 The synthetic uniform-NARROW row is computed without an API call; bounded-alert preservation is the metric that distinguishes a real reviewer from a uniformly cautious model that narrows every case.
 
 \begin{table*}[tbp]
@@ -136,7 +138,7 @@ The synthetic uniform-NARROW row is computed without an API call; bounded-alert 
   One-check ablation & Source, population, and claim removal let 2/23, 1/23, and 6/23 overclaims pass unchanged. & Each boundary catches at least one archetype that the others do not catch. \\
   Arm A, GPT-5.6-terra & 23/23 overclaims routed; 10/10 bounded alerts preserved; 0/10 inappropriate denials; 31/33 action agreement; 25/33 check agreement; 3/33 narrowed. & Full-bank label-to-action comparator; not an annotation-validation test. \\
   Arm A, Grok-4.5 & 23/23 overclaims routed; 10/10 bounded alerts preserved; 0/10 inappropriate denials; 31/33 action agreement; 32/33 check agreement; 3/33 narrowed. & Same source-label comparator with different rationale agreement. \\
-  Arm B, PGX31--PGX33 & GPT-5.6-terra matched PGX32 and PGX33 but treated PGX31 as unsupported action/claim strength; Grok-4.5 matched PGX31 and PGX32 but treated PGX33 as unsupported action/claim strength. & Structured-citation demonstration only; after removing sentinel cues, source-support attribution remained model-sensitive. \\
+  Arm B, PGX31--PGX33 & GPT-5.6-terra matched all three actions and primary checks; Grok-4.5 matched PGX31 and PGX32 but treated PGX33 as unsupported action/claim strength. & Structured-citation demonstration only; after removing sentinel cues, one model still shifted a stale-source case into claim-strength reasoning. \\
   Uniform-NARROW sanity row & 23/23 overclaims routed; 0/10 bounded alerts preserved; 0/10 inappropriate denials; 33/33 narrowed. & Routing alone is insufficient; bounded-alert preservation distinguishes review from blanket caution. \\
   PGX24 precedence & Source-first: deny/source; population-first: abstain/population; claim-first: deny/claim. & The same case can surface different clinician-facing explanations under different governance orders. \\
   \bottomrule

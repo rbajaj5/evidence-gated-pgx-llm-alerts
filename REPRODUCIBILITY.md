@@ -58,7 +58,7 @@ Arm A, xAI grok-4.5, full bank with source-support labels:
   23/23 designed overclaims routed, 10/10 bounded alerts preserved, 0/10 inappropriate denials,
   31/33 action matches, 32/33 primary-check matches, 3/33 narrowed.
 Arm B, OpenAI gpt-5.6-terra, PGX31-PGX33 structured citations with source-support label withheld:
-  matched PGX32 and PGX33; treated PGX31 as unsupported action / claim strength.
+  matched PGX31, PGX32, and PGX33.
 Arm B, xAI grok-4.5, PGX31-PGX33 structured citations with source-support label withheld:
   matched PGX31 and PGX32; treated PGX33 as unsupported action / claim strength.
 Synthetic uniform-NARROW sanity check:

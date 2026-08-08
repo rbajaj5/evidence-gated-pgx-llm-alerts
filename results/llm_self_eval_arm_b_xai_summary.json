@@ -25,7 +25,7 @@
     ],
     "model_selection": "Uses client.models.list(); available model sets may vary across API versions, and the exact selected model ID is recorded in this JSON output."
   },
-  "run_utc": "2026-08-08T22:42:11.090124+00:00",
+  "run_utc": "2026-08-08T23:10:30.583258+00:00",
   "case_count": 3,
   "case_ids": [
     "PGX31",
@@ -41,7 +41,7 @@
       "deterministic_primary_check": "source_support",
       "llm_primary_check": "source_support",
       "primary_check_match": true,
-      "llm_reason": "Cited 2026 addendum is not verifiable from supplied annotations; quoted_claim does not establish prasugrel requirement."
+      "llm_reason": "Quoted claim only presents a 2026 addendum label and does not verify the prasugrel-requirement action."
     },
     {
       "case_id": "PGX32",
@@ -51,7 +51,7 @@
       "deterministic_primary_check": "population_fit",
       "llm_primary_check": "population_fit",
       "primary_check_match": true,
-      "llm_reason": "population_fit is population_mismatch; same dose estimate without recalibration is not transportable."
+      "llm_reason": "Annotation marks population_mismatch for same dose-adjustment use without recalibration in underrepresented source-target population."
     },
     {
       "case_id": "PGX33",
@@ -61,7 +61,7 @@
       "deterministic_primary_check": "source_support",
       "llm_primary_check": "claim_strength",
       "primary_check_match": false,
-      "llm_reason": "Quoted support is limited to peginterferon-alpha regimens, not modern hepatitis C medication selection."
+      "llm_reason": "Citation supports only 2014 PEG interferon-alpha regimens, not modern hepatitis C medication selection."
     }
   ],
   "boundary": "Arm B is scoped to the three isolating cases only; per-case agreement is reported instead of rates over n=3."
