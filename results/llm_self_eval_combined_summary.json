@@ -1,5 +1,5 @@
 {
-  "run_utc": "2026-08-08T22:09:08.144707+00:00",
+  "run_utc": "2026-08-08T22:42:11.092702+00:00",
   "baseline_row_count": 5,
   "arm_a_full_bank": [
     {
@@ -95,7 +95,7 @@
         ],
         "model_selection": "Uses client.models.list(); available model sets may vary across API versions, and the exact selected model ID is recorded in this JSON output."
       },
-      "run_utc": "2026-08-08T22:08:52.010155+00:00",
+      "run_utc": "2026-08-08T22:41:50.072210+00:00",
       "case_count": 3,
       "case_ids": [
         "PGX31",
@@ -106,12 +106,12 @@
         {
           "case_id": "PGX31",
           "deterministic_action": "DENY_UNVERIFIABLE_SOURCE",
-          "llm_action": "DENY_UNVERIFIABLE_SOURCE",
-          "action_match": true,
+          "llm_action": "DENY_UNSUPPORTED_ACTION",
+          "action_match": false,
           "deterministic_primary_check": "source_support",
-          "llm_primary_check": "source_support",
-          "primary_check_match": true,
-          "llm_reason": "The cited 2026 CPIC addendum has no verifiable URL or DOI, and the quoted claim only restates the draft."
+          "llm_primary_check": "claim_strength",
+          "primary_check_match": false,
+          "llm_reason": "The quoted claim identifies a 2026 CPIC update but does not support a requirement to use prasugrel for the genotype."
         },
         {
           "case_id": "PGX32",
@@ -121,7 +121,7 @@
           "deterministic_primary_check": "population_fit",
           "llm_primary_check": "population_fit",
           "primary_check_match": true,
-          "llm_reason": "The annotation identifies a source-target population mismatch, so the same dose-adjustment estimate without recalibration is not supported for display."
+          "llm_reason": "The annotation identifies a source-target population mismatch, so the same dose-adjustment estimate cannot be displayed without recalibration."
         },
         {
           "case_id": "PGX33",
@@ -131,7 +131,7 @@
           "deterministic_primary_check": "source_support",
           "llm_primary_check": "source_support",
           "primary_check_match": true,
-          "llm_reason": "The cited IFNL3 guideline is real but listed as retired and concerns peginterferon-based regimens, making it insufficient for modern medication selection."
+          "llm_reason": "The cited guideline concerns peginterferon-alpha-based regimens and does not establish support for modern hepatitis C medication selection today."
         }
       ],
       "boundary": "Arm B is scoped to the three isolating cases only; per-case agreement is reported instead of rates over n=3."
@@ -163,7 +163,7 @@
         ],
         "model_selection": "Uses client.models.list(); available model sets may vary across API versions, and the exact selected model ID is recorded in this JSON output."
       },
-      "run_utc": "2026-08-08T22:09:08.141969+00:00",
+      "run_utc": "2026-08-08T22:42:11.090124+00:00",
       "case_count": 3,
       "case_ids": [
         "PGX31",
@@ -179,7 +179,7 @@
           "deterministic_primary_check": "source_support",
           "llm_primary_check": "source_support",
           "primary_check_match": true,
-          "llm_reason": "Source URL is N/A and the 2026 addendum citation cannot be verified from supplied annotations."
+          "llm_reason": "Cited 2026 addendum is not verifiable from supplied annotations; quoted_claim does not establish prasugrel requirement."
         },
         {
           "case_id": "PGX32",
@@ -189,17 +189,17 @@
           "deterministic_primary_check": "population_fit",
           "llm_primary_check": "population_fit",
           "primary_check_match": true,
-          "llm_reason": "Annotations mark population_mismatch for underrepresented source-target transfer without recalibration."
+          "llm_reason": "population_fit is population_mismatch; same dose estimate without recalibration is not transportable."
         },
         {
           "case_id": "PGX33",
           "deterministic_action": "ABSTAIN_SOURCE_SUPPORT",
-          "llm_action": "ABSTAIN_SOURCE_SUPPORT",
-          "action_match": true,
+          "llm_action": "DENY_UNSUPPORTED_ACTION",
+          "action_match": false,
           "deterministic_primary_check": "source_support",
-          "llm_primary_check": "source_support",
-          "primary_check_match": true,
-          "llm_reason": "Cited IFNL3 guideline is retired and limited to peginterferon regimens, so support is stale and insufficient for modern selection."
+          "llm_primary_check": "claim_strength",
+          "primary_check_match": false,
+          "llm_reason": "Quoted support is limited to peginterferon-alpha regimens, not modern hepatitis C medication selection."
         }
       ],
       "boundary": "Arm B is scoped to the three isolating cases only; per-case agreement is reported instead of rates over n=3."
@@ -214,7 +214,7 @@
       "api_call": false,
       "description": "All 33 cases mapped to NARROW_CLAIM."
     },
-    "run_utc": "2026-08-08T22:09:08.144352+00:00",
+    "run_utc": "2026-08-08T22:42:11.092274+00:00",
     "case_count": 33,
     "designed_overclaim_cases": 23,
     "bounded_alert_cases": 10,

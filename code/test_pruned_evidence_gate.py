@@ -117,7 +117,10 @@ def test_isolating_cases_use_structured_citations_without_monitor_changes() -> N
         assert set(anchor) == {"source_name", "source_url_or_doi", "quoted_claim", "annotation_note"}
         assert anchor["source_name"]
         assert anchor["quoted_claim"]
-        if anchor["source_url_or_doi"] != "N/A":
+        if case_id == "PGX31":
+            assert anchor["source_url_or_doi"].startswith("https://cpicpgx.org/")
+            assert anchor["source_url_or_doi"] not in bib_text
+        else:
             assert anchor["source_url_or_doi"] in bib_text
 
     assert isinstance(case("PGX30").guideline_anchor, str)
@@ -136,6 +139,9 @@ def test_llm_payloads_do_not_leak_author_only_annotation_notes() -> None:
     assert "guideline_anchor" not in arm_b_text
     assert "fabricated guideline" not in arm_b_text
     assert "hallucinated" not in arm_b_text
+    assert '"source_url_or_doi": "N/A"' not in arm_b_text
+    assert "listed as retired" not in arm_b_text
+    assert "retired" not in arm_b_text
     assert "structured_citation" in arm_b_text
     assert [row["case_id"] for row in _case_payload(ARM_B)] == ["PGX31", "PGX32", "PGX33"]
 

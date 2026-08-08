@@ -563,10 +563,9 @@ CASES: tuple[AlertCase, ...] = (
         "unverifiable",
         {
             "source_name": "CPIC Guideline Addendum for CYP2C19 Genotype and Clopidogrel Therapy: 2026 Update",
-            # % TODO verify: fabricated-source stress test; no source-specific URL is present in ml4h_findings_refs.bib.
-            "source_url_or_doi": "N/A",
-            "quoted_claim": "The drafted alert cites a CPIC 2026 addendum requiring prasugrel for a CYP2C19 genotype.",
-            "annotation_note": "Author annotation: no independently verifiable source is supplied for the claimed addendum.",
+            "source_url_or_doi": "https://cpicpgx.org/guidelines/cpic-guideline-addendum-cyp2c19-clopidogrel-2026/",
+            "quoted_claim": "The cited addendum is presented as a 2026 CPIC update to CYP2C19 genotype and clopidogrel therapy recommendations.",
+            "annotation_note": "Author annotation: this plausible-looking citation is an intentionally nonresolving fabricated-source stress test.",
         },
         "DENY_UNVERIFIABLE_SOURCE",
         True,
@@ -605,8 +604,8 @@ CASES: tuple[AlertCase, ...] = (
         {
             "source_name": "ClinPGx Guideline for IFNL3 and Peginterferon-alpha-based Regimens",
             "source_url_or_doi": "https://www.clinpgx.org/guideline/PA166251455",
-            "quoted_claim": "The guideline concerns IFNL3 and peginterferon-alpha-based regimens for hepatitis C and is listed as retired.",
-            "annotation_note": "Author annotation: the source is real but stale/context-shifted for modern hepatitis C medication selection.",
+            "quoted_claim": "The guideline concerns IFNL3 and peginterferon-alpha-based regimens for hepatitis C.",
+            "annotation_note": "Author annotation: the source is real and listed as retired; it is stale/context-shifted for modern hepatitis C medication selection.",
         },
         "ABSTAIN_SOURCE_SUPPORT",
         True,

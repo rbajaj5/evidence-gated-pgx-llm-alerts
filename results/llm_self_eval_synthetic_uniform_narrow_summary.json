@@ -7,7 +7,7 @@
     "api_call": false,
     "description": "All 33 cases mapped to NARROW_CLAIM."
   },
-  "run_utc": "2026-08-08T22:09:08.144352+00:00",
+  "run_utc": "2026-08-08T22:42:11.092274+00:00",
   "case_count": 33,
   "designed_overclaim_cases": 23,
   "bounded_alert_cases": 10,

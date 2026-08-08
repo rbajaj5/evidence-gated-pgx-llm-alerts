@@ -1,6 +1,6 @@
 arm,provider,model,scope,overclaim_routing,bounded_alert_preservation,inappropriate_denials,action_agreement,primary_check_agreement,narrowing_rate,per_case_agreement
 A_source_label_full_bank,openai,gpt-5.6-terra,33 cases,23/23,10/10,0/10,31/33,25/33,0.0909,N/A
 A_source_label_full_bank,xai,grok-4.5,33 cases,23/23,10/10,0/10,31/33,32/33,0.0909,N/A
-B_structured_citation_isolating_cases,openai,gpt-5.6-terra,PGX31-PGX33 only,N/A,N/A,N/A,N/A,N/A,N/A,"PGX31: action=True, check=True; PGX32: action=True, check=True; PGX33: action=True, check=True"
-B_structured_citation_isolating_cases,xai,grok-4.5,PGX31-PGX33 only,N/A,N/A,N/A,N/A,N/A,N/A,"PGX31: action=True, check=True; PGX32: action=True, check=True; PGX33: action=True, check=True"
+B_structured_citation_isolating_cases,openai,gpt-5.6-terra,PGX31-PGX33 only,N/A,N/A,N/A,N/A,N/A,N/A,"PGX31: action=False, check=False; PGX32: action=True, check=True; PGX33: action=True, check=True"
+B_structured_citation_isolating_cases,xai,grok-4.5,PGX31-PGX33 only,N/A,N/A,N/A,N/A,N/A,N/A,"PGX31: action=True, check=True; PGX32: action=True, check=True; PGX33: action=False, check=False"
 synthetic_uniform_narrow_full_bank,synthetic,uniform-NARROW sanity check,33 cases,23/23,0/10,0/10,5/33,6/33,1.0000,N/A

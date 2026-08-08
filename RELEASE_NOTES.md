@@ -44,7 +44,7 @@ Full conformance accounting is retained in the supplement and machine-readable J
 0 inappropriate denials
 Check ablation: disabling source support allows 2/23 overclaims through unchanged; disabling population fit allows 1/23 through; disabling claim strength allows 6/23 through.
 LLM self-evaluation Arm A: GPT-5.6-terra and Grok-4.5 each routed 23/23 designed overclaims and allowed 10/10 bounded alerts; action agreement with the deterministic monitor was 31/33 for both.
-LLM self-evaluation Arm B: GPT-5.6-terra and Grok-4.5 each matched deterministic action and primary check on PGX31, PGX32, and PGX33 when source-support labels were withheld.
+LLM self-evaluation Arm B: after sentinel cues were removed, GPT-5.6-terra matched PGX32 and PGX33 but attributed PGX31 to claim strength, while Grok-4.5 matched PGX31 and PGX32 but attributed PGX33 to claim strength.
 Synthetic uniform-NARROW sanity row: 23/23 designed overclaims routed, 0/10 bounded alerts preserved, 0/10 inappropriate denials, and 33/33 narrowed.
 ```
 
