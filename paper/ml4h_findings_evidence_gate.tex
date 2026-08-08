@@ -40,8 +40,9 @@ Large language models can draft medication alerts whose fluency exceeds the evid
 This paper studies one workflow: pharmacogenomic and genomic medication-alert text.
 I implement a synthetic pre-display evidence gate with three checks: citation/guideline support, population fit, and endpoint/actionability.
 Stage 1 does not call an LLM or parse free text; it tests a deterministic controller over structured annotations.
-In 33 author-designed synthetic cases, the controller blocked or narrowed all 23 designed overclaim archetypes, allowed all 10 bounded alerts, and produced no inappropriate denials.
-Action conformance was 33/33; primary-gate conformance was 31/33.
+In one-gate ablations, disabling citation/guideline support, population fit, or endpoint/actionability allowed 2/23, 1/23, and 6/23 designed overclaims through unchanged, respectively.
+With all gates active, all 23 designed overclaim archetypes were blocked or narrowed and all 10 bounded alerts passed unchanged.
+Primary-gate conformance was 31/33, with two gate-precedence disagreements reported as negative results.
 These are specification-conformance results, not clinical safety, generalization, or patient-benefit evidence.
 \end{abstract}
 
@@ -98,24 +99,6 @@ The three checks are summarized in Table~\ref{tab:gates}.
 
 \begin{table}[tbp]
 \floatconts
-  {tab:results}
-  {\caption{Stage 1 specification-conformance counts.}}
-  {\begin{tabular}{p{0.72\linewidth}r}
-  \toprule
-  Result & Value \\
-  \midrule
-  Overclaim archetypes allowed unchanged & 0/23 \\
-  Designed overclaim archetypes blocked or narrowed & 23/23 \\
-  Bounded alerts allowed & 10/10 \\
-  Action conformance & 33/33 \\
-  Primary-gate conformance & 31/33 \\
-  Inappropriate denial & 0/10 \\
-  \bottomrule
-  \end{tabular}}
-\end{table}
-
-\begin{table}[tbp]
-\floatconts
   {tab:ablation}
   {\caption{One-gate ablation on the synthetic case bank.}}
   {\resizebox{\linewidth}{!}{\begin{tabular}{@{}lrrr@{}}
@@ -129,12 +112,13 @@ The three checks are summarized in Table~\ref{tab:gates}.
   \end{tabular}}}
 \end{table}
 
-Table~\ref{tab:results} reports specification-conformance counts only: no designed overclaim reached allow unchanged, all bounded alerts passed, and no bounded alert was denied too strongly.
+All 23 designed overclaim archetypes were blocked or narrowed and all 10 bounded alerts passed unchanged, so the controller is not a blanket denial rule.
 The ablation now includes three isolating cases: a fabricated CPIC addendum attached to an otherwise actionable claim, a real guideline-supported claim transported to a mismatched population, and a stale but real guideline used as current evidence.
 Table~\ref{tab:ablation} shows that disabling each gate allows at least one designed overclaim to pass unchanged, so the gates are not merely duplicating endpoint/actionability.
 Removing citation/guideline support allows 2/23 overclaims through unchanged; removing population fit allows 1/23 through; removing endpoint/actionability allows 6/23 through.
 The result supports a necessity chain for the three gates in this synthetic case bank.
 
+Primary-gate conformance was 31/33.
 PGX19 and PGX24 remain negative results: both are action-level successes but primary-gate mismatches because citation/guideline support fires before the gate that motivated the case design.
 This exposes controller precedence rather than hiding it inside a perfect conformance score.
 
