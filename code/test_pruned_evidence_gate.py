@@ -13,7 +13,7 @@ def test_case_bank_is_single_workflow_and_three_gates() -> None:
     _, summary = evaluate()
     assert summary["workflow"] == "pharmacogenomic/genomic medication-alert text"
     assert summary["gate_count"] == 3
-    assert summary["case_count"] == 30
+    assert summary["case_count"] == 33
 
 
 def test_guideline_supported_alerts_are_allowed() -> None:
@@ -25,7 +25,7 @@ def test_guideline_supported_alerts_are_allowed() -> None:
 
 
 def test_population_transport_overclaims_are_not_allowed() -> None:
-    for case_id in ("PGX10", "PGX25", "PGX26", "PGX27"):
+    for case_id in ("PGX10", "PGX25", "PGX26", "PGX27", "PGX32"):
         result = gate_case(case(case_id))
         assert result.primary_gate == "population_fit"
         assert result.actual_action == "ABSTAIN_POPULATION_FIT"
@@ -38,6 +38,8 @@ def test_population_transport_overclaims_are_not_allowed() -> None:
 
 def test_unverifiable_and_unsupported_citations_are_blocked() -> None:
     assert gate_case(case("PGX30")).actual_action == "DENY_CITATION"
+    assert gate_case(case("PGX31")).actual_action == "DENY_CITATION"
+    assert gate_case(case("PGX33")).actual_action == "ABSTAIN_CITATION_SUPPORT"
     for case_id in ("PGX12", "PGX17", "PGX18", "PGX23"):
         result = gate_case(case(case_id))
         assert result.primary_gate == "citation_guideline_support"
@@ -67,12 +69,14 @@ def test_decision_contract_is_separate_from_expected_labels() -> None:
 
 def test_gate_ablation_reports_distinct_gate_roles() -> None:
     rows = {row.disabled_gate: row for row in ablation_summary()}
-    assert rows["citation_guideline_support"].action_changed_count == 5
-    assert rows["citation_guideline_support"].primary_gate_changed_count == 10
-    assert rows["population_fit"].action_changed_count == 4
-    assert rows["population_fit"].primary_gate_changed_count == 4
+    assert rows["citation_guideline_support"].overclaim_allowed_unchanged_count == 2
+    assert rows["citation_guideline_support"].action_changed_count == 7
+    assert rows["citation_guideline_support"].primary_gate_changed_count == 12
+    assert rows["population_fit"].overclaim_allowed_unchanged_count == 1
+    assert rows["population_fit"].action_changed_count == 5
+    assert rows["population_fit"].primary_gate_changed_count == 5
     assert rows["endpoint_actionability"].overclaim_allowed_unchanged_count == 6
-    assert rows["endpoint_actionability"].designed_overclaim_archetype_blocked_count == 14
+    assert rows["endpoint_actionability"].designed_overclaim_archetype_blocked_count == 17
 
 
 def test_summary_metrics_are_specification_conformance_not_clinical_claims() -> None:
@@ -81,8 +85,8 @@ def test_summary_metrics_are_specification_conformance_not_clinical_claims() -> 
     assert summary["bounded_alert_allowed_rate"] >= 0.95
     assert summary["inappropriate_denial_count"] == 0
     assert summary["overclaim_allowed_unchanged_count"] == 0
-    assert summary["action_conformance_count"] == 30
-    assert summary["gate_conformance_count"] == 28
+    assert summary["action_conformance_count"] == 33
+    assert summary["gate_conformance_count"] == 31
     assert {case["case_id"] for case in summary["gate_disagreement_cases"]} == {"PGX19", "PGX24"}
     assert summary["gate_precedence_order"] == [
         "citation_guideline_support",

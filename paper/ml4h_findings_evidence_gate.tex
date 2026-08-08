@@ -3,18 +3,26 @@
 % https://www.overleaf.com/latex/templates/machine-learning-for-health-ml4h-2026-template/sqgwhtyswgcy
 \documentclass[pmlr,twocolumn,10pt]{jmlr}
 
+% Local fallback for stock JMLR installs. The official ML4H 2026 template
+% defines \mlhtrack; this no-op metadata setter is used only when compiling
+% outside that template.
+\providecommand{\mlhtrack}[1]{\gdef\mlhtrackname{Findings Track}}
+\providecommand{\mlhtrackname}{Findings Track}
+
+% REQUIRED ML4H 2026 track metadata. Keep before the submission/final
+% conditionals because the class uses this command to set track flags.
 \mlhtrack{findings}
 
 \newif\iffinal
 \finalfalse
 
 \iffinal
-  \ifmlhfindings \jmlrproceedings{}{ML4H 2026 - Findings Track}\fi
-  \jmlrworkshop{Machine Learning for Health (ML4H) 2026}
+\jmlrproceedings{}{ML4H 2026 -- Findings Track}
 \else
-  \jmlrproceedings{}{Submitted to ML4H 2026: \mlhtrackname}
-  \jmlrworkshop{Machine Learning for Health (ML4H) 2026}
+\jmlrproceedings{}{Submitted to ML4H 2026: \mlhtrackname}
 \fi
+\jmlryear{2026}
+\jmlrworkshop{Machine Learning for Health (ML4H) 2026}
 
 \usepackage{booktabs}
 \usepackage[switch]{lineno}
@@ -32,8 +40,8 @@ Large language models can draft medication alerts whose fluency exceeds the evid
 This paper studies one workflow: pharmacogenomic and genomic medication-alert text.
 I implement a synthetic pre-display evidence gate with three checks: citation/guideline support, population fit, and endpoint/actionability.
 Stage 1 does not call an LLM or parse free text; it tests a deterministic controller over structured annotations.
-In 30 author-designed synthetic cases, the controller blocked or narrowed all 20 designed overclaim archetypes, allowed all 10 bounded alerts, and produced no inappropriate denials.
-Action conformance was 30/30; primary-gate conformance was 28/30.
+In 33 author-designed synthetic cases, the controller blocked or narrowed all 23 designed overclaim archetypes, allowed all 10 bounded alerts, and produced no inappropriate denials.
+Action conformance was 33/33; primary-gate conformance was 31/33.
 These are specification-conformance results, not clinical safety, generalization, or patient-benefit evidence.
 \end{abstract}
 
@@ -53,13 +61,13 @@ Any Stage 2 use of clinical cases or expert adjudication would require appropria
 Healthcare LLMs can make evidentiary overreach look syntactically clean.
 A medication alert may cite a real guideline while turning a bounded pharmacogenomic recommendation into a universal instruction, a population-specific association into a transported claim, or a surrogate endpoint into patient-outcome benefit.
 The gap matters because fluency can hide what evidence does, and does not, authorize.
-Pharmacogenomic medication alerts are a useful testbed because CPIC and ClinPGx already distinguish genotype, phenotype, evidence level, and prescribing recommendation.
+Pharmacogenomic medication alerts are a useful testbed because CPIC and ClinPGx already distinguish genotype, phenotype, evidence level, and prescribing recommendation \citep{cpicguidelines,clinpgx2026}.
 
 \section{Evidence Boundary}
 Healthcare AI evaluation should distinguish implementation consistency from patient-outcome benefit.
-Byrne et al. emphasize that outcome claims require pragmatic clinical evaluation, while Stegenga motivates caution when evidentiary pipelines make interventions appear stronger than they are.
-FDA--NIH BEST materials provide endpoint vocabulary: biomarkers, surrogate endpoints, validated surrogates, and clinical outcomes are not interchangeable.
-Pharmacogenomics adds a positive control: CPIC-style resources can support bounded prescribing language but do not automatically support claims that an LLM improves outcomes, that an association is causal, or that a result transports across populations without recalibration.
+Byrne et al. emphasize that outcome claims require pragmatic clinical evaluation \citep{byrne2024ai}, while Stegenga motivates caution when evidentiary pipelines make interventions appear stronger than they are \citep{stegenga2018medical}.
+FDA--NIH BEST materials provide endpoint vocabulary: biomarkers, surrogate endpoints, validated surrogates, and clinical outcomes are not interchangeable \citep{bestresource}.
+Pharmacogenomics adds a positive control: CPIC-style resources can support bounded prescribing language, including CYP2C19--clopidogrel and DPYD--fluoropyrimidine examples \citep{lee2022cyp2c19,amstutz2018dpyd}, but do not automatically support claims that an LLM improves outcomes, that an association is causal, or that a result transports across populations without recalibration.
 
 \section{Methods}
 The controller is a deterministic pre-display gate, not an autonomous clinical agent.
@@ -67,40 +75,41 @@ It receives a synthetic candidate alert plus structured evidence annotations ass
 The fixed precedence order is citation/guideline support, population fit, then endpoint/actionability.
 It returns one of five permissions: allow, narrow, abstain for population fit, abstain for citation support, or deny unsupported action.
 
-\begin{table}[tbp]
+\begin{table*}[tbp]
 \floatconts
   {tab:gates}
   {\caption{Evidence-gate roles.}}
-  {\begin{tabular}{p{0.19\linewidth}p{0.31\linewidth}p{0.38\linewidth}}
+  {\begin{tabular}{@{}p{0.17\textwidth}p{0.37\textwidth}p{0.35\textwidth}@{}}
   \toprule
   Gate & Question & Permitted effect \\
   \midrule
-  Citation/guideline & Is the cited source real, current, relevant, and strong enough? & Deny fabricated citations; abstain on uncertain support. \\
-  Population fit & Does source evidence plausibly fit the target patient or population? & Abstain from transport. \\
-  Endpoint/actionability & Does evidence support medication action, not only association? & Allow bounded alerts; narrow overstrong claims. \\
+  Citation & Is the cited source real, current, relevant, and strong enough? & Deny fabricated citations; abstain on uncertain support. \\
+  Population & Does source evidence plausibly fit the target patient or population? & Abstain from transport. \\
+  Endpoint & Does evidence support medication action, not only association? & Allow bounded alerts; narrow overstrong claims. \\
   \bottomrule
   \end{tabular}}
-\end{table}
+\end{table*}
 
 \section{Stage 1 Scaffold}
-The case bank contains 30 author-designed synthetic cases: 10 bounded aligned alerts and 20 overclaim archetypes involving universal action language, unsupported genetics, population mismatch, citation weakness, variant uncertainty, or obsolete/context-shifted evidence.
-The 20/10 split is stress-test coverage, not a clinical base rate.
+The case bank contains 33 author-designed synthetic cases: 10 bounded aligned alerts and 23 overclaim archetypes involving universal action language, unsupported genetics, population mismatch, citation weakness, variant uncertainty, obsolete/context-shifted evidence, and three isolating cases.
+The 23/10 split is stress-test coverage, not a clinical base rate.
 Each case has expected labels, but the controller does not read them.
+The three checks are summarized in Table~\ref{tab:gates}.
 
 \begin{table}[tbp]
 \floatconts
   {tab:results}
   {\caption{Stage 1 specification-conformance counts.}}
-  {\begin{tabular}{lll}
+  {\begin{tabular}{p{0.72\linewidth}r}
   \toprule
-  Result & Value & Claim allowed \\
+  Result & Value \\
   \midrule
-  Overclaim archetypes allowed unchanged & 0/20 & None reached allow unchanged. \\
-  Designed overclaim archetypes blocked & 20/20 & Routed to narrow, abstain, or deny. \\
-  Bounded alerts allowed & 10/10 & Aligned bounded alerts passed. \\
-  Action conformance & 30/30 & Action matched expected label. \\
-  Primary-gate conformance & 28/30 & PGX19 and PGX24 differed by precedence. \\
-  Inappropriate denial & 0/10 & No bounded aligned alert was denied. \\
+  Overclaim archetypes allowed unchanged & 0/23 \\
+  Designed overclaim archetypes blocked or narrowed & 23/23 \\
+  Bounded alerts allowed & 10/10 \\
+  Action conformance & 33/33 \\
+  Primary-gate conformance & 31/33 \\
+  Inappropriate denial & 0/10 \\
   \bottomrule
   \end{tabular}}
 \end{table}
@@ -109,20 +118,25 @@ Each case has expected labels, but the controller does not read them.
 \floatconts
   {tab:ablation}
   {\caption{One-gate ablation on the synthetic case bank.}}
-  {\begin{tabular}{lrrrr}
+  {\resizebox{\linewidth}{!}{\begin{tabular}{@{}lrrr@{}}
   \toprule
-  Disabled gate & Overclaims allowed & Blocked & Action changes & Gate changes \\
+  Disabled gate & Allowed & Action $\Delta$ & Gate $\Delta$ \\
   \midrule
-  Citation/guideline & 0 & 20 & 5 & 10 \\
-  Population fit & 0 & 20 & 4 & 4 \\
-  Endpoint/actionability & 6 & 14 & 6 & 6 \\
+  Citation/guideline & 2 & 7 & 12 \\
+  Population fit & 1 & 5 & 5 \\
+  Endpoint/actionability & 6 & 6 & 6 \\
   \bottomrule
-  \end{tabular}}
+  \end{tabular}}}
 \end{table}
 
-The ablation is deliberately modest.
-Endpoint/actionability is the only gate whose removal allows designed overclaims through unchanged.
-Citation/guideline support and population fit mainly preserve the correct governance action and reason: without them, the controller often still blocks the text through another gate, but loses the distinction between unverifiable evidence, population transport, and actionability.
+Table~\ref{tab:results} reports specification-conformance counts only: no designed overclaim reached allow unchanged, all bounded alerts passed, and no bounded alert was denied too strongly.
+The ablation now includes three isolating cases: a fabricated CPIC addendum attached to an otherwise actionable claim, a real guideline-supported claim transported to a mismatched population, and a stale but real guideline used as current evidence.
+Table~\ref{tab:ablation} shows that disabling each gate allows at least one designed overclaim to pass unchanged, so the gates are not merely duplicating endpoint/actionability.
+Removing citation/guideline support allows 2/23 overclaims through unchanged; removing population fit allows 1/23 through; removing endpoint/actionability allows 6/23 through.
+The result supports a necessity chain for the three gates in this synthetic case bank.
+
+PGX19 and PGX24 remain negative results: both are action-level successes but primary-gate mismatches because citation/guideline support fires before the gate that motivated the case design.
+This exposes controller precedence rather than hiding it inside a perfect conformance score.
 
 \section{Evaluation Plan}
 The independent Stage 2 evaluation should compare ungated LLM drafts with gated drafts on independently authored cases.
@@ -132,8 +146,10 @@ Reviewers should be blinded to arm when feasible and classify overclaiming, inap
 The governance value of the gate is transparency.
 The controller is deterministic, auditable, and intentionally non-agentic: each alert can show which evidence feature triggered allow, narrow, abstain, or deny.
 Fairness and bias are central in pharmacogenomics.
-HLA-B*15:02 risk language is ancestry-conditional, founder-variant evidence may not transport to general US populations, and biobank results can misfit underrepresented or recently admixed groups.
+HLA-B*15:02 risk language is ancestry-conditional, founder-variant evidence may not transport to general US populations, and biobank results can misfit underrepresented or recently admixed groups \citep{clinpgxhla,clinvar,gnomad,allofus,genomeindia,psifas}.
+Cases PGX09, PGX10, PGX25, PGX26, and PGX27 treat population fit as an equity constraint.
 PGX24 marks a high-risk boundary: a polygenic score should not be used to deny opioid or stimulant therapy without stronger evidence and governance.
+Stage 1 contains no PHI and makes no diagnosis or treatment recommendation; deployed clinical decision support would still need accountability for extraction, citation verification, thresholds, overrides, and audit logging.
 The key limitation is that results are synthetic and author-designed.
 They show rule conformance, not generalization, and assume structured annotations rather than extracting them from live LLM output or EHR context.
 

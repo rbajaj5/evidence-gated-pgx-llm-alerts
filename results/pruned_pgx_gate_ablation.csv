@@ -1,4 +1,4 @@
 condition,disabled_gate,overclaim_allowed_unchanged_count,designed_overclaim_archetype_blocked_count,bounded_alert_allowed_count,inappropriate_denial_count,action_changed_count,primary_gate_changed_count
-without_citation_guideline_support,citation_guideline_support,0,20,10,0,5,10
-without_population_fit,population_fit,0,20,10,0,4,4
-without_endpoint_actionability,endpoint_actionability,6,14,10,0,6,6
+without_citation_guideline_support,citation_guideline_support,2,21,10,0,7,12
+without_population_fit,population_fit,1,22,10,0,5,5
+without_endpoint_actionability,endpoint_actionability,6,17,10,0,6,6
