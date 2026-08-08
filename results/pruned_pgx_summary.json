@@ -7,21 +7,20 @@
     "Population fit",
     "Citation/guideline support"
   ],
+  "author_designed_overclaim_cases": 20,
+  "author_designed_bounded_alert_cases": 10,
+  "case_mix_boundary": "The 20/10 split is author-designed stress-test coverage, not a measured clinical base rate.",
   "ungated_overclaim_count": 20,
   "ungated_overclaim_rate": 0.6666666666666666,
   "gated_remaining_overclaim_count": 0,
   "gated_remaining_overclaim_rate": 0.0,
-  "absolute_overclaim_reduction": 0.6666666666666666,
-  "true_positive": 20,
-  "false_positive": 0,
-  "true_negative": 10,
-  "false_negative": 0,
-  "sensitivity_overclaim_detection": 1.0,
-  "specificity_aligned_claim_allowance": 1.0,
+  "designed_overclaim_archetype_blocked_count": 20,
+  "designed_overclaim_archetype_blocked_rate": 1.0,
+  "bounded_alert_allowed_count": 10,
+  "bounded_alert_allowed_rate": 1.0,
   "inappropriate_denial_count": 0,
-  "brier_overclaim_risk": 0.11152,
-  "matched_expected_count": 30,
-  "matched_expected_rate": 1.0,
+  "spec_conformance_count": 30,
+  "spec_conformance_rate": 1.0,
   "action_counts": {
     "ALLOW_BOUNDED_ALERT": 10,
     "NARROW_CLAIM": 5,
@@ -39,5 +38,5 @@
   "error_counts": {
     "matched_expected": 30
   },
-  "stage_boundary": "Stage 1 synthetic construct-validity scaffold; independent authored cases and blinded reviewer adjudication remain Stage 2."
+  "stage_boundary": "Stage 1 is specification conformance on author-designed synthetic archetypes; independent safety, accuracy, generalization, and clinical utility remain Stage 2."
 }

@@ -51,8 +51,9 @@ def test_opioid_addiction_claim_is_denied_not_narrowed() -> None:
 
 def test_summary_metrics_are_construct_validity_not_clinical_claims() -> None:
     _, summary = evaluate()
-    assert summary["sensitivity_overclaim_detection"] >= 0.95
-    assert summary["specificity_aligned_claim_allowance"] >= 0.95
+    assert summary["designed_overclaim_archetype_blocked_rate"] >= 0.95
+    assert summary["bounded_alert_allowed_rate"] >= 0.95
     assert summary["inappropriate_denial_count"] == 0
     assert summary["gated_remaining_overclaim_count"] == 0
-    assert "Stage 1 synthetic construct-validity scaffold" in summary["stage_boundary"]
+    assert "Stage 1 is specification conformance" in summary["stage_boundary"]
+    assert "not a measured clinical base rate" in summary["case_mix_boundary"]

@@ -12,7 +12,7 @@ The pruned package removes unrelated exploratory components from the submission-
 - population-fit gate,
 - citation/guideline-support gate,
 - 30 synthetic pharmacogenomic/genomic alert cases,
-- Stage 1 construct-validity metrics,
+- Stage 1 specification-conformance counts,
 - a Stage 2 plan for independently authored cases and blinded reviewer adjudication.
 
 ## Main outputs
@@ -32,4 +32,4 @@ outputs/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj.zip
 0 inappropriate denials
 ```
 
-These are synthetic implementation-consistency and construct-validity results. They do not establish clinical safety or patient benefit.
+These are synthetic specification-conformance results on author-designed archetypes. They do not establish clinical safety or patient benefit, and the 20/10 case split is not a measured clinical base rate.

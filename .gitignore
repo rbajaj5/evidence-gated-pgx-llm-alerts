@@ -1,5 +1,8 @@
 __pycache__/
 .pytest_cache/
+_audit_text/
+_pdf_qa/
+_rendered/
 code/results/
 *.pyc
 *.pyo

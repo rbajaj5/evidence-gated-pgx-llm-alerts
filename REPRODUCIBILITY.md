@@ -1,13 +1,12 @@
 # Reproducibility
 
-This repository now has a pruned submission-facing path and a legacy exploratory path. The active capstone package is built from:
+This repository is the standalone pruned submission-facing package. The active executable artifact is:
 
 ```text
-work/pruned_evidence_gate/
-work/build_pruned_evidence_gate_package.py
+code/pruned_evidence_gate.py
 ```
 
-The earlier broad harness under `work/evidence_gated_llm_capstone/` is retained for provenance, but it is not the active reviewer-facing project.
+The repository intentionally excludes the earlier exploratory components that made the prior capstone package too broad.
 
 ## Environment
 
@@ -15,9 +14,9 @@ Tested locally with Python 3.13 on Windows.
 
 ```powershell
 py -3.13 -m pip install -r requirements.txt
-$env:PYTHONPATH=(Resolve-Path 'work\pruned_evidence_gate').Path
-py -3.13 'work\pruned_evidence_gate\pruned_evidence_gate.py'
-py -3.13 -m pytest 'work\pruned_evidence_gate' -q
+$env:PYTHONPATH=(Resolve-Path 'code').Path
+py -3.13 'code\pruned_evidence_gate.py'
+py -3.13 -m pytest 'code' -q
 ```
 
 Expected focused-test result:
@@ -26,33 +25,25 @@ Expected focused-test result:
 6 passed
 ```
 
-Expected Stage 1 metric snapshot:
+Expected Stage 1 conformance snapshot:
 
 ```text
 case_count: 30
 workflow: pharmacogenomic/genomic medication-alert text
-ungated_overclaim_count: 20
+author_designed_overclaim_cases: 20
+author_designed_bounded_alert_cases: 10
+case_mix_boundary: The 20/10 split is author-designed stress-test coverage, not a measured clinical base rate.
 gated_remaining_overclaim_count: 0
-sensitivity_overclaim_detection: 1.0
-specificity_aligned_claim_allowance: 1.0
+designed_overclaim_archetype_blocked_rate: 1.0
+bounded_alert_allowed_rate: 1.0
 inappropriate_denial_count: 0
+spec_conformance_count: 30
 ```
 
-## Build the Package
+## Package Contents
 
-```powershell
-py -3.13 'work\build_pruned_evidence_gate_package.py'
-```
-
-This writes:
-
-```text
-outputs/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj/
-outputs/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj.zip
-```
-
-The package includes DOCX and PDF versions of the proposal, paper draft, summary sheet, and technical supplement; the synthetic case bank; CSV/JSON results; figures; and a SHA256 manifest.
+The `package/` directory contains the submission ZIP. The unzipped repository also exposes the same main materials directly: DOCX and PDF versions of the proposal, progress report, paper draft, summary sheet, and technical supplement; the synthetic case bank; CSV/JSON results; figures; and a SHA256 manifest.
 
 ## Scope Boundary
 
-The active experiment is a construct-validity scaffold. It tests whether a deterministic three-gate controller follows an intended evidence grammar on author-designed synthetic cases. It does not prove independent safety, clinical accuracy, generalization, or patient benefit.
+The active experiment is a specification-conformance scaffold. It tests whether a deterministic three-gate controller follows an intended evidence grammar on author-designed synthetic archetypes. It does not prove independent safety, clinical accuracy, generalization, or patient benefit.

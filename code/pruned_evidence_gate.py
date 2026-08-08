@@ -12,12 +12,11 @@ import csv
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from statistics import mean
 
 
-ROOT = Path(__file__).resolve().parent
-RESULTS = ROOT / "results"
-FIGURES = ROOT / "figures"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+RESULTS = PROJECT_ROOT / "results"
+FIGURES = PROJECT_ROOT / "figures"
 
 
 GATE_LABELS = {
@@ -598,11 +597,11 @@ def evaluate(cases: tuple[AlertCase, ...] = CASES) -> tuple[list[GateResult], di
     results = [gate_case(case) for case in cases]
     gt = [case.ground_truth_overclaim for case in cases]
     pred = [r.detects_overclaim for r in results]
-    tp = sum(g and p for g, p in zip(gt, pred))
-    fp = sum((not g) and p for g, p in zip(gt, pred))
-    tn = sum((not g) and (not p) for g, p in zip(gt, pred))
-    fn = sum(g and (not p) for g, p in zip(gt, pred))
-    brier = mean((r.risk_score - float(g)) ** 2 for r, g in zip(results, gt))
+    designed_overclaim_count = sum(gt)
+    designed_bounded_count = len(cases) - designed_overclaim_count
+    overclaim_blocked_count = sum(g and p for g, p in zip(gt, pred))
+    bounded_allowed_count = sum((not g) and (not p) for g, p in zip(gt, pred))
+    spec_conformance_count = sum(r.actual_action == r.expected_action for r in results)
     action_counts: dict[str, int] = {}
     gate_counts: dict[str, int] = {}
     error_counts: dict[str, int] = {}
@@ -616,27 +615,26 @@ def evaluate(cases: tuple[AlertCase, ...] = CASES) -> tuple[list[GateResult], di
         "workflow": "pharmacogenomic/genomic medication-alert text",
         "gate_count": 3,
         "gates": list(GATE_LABELS.values()),
-        "ungated_overclaim_count": sum(gt),
-        "ungated_overclaim_rate": sum(gt) / len(cases),
+        "author_designed_overclaim_cases": designed_overclaim_count,
+        "author_designed_bounded_alert_cases": designed_bounded_count,
+        "case_mix_boundary": "The 20/10 split is author-designed stress-test coverage, not a measured clinical base rate.",
+        "ungated_overclaim_count": designed_overclaim_count,
+        "ungated_overclaim_rate": designed_overclaim_count / len(cases),
         "gated_remaining_overclaim_count": sum(r.gated_remaining_overclaim for r in results),
         "gated_remaining_overclaim_rate": sum(r.gated_remaining_overclaim for r in results) / len(cases),
-        "absolute_overclaim_reduction": (sum(gt) - sum(r.gated_remaining_overclaim for r in results)) / len(cases),
-        "true_positive": tp,
-        "false_positive": fp,
-        "true_negative": tn,
-        "false_negative": fn,
-        "sensitivity_overclaim_detection": tp / (tp + fn) if (tp + fn) else 0.0,
-        "specificity_aligned_claim_allowance": tn / (tn + fp) if (tn + fp) else 0.0,
+        "designed_overclaim_archetype_blocked_count": overclaim_blocked_count,
+        "designed_overclaim_archetype_blocked_rate": overclaim_blocked_count / designed_overclaim_count if designed_overclaim_count else 0.0,
+        "bounded_alert_allowed_count": bounded_allowed_count,
+        "bounded_alert_allowed_rate": bounded_allowed_count / designed_bounded_count if designed_bounded_count else 0.0,
         "inappropriate_denial_count": sum(r.inappropriate_denial for r in results),
-        "brier_overclaim_risk": brier,
-        "matched_expected_count": sum(r.actual_action == r.expected_action for r in results),
-        "matched_expected_rate": sum(r.actual_action == r.expected_action for r in results) / len(results),
+        "spec_conformance_count": spec_conformance_count,
+        "spec_conformance_rate": spec_conformance_count / len(results),
         "action_counts": action_counts,
         "primary_gate_counts": gate_counts,
         "error_counts": error_counts,
         "stage_boundary": (
-            "Stage 1 synthetic construct-validity scaffold; independent authored cases "
-            "and blinded reviewer adjudication remain Stage 2."
+            "Stage 1 is specification conformance on author-designed synthetic archetypes; "
+            "independent safety, accuracy, generalization, and clinical utility remain Stage 2."
         ),
     }
     return results, summary

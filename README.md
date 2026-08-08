@@ -20,16 +20,17 @@ LLM-drafted pharmacogenomic or genomic medication-alert text.
 2. Population fit.
 3. Citation/guideline support.
 
-## Stage 1 result
+## Stage 1 conformance snapshot
 
 - Synthetic cases: 30
-- Ungated overclaim rate: 0.67
+- Author-designed overclaim archetypes: 20
+- Author-designed bounded alerts: 10
 - Gated remaining overclaim rate: 0.00
-- Sensitivity: 1.00
-- Specificity: 1.00
+- Designed overclaim archetypes blocked: 20/20
+- Bounded alerts allowed: 10/10
 - Inappropriate denial count: 0
 
-These are construct-validity results on author-designed synthetic cases. They do not prove clinical safety, accuracy, generalization, or patient benefit.
+These are specification-conformance counts on author-designed synthetic archetypes. The 20/10 case split is a stress-test design choice, not a measured clinical base rate. These results do not prove clinical safety, accuracy, generalization, or patient benefit.
 
 ## Stage 2 plan
 
@@ -45,6 +46,21 @@ Compare ungated and gated LLM alert drafts on independently authored cases with 
 - `code/`: pruned evaluator and tests only.
 - `results/`: CSV and JSON outputs.
 - `figures/`: three submission-facing figures.
+
+## Direct Files for Review
+
+Use these links if an automated reader can see this README but cannot enumerate the GitHub file tree.
+
+- Final paper: [PDF](paper/Module_14_Final_Paper_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](paper/Module_14_Final_Paper_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
+- Summary sheet: [PDF](summary/Module_14_Summary_Sheet_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](summary/Module_14_Summary_Sheet_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
+- Research proposal: [PDF](proposal/Module_14_Capstone_Proposal_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](proposal/Module_14_Capstone_Proposal_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
+- Outline and progress: [PDF](progress/Module_14_Capstone_Outline_Progress_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](progress/Module_14_Capstone_Outline_Progress_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
+- Technical supplement: [PDF](supplement/Module_14_Technical_Supplement_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](supplement/Module_14_Technical_Supplement_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
+- Complete submission ZIP: [Module 14 capstone package](package/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj.zip)
+- Executable evaluator: [code/pruned_evidence_gate.py](code/pruned_evidence_gate.py)
+- Unit tests: [code/test_pruned_evidence_gate.py](code/test_pruned_evidence_gate.py)
+- Summary results: [results/pruned_pgx_summary.json](results/pruned_pgx_summary.json)
+- Case bank: [results/pruned_pgx_casebook.csv](results/pruned_pgx_casebook.csv)
 
 ## Rubric map
 
