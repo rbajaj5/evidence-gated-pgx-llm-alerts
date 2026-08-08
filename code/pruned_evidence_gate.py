@@ -48,7 +48,7 @@ class AlertCase:
     actionability_level: str
     population_fit: str
     citation_support: str
-    guideline_anchor: str
+    guideline_anchor: str | dict[str, str]
     expected_action: str
     ground_truth_overclaim: bool
     expected_check: str
@@ -561,7 +561,13 @@ CASES: tuple[AlertCase, ...] = (
         "actionable",
         "target_fit",
         "unverifiable",
-        "Fabricated CPIC addendum",
+        {
+            "source_name": "CPIC Guideline Addendum for CYP2C19 Genotype and Clopidogrel Therapy: 2026 Update",
+            # % TODO verify: fabricated-source stress test; no source-specific URL is present in ml4h_findings_refs.bib.
+            "source_url_or_doi": "N/A",
+            "quoted_claim": "The drafted alert cites a CPIC 2026 addendum requiring prasugrel for a CYP2C19 genotype.",
+            "annotation_note": "Author annotation: no independently verifiable source is supplied for the claimed addendum.",
+        },
         "DENY_UNVERIFIABLE_SOURCE",
         True,
         "source_support",
@@ -576,7 +582,12 @@ CASES: tuple[AlertCase, ...] = (
         "actionable",
         "population_mismatch",
         "verified_guideline",
-        "CPIC 2017 DPYD-fluoropyrimidines with source-target mismatch",
+        {
+            "source_name": "CPIC Guideline for DPYD Genotype and Fluoropyrimidine Dosing: 2017 Update",
+            "source_url_or_doi": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5760397/",
+            "quoted_claim": "DPYD genotype test results can be used to guide dosing of fluoropyrimidines such as 5-fluorouracil and capecitabine.",
+            "annotation_note": "Author annotation: the source supports bounded DPYD dosing review; the case tests source-target population transport.",
+        },
         "ABSTAIN_POPULATION_FIT",
         True,
         "population_fit",
@@ -591,7 +602,12 @@ CASES: tuple[AlertCase, ...] = (
         "actionable",
         "target_fit",
         "outdated_or_context_shifted",
-        "Older IFNL3 interferon-era response literature",
+        {
+            "source_name": "ClinPGx Guideline for IFNL3 and Peginterferon-alpha-based Regimens",
+            "source_url_or_doi": "https://www.clinpgx.org/guideline/PA166251455",
+            "quoted_claim": "The guideline concerns IFNL3 and peginterferon-alpha-based regimens for hepatitis C and is listed as retired.",
+            "annotation_note": "Author annotation: the source is real but stale/context-shifted for modern hepatitis C medication selection.",
+        },
         "ABSTAIN_SOURCE_SUPPORT",
         True,
         "source_support",
@@ -855,6 +871,7 @@ def evaluate(cases: tuple[AlertCase, ...] = CASES) -> tuple[list[CheckResult], d
         "author_designed_overclaim_cases": designed_overclaim_count,
         "author_designed_bounded_alert_cases": designed_bounded_count,
         "case_mix_boundary": "The 23/10 split is author-designed stress-test coverage, not a measured clinical base rate.",
+        "structured_citation_case_ids": ["PGX31", "PGX32", "PGX33"],
         "ungated_overclaim_count": designed_overclaim_count,
         "ungated_overclaim_rate": designed_overclaim_count / len(cases),
         "overclaim_allowed_unchanged_count": sum(r.overclaim_allowed_unchanged for r in results),

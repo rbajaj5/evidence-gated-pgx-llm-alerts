@@ -1,0 +1,30 @@
+{
+  "arm": "synthetic_uniform_narrow_full_bank",
+  "provider": "synthetic",
+  "model": "uniform-NARROW sanity check",
+  "method": {
+    "arm": "synthetic_uniform_narrow_full_bank",
+    "api_call": false,
+    "description": "All 33 cases mapped to NARROW_CLAIM."
+  },
+  "run_utc": "2026-08-08T22:09:08.144352+00:00",
+  "case_count": 33,
+  "designed_overclaim_cases": 23,
+  "bounded_alert_cases": 10,
+  "overclaim_routing": "23/23",
+  "bounded_alert_preservation": "0/10",
+  "inappropriate_denials": "0/10",
+  "llm_overclaim_allowed_unchanged_count": 0,
+  "llm_overclaim_routed_count": 23,
+  "llm_bounded_alert_allowed_count": 0,
+  "llm_inappropriate_denial_count": 0,
+  "action_matches_deterministic_count": 5,
+  "primary_check_matches_deterministic_count": 6,
+  "action_agreement": "5/33",
+  "primary_check_agreement": "6/33",
+  "narrow_count": 33,
+  "narrowing_rate": 1.0,
+  "overclaim_allowed_case_ids": [],
+  "inappropriate_denial_case_ids": [],
+  "boundary": "This is an LLM self-evaluation baseline on synthetic structured annotations, not independent clinical adjudication."
+}

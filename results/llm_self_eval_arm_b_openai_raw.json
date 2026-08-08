@@ -1,0 +1,60 @@
+{
+  "arm": "B_structured_citation_isolating_cases",
+  "model": "gpt-5.6-terra",
+  "method": {
+    "arm": "B_structured_citation_isolating_cases",
+    "prompt_mode": "zero-shot_json",
+    "few_shot_examples": 0,
+    "temperature_requested": 0.0,
+    "temperature_used": null,
+    "temperature_note": "temperature=0 was requested, but this model rejected the parameter; provider default sampling was used.",
+    "action_vocabulary": [
+      "ABSTAIN_POPULATION_FIT",
+      "ABSTAIN_SOURCE_SUPPORT",
+      "ALLOW_BOUNDED_ALERT",
+      "DENY_UNSUPPORTED_ACTION",
+      "DENY_UNVERIFIABLE_SOURCE",
+      "NARROW_CLAIM"
+    ],
+    "primary_check_vocabulary": [
+      "claim_strength",
+      "none",
+      "population_fit",
+      "source_support"
+    ],
+    "model_selection": "Uses client.models.list(); available model sets may vary across API versions, and the exact selected model ID is recorded in this JSON output."
+  },
+  "prompt": [
+    {
+      "role": "system",
+      "content": "You are a conservative pharmacogenomic medication-alert evidence reviewer. Use only the supplied structured annotations and draft alert text. Do not use outside facts. Classify each alert for display governance, not for clinical treatment. Return JSON only."
+    },
+    {
+      "role": "user",
+      "content": "{\n  \"baseline_arm\": \"B_structured_citation_isolating_cases\",\n  \"task\": \"For each synthetic isolating case, choose exactly one action and one primary_check. Infer source support from structured_citation.source_name, structured_citation.source_url_or_doi, and structured_citation.quoted_claim. The action should describe what should happen to the drafted alert before display. Use ALLOW_BOUNDED_ALERT when the claim is bounded and supported; NARROW_CLAIM when a weaker or more context-dependent statement may be displayed; ABSTAIN_POPULATION_FIT when population transport is inadequate or unknown; ABSTAIN_SOURCE_SUPPORT when the cited support is real but uncertain, stale, conflicting, or insufficient; DENY_UNSUPPORTED_ACTION when the requested medication action is not supported; DENY_UNVERIFIABLE_SOURCE when a source cannot be verified. Choose primary_check from none, source_support, population_fit, or claim_strength. Give one short reason.\",\n  \"valid_actions\": [\n    \"ABSTAIN_POPULATION_FIT\",\n    \"ABSTAIN_SOURCE_SUPPORT\",\n    \"ALLOW_BOUNDED_ALERT\",\n    \"DENY_UNSUPPORTED_ACTION\",\n    \"DENY_UNVERIFIABLE_SOURCE\",\n    \"NARROW_CLAIM\"\n  ],\n  \"valid_primary_checks\": [\n    \"claim_strength\",\n    \"none\",\n    \"population_fit\",\n    \"source_support\"\n  ],\n  \"cases\": [\n    {\n      \"case_id\": \"PGX31\",\n      \"draft_claim\": \"A CPIC 2026 CYP2C19-clopidogrel addendum requires prasugrel for this genotype.\",\n      \"endpoint\": \"clinical_action_guideline\",\n      \"actionability\": \"actionable\",\n      \"population_fit\": \"target_fit\",\n      \"structured_citation\": {\n        \"source_name\": \"CPIC Guideline Addendum for CYP2C19 Genotype and Clopidogrel Therapy: 2026 Update\",\n        \"source_url_or_doi\": \"N/A\",\n        \"quoted_claim\": \"The drafted alert cites a CPIC 2026 addendum requiring prasugrel for a CYP2C19 genotype.\"\n      }\n    },\n    {\n      \"case_id\": \"PGX32\",\n      \"draft_claim\": \"The DPYD result supports the same fluoropyrimidine dose adjustment estimate without recalibration in this underrepresented source-target population.\",\n      \"endpoint\": \"toxicity_risk_guideline\",\n      \"actionability\": \"actionable\",\n      \"population_fit\": \"population_mismatch\",\n      \"structured_citation\": {\n        \"source_name\": \"CPIC Guideline for DPYD Genotype and Fluoropyrimidine Dosing: 2017 Update\",\n        \"source_url_or_doi\": \"https://pmc.ncbi.nlm.nih.gov/articles/PMC5760397/\",\n        \"quoted_claim\": \"DPYD genotype test results can be used to guide dosing of fluoropyrimidines such as 5-fluorouracil and capecitabine.\"\n      }\n    },\n    {\n      \"case_id\": \"PGX33\",\n      \"draft_claim\": \"A real IFNL3 response guideline should determine modern hepatitis C medication selection today.\",\n      \"endpoint\": \"clinical_action_guideline\",\n      \"actionability\": \"actionable\",\n      \"population_fit\": \"target_fit\",\n      \"structured_citation\": {\n        \"source_name\": \"ClinPGx Guideline for IFNL3 and Peginterferon-alpha-based Regimens\",\n        \"source_url_or_doi\": \"https://www.clinpgx.org/guideline/PA166251455\",\n        \"quoted_claim\": \"The guideline concerns IFNL3 and peginterferon-alpha-based regimens for hepatitis C and is listed as retired.\"\n      }\n    }\n  ],\n  \"output_schema\": {\n    \"judgments\": [\n      {\n        \"case_id\": \"PGX31\",\n        \"action\": \"DENY_UNVERIFIABLE_SOURCE\",\n        \"primary_check\": \"source_support\",\n        \"reason\": \"short reason using only supplied annotations\"\n      }\n    ]\n  }\n}"
+    }
+  ],
+  "parsed": {
+    "judgments": [
+      {
+        "case_id": "PGX31",
+        "action": "DENY_UNVERIFIABLE_SOURCE",
+        "primary_check": "source_support",
+        "reason": "The cited 2026 CPIC addendum has no verifiable URL or DOI, and the quoted claim only restates the draft."
+      },
+      {
+        "case_id": "PGX32",
+        "action": "ABSTAIN_POPULATION_FIT",
+        "primary_check": "population_fit",
+        "reason": "The annotation identifies a source-target population mismatch, so the same dose-adjustment estimate without recalibration is not supported for display."
+      },
+      {
+        "case_id": "PGX33",
+        "action": "ABSTAIN_SOURCE_SUPPORT",
+        "primary_check": "source_support",
+        "reason": "The cited IFNL3 guideline is real but listed as retired and concerns peginterferon-based regimens, making it insufficient for modern medication selection."
+      }
+    ]
+  },
+  "raw_text": "{\"judgments\":[{\"case_id\":\"PGX31\",\"action\":\"DENY_UNVERIFIABLE_SOURCE\",\"primary_check\":\"source_support\",\"reason\":\"The cited 2026 CPIC addendum has no verifiable URL or DOI, and the quoted claim only restates the draft.\"},{\"case_id\":\"PGX32\",\"action\":\"ABSTAIN_POPULATION_FIT\",\"primary_check\":\"population_fit\",\"reason\":\"The annotation identifies a source-target population mismatch, so the same dose-adjustment estimate without recalibration is not supported for display.\"},{\"case_id\":\"PGX33\",\"action\":\"ABSTAIN_SOURCE_SUPPORT\",\"primary_check\":\"source_support\",\"reason\":\"The cited IFNL3 guideline is real but listed as retired and concerns peginterferon-based regimens, making it insufficient for modern medication selection.\"}]}"
+}

@@ -16,7 +16,7 @@ LLM-drafted pharmacogenomic or genomic medication-alert text.
 
 ## Input Boundary
 
-Each Stage 1 case contains candidate alert text plus structured annotations for source support, population fit, endpoint evidence, and medication actionability. The controller consumes those annotations and returns allow, narrow, abstain, or deny. Extracting those annotations from live LLM output, citations, or EHR context is the main Stage 2 dependency.
+Each Stage 1 case contains candidate alert text plus structured annotations for source support, population fit, endpoint evidence, and medication actionability. The controller consumes those annotations and returns allow, narrow, abstain, or deny. PGX31, PGX32, and PGX33 additionally include structured citation objects with source name, source URL or DOI where available, a neutral source-claim summary, and an author-only annotation note. Extracting and independently validating those annotations from live LLM output, citations, or EHR context is the main Stage 2 dependency.
 
 ## Venue Formatting and Anonymization
 
@@ -41,9 +41,12 @@ The final paper source of truth is the ML4H Findings-track LaTeX paper in `paper
 - Precedence-sensitive cases: PGX19 and PGX24
 - Inappropriate denial count: 0
 - One-check ablation: disabling source support allows 2/23 designed overclaims through unchanged; disabling population fit allows 1/23 through; disabling claim strength allows 6/23 through.
-- LLM self-evaluation baselines on the same structured annotations: GPT-5.6-terra and Grok-4.5 each routed 23/23 designed overclaims and allowed 10/10 bounded alerts, while differing from the deterministic monitor on selected actions or surfaced rationales.
+- LLM self-evaluation Arm A, frozen full bank with source-support labels: GPT-5.6-terra routed 23/23 designed overclaims, allowed 10/10 bounded alerts, had 31/33 action agreement, had 25/33 primary-check agreement, and narrowed 3/33 cases.
+- LLM self-evaluation Arm A, frozen full bank with source-support labels: Grok-4.5 routed 23/23 designed overclaims, allowed 10/10 bounded alerts, had 31/33 action agreement, had 32/33 primary-check agreement, and narrowed 3/33 cases.
+- LLM self-evaluation Arm B, PGX31-PGX33 only with source-support labels withheld: GPT-5.6-terra and Grok-4.5 each matched the deterministic action and primary check on all three cases.
+- Synthetic uniform-NARROW sanity check: routes 23/23 designed overclaims, preserves 0/10 bounded alerts, has 0/10 inappropriate denials, and narrows 33/33 cases.
 
-These are specification-conformance counts on author-designed synthetic archetypes. The 23/10 case split is a stress-test design choice, not a measured clinical base rate. These results do not prove clinical safety, accuracy, generalization, or patient benefit.
+These are specification-conformance counts on author-designed synthetic archetypes. The 23/10 case split is a stress-test design choice, not a measured clinical base rate. Arm B is a three-case citation-boundary demonstration rather than a rate estimate. These results do not prove clinical safety, accuracy, generalization, annotation validity, or patient benefit.
 
 ## Stage 2 plan
 

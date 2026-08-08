@@ -24,7 +24,7 @@ py -3.13 'code\build_submission_package.py'
 Expected focused-test result:
 
 ```text
-11 passed
+13 passed
 ```
 
 Expected Stage 1 conformance snapshot:
@@ -48,11 +48,22 @@ check_ablation:
   without_claim_strength: 6 overclaims allowed unchanged; 6 action changes; 6 primary-check changes
 ```
 
-Expected optional LLM self-evaluation baseline snapshot, if `OPENAI_API_KEY` and the local xAI key file or `XAI_API_KEY` are available:
+Expected optional LLM self-evaluation snapshot, if `OPENAI_API_KEY` and `XAI_API_KEY` are available:
 
 ```text
-OpenAI gpt-5.6-terra: 23/23 designed overclaims routed, 10/10 bounded alerts allowed, 31/33 action matches, 25/33 primary-check matches.
-xAI grok-4.5: 23/23 designed overclaims routed, 10/10 bounded alerts allowed, 31/33 action matches, 32/33 primary-check matches.
+Arm A, OpenAI gpt-5.6-terra, full bank with source-support labels:
+  23/23 designed overclaims routed, 10/10 bounded alerts preserved, 0/10 inappropriate denials,
+  31/33 action matches, 25/33 primary-check matches, 3/33 narrowed.
+Arm A, xAI grok-4.5, full bank with source-support labels:
+  23/23 designed overclaims routed, 10/10 bounded alerts preserved, 0/10 inappropriate denials,
+  31/33 action matches, 32/33 primary-check matches, 3/33 narrowed.
+Arm B, OpenAI gpt-5.6-terra, PGX31-PGX33 structured citations with source-support label withheld:
+  action and primary-check match for PGX31, PGX32, and PGX33.
+Arm B, xAI grok-4.5, PGX31-PGX33 structured citations with source-support label withheld:
+  action and primary-check match for PGX31, PGX32, and PGX33.
+Synthetic uniform-NARROW sanity check:
+  23/23 designed overclaims routed, 0/10 bounded alerts preserved, 0/10 inappropriate denials,
+  5/33 action matches, 6/33 primary-check matches, 33/33 narrowed.
 ```
 
 ## Package Contents
@@ -65,4 +76,4 @@ The manifest is generated from the repository-facing file set only by `code/buil
 
 ## Scope Boundary
 
-The active deterministic experiment is a specification-conformance scaffold. It tests whether a three-check controller follows an intended evidence grammar on author-designed synthetic archetypes. Stage 1 consumes structured evidence annotations only; it does not parse free text, verify citations, or extract population-fit features. The optional LLM self-evaluation baseline sends those same synthetic annotations to frontier models as a comparator. Neither experiment proves independent safety, clinical accuracy, generalization, or patient benefit.
+The active deterministic experiment is a specification-conformance scaffold. It tests whether a three-check controller follows an intended evidence grammar on author-designed synthetic archetypes. Stage 1 consumes structured evidence annotations only; it does not parse free text, verify citations, independently validate the annotation layer, or extract population-fit features. Arm A sends the full structured labels to frontier models as a label-to-action comparator. Arm B withholds the source-support label for PGX31-PGX33 and supplies structured citations instead. Neither experiment proves independent safety, clinical accuracy, generalization, annotation validity, or patient benefit.

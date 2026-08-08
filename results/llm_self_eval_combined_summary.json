@@ -1,51 +1,240 @@
 {
-  "run_utc": "2026-08-08T20:41:51.498612+00:00",
-  "baseline_count": 2,
-  "baselines": [
+  "run_utc": "2026-08-08T22:09:08.144707+00:00",
+  "baseline_row_count": 5,
+  "arm_a_full_bank": [
     {
+      "arm": "A_source_label_full_bank",
       "provider": "openai",
       "model": "gpt-5.6-terra",
+      "method": {
+        "arm": "A_source_label_full_bank",
+        "prompt_mode": "zero-shot_json",
+        "few_shot_examples": 0,
+        "input_boundary": "Frozen prior run included source-support labels and legacy anchors.",
+        "source": "C:/Users/anaxe/Documents/Codex/evidence-gated-pgx-llm-alerts/results/llm_self_eval_openai_summary.json"
+      },
       "run_utc": "2026-08-08T20:40:50.602982+00:00",
       "case_count": 33,
       "designed_overclaim_cases": 23,
       "bounded_alert_cases": 10,
+      "overclaim_routing": "23/23",
+      "bounded_alert_preservation": "10/10",
+      "inappropriate_denials": "0/10",
       "llm_overclaim_allowed_unchanged_count": 0,
       "llm_overclaim_routed_count": 23,
       "llm_bounded_alert_allowed_count": 10,
       "llm_inappropriate_denial_count": 0,
       "action_matches_deterministic_count": 31,
       "primary_check_matches_deterministic_count": 25,
-      "action_matches_expected_count": 31,
-      "primary_check_matches_expected_count": 26,
-      "transport_overclaim_allowed_unchanged_count": 0,
-      "source_overclaim_allowed_unchanged_count": 0,
-      "claim_overclaim_allowed_unchanged_count": 0,
+      "action_agreement": "31/33",
+      "primary_check_agreement": "25/33",
+      "narrow_count": 3,
+      "narrowing_rate": 0.09090909090909091,
       "overclaim_allowed_case_ids": [],
       "inappropriate_denial_case_ids": [],
       "boundary": "This is an LLM self-evaluation baseline on synthetic structured annotations, not independent clinical adjudication."
     },
     {
+      "arm": "A_source_label_full_bank",
       "provider": "xai",
       "model": "grok-4.5",
+      "method": {
+        "arm": "A_source_label_full_bank",
+        "prompt_mode": "zero-shot_json",
+        "few_shot_examples": 0,
+        "input_boundary": "Frozen prior run included source-support labels and legacy anchors.",
+        "source": "C:/Users/anaxe/Documents/Codex/evidence-gated-pgx-llm-alerts/results/llm_self_eval_xai_summary.json"
+      },
       "run_utc": "2026-08-08T20:41:51.496720+00:00",
       "case_count": 33,
       "designed_overclaim_cases": 23,
       "bounded_alert_cases": 10,
+      "overclaim_routing": "23/23",
+      "bounded_alert_preservation": "10/10",
+      "inappropriate_denials": "0/10",
       "llm_overclaim_allowed_unchanged_count": 0,
       "llm_overclaim_routed_count": 23,
       "llm_bounded_alert_allowed_count": 10,
       "llm_inappropriate_denial_count": 0,
       "action_matches_deterministic_count": 31,
       "primary_check_matches_deterministic_count": 32,
-      "action_matches_expected_count": 31,
-      "primary_check_matches_expected_count": 30,
-      "transport_overclaim_allowed_unchanged_count": 0,
-      "source_overclaim_allowed_unchanged_count": 0,
-      "claim_overclaim_allowed_unchanged_count": 0,
+      "action_agreement": "31/33",
+      "primary_check_agreement": "32/33",
+      "narrow_count": 3,
+      "narrowing_rate": 0.09090909090909091,
       "overclaim_allowed_case_ids": [],
       "inappropriate_denial_case_ids": [],
       "boundary": "This is an LLM self-evaluation baseline on synthetic structured annotations, not independent clinical adjudication."
     }
   ],
-  "boundary": "LLM baselines are self-evaluation runs over synthetic structured annotations; they are not blinded clinical adjudication."
+  "arm_b_isolating_cases": [
+    {
+      "arm": "B_structured_citation_isolating_cases",
+      "provider": "openai",
+      "model": "gpt-5.6-terra",
+      "method": {
+        "arm": "B_structured_citation_isolating_cases",
+        "prompt_mode": "zero-shot_json",
+        "few_shot_examples": 0,
+        "temperature_requested": 0.0,
+        "temperature_used": null,
+        "temperature_note": "temperature=0 was requested, but this model rejected the parameter; provider default sampling was used.",
+        "action_vocabulary": [
+          "ABSTAIN_POPULATION_FIT",
+          "ABSTAIN_SOURCE_SUPPORT",
+          "ALLOW_BOUNDED_ALERT",
+          "DENY_UNSUPPORTED_ACTION",
+          "DENY_UNVERIFIABLE_SOURCE",
+          "NARROW_CLAIM"
+        ],
+        "primary_check_vocabulary": [
+          "claim_strength",
+          "none",
+          "population_fit",
+          "source_support"
+        ],
+        "model_selection": "Uses client.models.list(); available model sets may vary across API versions, and the exact selected model ID is recorded in this JSON output."
+      },
+      "run_utc": "2026-08-08T22:08:52.010155+00:00",
+      "case_count": 3,
+      "case_ids": [
+        "PGX31",
+        "PGX32",
+        "PGX33"
+      ],
+      "per_case_results": [
+        {
+          "case_id": "PGX31",
+          "deterministic_action": "DENY_UNVERIFIABLE_SOURCE",
+          "llm_action": "DENY_UNVERIFIABLE_SOURCE",
+          "action_match": true,
+          "deterministic_primary_check": "source_support",
+          "llm_primary_check": "source_support",
+          "primary_check_match": true,
+          "llm_reason": "The cited 2026 CPIC addendum has no verifiable URL or DOI, and the quoted claim only restates the draft."
+        },
+        {
+          "case_id": "PGX32",
+          "deterministic_action": "ABSTAIN_POPULATION_FIT",
+          "llm_action": "ABSTAIN_POPULATION_FIT",
+          "action_match": true,
+          "deterministic_primary_check": "population_fit",
+          "llm_primary_check": "population_fit",
+          "primary_check_match": true,
+          "llm_reason": "The annotation identifies a source-target population mismatch, so the same dose-adjustment estimate without recalibration is not supported for display."
+        },
+        {
+          "case_id": "PGX33",
+          "deterministic_action": "ABSTAIN_SOURCE_SUPPORT",
+          "llm_action": "ABSTAIN_SOURCE_SUPPORT",
+          "action_match": true,
+          "deterministic_primary_check": "source_support",
+          "llm_primary_check": "source_support",
+          "primary_check_match": true,
+          "llm_reason": "The cited IFNL3 guideline is real but listed as retired and concerns peginterferon-based regimens, making it insufficient for modern medication selection."
+        }
+      ],
+      "boundary": "Arm B is scoped to the three isolating cases only; per-case agreement is reported instead of rates over n=3."
+    },
+    {
+      "arm": "B_structured_citation_isolating_cases",
+      "provider": "xai",
+      "model": "grok-4.5",
+      "method": {
+        "arm": "B_structured_citation_isolating_cases",
+        "prompt_mode": "zero-shot_json",
+        "few_shot_examples": 0,
+        "temperature_requested": 0.0,
+        "temperature_used": 0.0,
+        "temperature_note": "temperature=0 accepted by provider API.",
+        "action_vocabulary": [
+          "ABSTAIN_POPULATION_FIT",
+          "ABSTAIN_SOURCE_SUPPORT",
+          "ALLOW_BOUNDED_ALERT",
+          "DENY_UNSUPPORTED_ACTION",
+          "DENY_UNVERIFIABLE_SOURCE",
+          "NARROW_CLAIM"
+        ],
+        "primary_check_vocabulary": [
+          "claim_strength",
+          "none",
+          "population_fit",
+          "source_support"
+        ],
+        "model_selection": "Uses client.models.list(); available model sets may vary across API versions, and the exact selected model ID is recorded in this JSON output."
+      },
+      "run_utc": "2026-08-08T22:09:08.141969+00:00",
+      "case_count": 3,
+      "case_ids": [
+        "PGX31",
+        "PGX32",
+        "PGX33"
+      ],
+      "per_case_results": [
+        {
+          "case_id": "PGX31",
+          "deterministic_action": "DENY_UNVERIFIABLE_SOURCE",
+          "llm_action": "DENY_UNVERIFIABLE_SOURCE",
+          "action_match": true,
+          "deterministic_primary_check": "source_support",
+          "llm_primary_check": "source_support",
+          "primary_check_match": true,
+          "llm_reason": "Source URL is N/A and the 2026 addendum citation cannot be verified from supplied annotations."
+        },
+        {
+          "case_id": "PGX32",
+          "deterministic_action": "ABSTAIN_POPULATION_FIT",
+          "llm_action": "ABSTAIN_POPULATION_FIT",
+          "action_match": true,
+          "deterministic_primary_check": "population_fit",
+          "llm_primary_check": "population_fit",
+          "primary_check_match": true,
+          "llm_reason": "Annotations mark population_mismatch for underrepresented source-target transfer without recalibration."
+        },
+        {
+          "case_id": "PGX33",
+          "deterministic_action": "ABSTAIN_SOURCE_SUPPORT",
+          "llm_action": "ABSTAIN_SOURCE_SUPPORT",
+          "action_match": true,
+          "deterministic_primary_check": "source_support",
+          "llm_primary_check": "source_support",
+          "primary_check_match": true,
+          "llm_reason": "Cited IFNL3 guideline is retired and limited to peginterferon regimens, so support is stale and insufficient for modern selection."
+        }
+      ],
+      "boundary": "Arm B is scoped to the three isolating cases only; per-case agreement is reported instead of rates over n=3."
+    }
+  ],
+  "synthetic_uniform_narrow": {
+    "arm": "synthetic_uniform_narrow_full_bank",
+    "provider": "synthetic",
+    "model": "uniform-NARROW sanity check",
+    "method": {
+      "arm": "synthetic_uniform_narrow_full_bank",
+      "api_call": false,
+      "description": "All 33 cases mapped to NARROW_CLAIM."
+    },
+    "run_utc": "2026-08-08T22:09:08.144352+00:00",
+    "case_count": 33,
+    "designed_overclaim_cases": 23,
+    "bounded_alert_cases": 10,
+    "overclaim_routing": "23/23",
+    "bounded_alert_preservation": "0/10",
+    "inappropriate_denials": "0/10",
+    "llm_overclaim_allowed_unchanged_count": 0,
+    "llm_overclaim_routed_count": 23,
+    "llm_bounded_alert_allowed_count": 0,
+    "llm_inappropriate_denial_count": 0,
+    "action_matches_deterministic_count": 5,
+    "primary_check_matches_deterministic_count": 6,
+    "action_agreement": "5/33",
+    "primary_check_agreement": "6/33",
+    "narrow_count": 33,
+    "narrowing_rate": 1.0,
+    "overclaim_allowed_case_ids": [],
+    "inappropriate_denial_case_ids": [],
+    "boundary": "This is an LLM self-evaluation baseline on synthetic structured annotations, not independent clinical adjudication."
+  },
+  "methodological_note": "Bounded-alert preservation is the metric that distinguishes a real reviewer from a uniformly cautious model that narrows every case.",
+  "boundary": "Arm A is frozen from the prior source-label run. Arm B withholds source-support labels and author-facing notes, and is scoped only to PGX31-PGX33."
 }

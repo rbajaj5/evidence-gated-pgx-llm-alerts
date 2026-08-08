@@ -11,6 +11,11 @@
   "author_designed_overclaim_cases": 23,
   "author_designed_bounded_alert_cases": 10,
   "case_mix_boundary": "The 23/10 split is author-designed stress-test coverage, not a measured clinical base rate.",
+  "structured_citation_case_ids": [
+    "PGX31",
+    "PGX32",
+    "PGX33"
+  ],
   "ungated_overclaim_count": 23,
   "ungated_overclaim_rate": 0.696969696969697,
   "overclaim_allowed_unchanged_count": 0,

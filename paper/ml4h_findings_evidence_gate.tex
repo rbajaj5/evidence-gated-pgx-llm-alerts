@@ -46,7 +46,8 @@ The monitor checks source support, population fit, and claim strength, then retu
 Stage 1 is a synthetic specification test: the case bank supplies the structured annotations a future live system would need to extract, and ablation tests whether any check is dispensable.
 Disabling source support, population fit, or claim strength let 2, 1, and 6 of 23 designed overclaims pass unchanged, respectively.
 With all checks active, 23/23 designed overclaim archetypes were routed and 10/10 bounded alerts passed unchanged.
-GPT-5.6-terra and Grok-4.5 self-evaluation baselines also routed 23/23 overclaims, but differed from the deterministic monitor on selected actions or surfaced rationales.
+In a frozen full-bank LLM baseline that included the source-support label, GPT-5.6-terra and Grok-4.5 also routed 23/23 overclaims and preserved 10/10 bounded alerts.
+A second three-case baseline withheld the source-support label and supplied structured citations for PGX31--PGX33; both models matched the deterministic action and primary check on all three isolating cases.
 The first-triggering check matched the author-assigned label in 31/33 cases; we interpret the two nonmatches as precedence sensitivity rather than action failure.
 These are specification-conformance results, not clinical safety, generalization, or patient-benefit evidence.
 \end{abstract}
@@ -112,6 +113,8 @@ Table~\ref{tab:gates} maps the general evidence-boundary pattern to the pharmaco
 The case bank contains 33 author-designed synthetic cases: 10 bounded aligned alerts and 23 overclaim archetypes involving universal action language, unsupported genetics, population mismatch, citation weakness, variant uncertainty, obsolete evidence, and changed clinical context.
 An isolating case is designed so that only one check changes the action; with that check disabled, the overclaim passes unchanged.
 Within the 23 overclaim archetypes, three cases isolate a fabricated CPIC addendum attached to an otherwise actionable claim, a real guideline-supported claim applied to a mismatched population, and a stale but real guideline used as current evidence.
+For these three isolating cases, the legacy anchor is replaced by a structured citation object with source name, source URL or DOI, neutral claim summary, and a separate author annotation note.
+PGX32 and PGX33 use bibliography-linked DPYD and IFNL3 sources where available \citep{amstutz2018dpyd,clinpgxifnl3}; PGX31 intentionally has no resolvable source URL because it is the fabricated-source stress test.
 The 23/10 split is stress-test coverage, not a clinical base rate.
 Each case has expected labels, but the controller does not read them.
 The three checks are summarized in Table~\ref{tab:gates}.
@@ -123,23 +126,26 @@ Removing source support allows 2/23 overclaims through unchanged; removing popul
 No check is redundant in this synthetic case bank: each check blocks at least one designed overclaim that passes unchanged when that check is disabled.
 
 \paragraph{LLM self-evaluation baseline}
-Two frontier LLMs classified the same 33 structured annotations without seeing the deterministic rule table.
-This tests a natural objection: perhaps the model can police its own evidence boundary if prompted carefully.
-Both baselines routed all 23 designed overclaims and allowed all 10 bounded alerts, but they were not identical to the deterministic monitor.
-GPT-5.6-terra matched 31/33 actions and 25/33 primary checks; Grok-4.5 matched 31/33 actions and 32/33 primary checks.
-Thus, on this structured synthetic task, LLM self-review did not simply fail; the remaining issue is that stochastic reviewers can choose different rationales or stronger actions without an explicit governance policy.
+Two LLM comparator arms were used.
+Arm A is the frozen full-bank baseline: the models received structured annotations including the source-support label and legacy anchor, but no author annotation note.
+It therefore tests whether models can map labels into the same action vocabulary, not whether they can validate the labels.
+Arm B is narrower and harder: only PGX31--PGX33 were shown, the source-support label was withheld, and the prompt supplied only structured citation fields plus population fit, endpoint, and actionability.
+Arm B is a three-case demonstration, not a rate estimate over the full bank.
+The synthetic uniform-NARROW row is computed without an API call; bounded-alert preservation is the metric that distinguishes a real reviewer from a uniformly cautious model that narrows every case.
 
 \begin{table*}[tbp]
 \floatconts
   {tab:stage1results}
   {\caption{Stage 1 ablation, LLM self-evaluation, and precedence-sensitivity results.}}
-  {\footnotesize\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.32\textwidth}>{\raggedright\arraybackslash}p{0.38\textwidth}@{}}
+  {\footnotesize\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}@{}}
   \toprule
   Analysis & Result & Interpretation \\
   \midrule
   One-check ablation & Source, population, and claim removal let 2/23, 1/23, and 6/23 overclaims pass unchanged. & Each boundary catches at least one archetype that the others do not catch. \\
-  GPT-5.6-terra baseline & 23/23 overclaims routed; 10/10 bounded alerts allowed; 31/33 action agreement; 25/33 check agreement. & Frontier self-review was conservative, but rationale selection varied. \\
-  Grok-4.5 baseline & 23/23 overclaims routed; 10/10 bounded alerts allowed; 31/33 action agreement; 32/33 check agreement. & A second frontier self-review reproduced overclaim routing but not every action choice. \\
+  Arm A, GPT-5.6-terra & 23/23 overclaims routed; 10/10 bounded alerts preserved; 0/10 inappropriate denials; 31/33 action agreement; 25/33 check agreement; 3/33 narrowed. & Full-bank label-to-action comparator; not an annotation-validation test. \\
+  Arm A, Grok-4.5 & 23/23 overclaims routed; 10/10 bounded alerts preserved; 0/10 inappropriate denials; 31/33 action agreement; 32/33 check agreement; 3/33 narrowed. & Same source-label comparator with different rationale agreement. \\
+  Arm B, PGX31--PGX33 & GPT-5.6-terra and Grok-4.5 each matched deterministic action and primary check on PGX31, PGX32, and PGX33. & Structured-citation demonstration only; no rates are reported over n=3. \\
+  Uniform-NARROW sanity row & 23/23 overclaims routed; 0/10 bounded alerts preserved; 0/10 inappropriate denials; 33/33 narrowed. & Routing alone is insufficient; bounded-alert preservation distinguishes review from blanket caution. \\
   PGX24 precedence & Source-first: deny/source; population-first: abstain/population; claim-first: deny/claim. & The same case can surface different clinician-facing explanations under different governance orders. \\
   \bottomrule
   \end{tabular}}
@@ -175,13 +181,15 @@ PGX24 represents the high-risk practice of using a polygenic score to deny opioi
 Stage 1 contains no PHI and makes no diagnosis or treatment recommendation; deployed clinical decision support would still need accountability for extraction, citation verification, thresholds, overrides, and audit logging.
 The key limitation is that results are synthetic and author-designed.
 They show rule conformance, not generalization, and assume structured annotations rather than extracting them from live LLM output or EHR context.
+Stage 1 tests decision logic conditional on author-assigned structured annotations.
+PGX31, PGX32, and PGX33 use structured citations drawn from primary sources where verifiable; the annotation layer itself was not independently validated against those sources in Stage 1.
+Validating annotations against primary literature is a Stage 2 prerequisite.
 
 \section{Conclusion}
 The practical problem is annotation, not compute.
-Stage 1 shows that the monitor logic is auditable and that the three checks do different work on a synthetic pharmacogenomic case bank.
-Source support, population fit, and claim strength each block at least one designed overclaim that passes when that check is removed.
-The LLM baselines suggest that self-evaluation over structured annotations can be conservative, but action choice and explanation order still vary without explicit predicates.
-That result turns the next experiment into a concrete measurement problem: determine whether live LLM and EHR pipelines can populate the three annotations reliably enough to reduce overclaiming without increasing inappropriate denial.
+Stage 1 shows that the monitor is auditable and that source support, population fit, and claim strength each block at least one designed overclaim that passes when that check is removed.
+The LLM baselines show useful but policy-dependent self-evaluation over structured annotations.
+Stage 2 must test whether live LLM and EHR pipelines can populate those annotations and reduce overclaiming without increasing inappropriate denial.
 
 \bibliography{ml4h_findings_refs}
 

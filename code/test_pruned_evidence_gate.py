@@ -13,6 +13,7 @@ from pruned_evidence_gate import (
     monitor_case,
     precedence_sensitivity,
 )
+from llm_self_evaluation_baseline import ARM_A, ARM_B, _case_payload
 
 
 def case(case_id: str):
@@ -108,6 +109,37 @@ def test_check_ablation_reports_distinct_check_roles() -> None:
     assert rows["claim_strength"].designed_overclaim_archetype_blocked_count == 17
 
 
+def test_isolating_cases_use_structured_citations_without_monitor_changes() -> None:
+    bib_text = (PROJECT_ROOT / "paper" / "ml4h_findings_refs.bib").read_text(encoding="utf-8")
+    for case_id in ("PGX31", "PGX32", "PGX33"):
+        anchor = case(case_id).guideline_anchor
+        assert isinstance(anchor, dict)
+        assert set(anchor) == {"source_name", "source_url_or_doi", "quoted_claim", "annotation_note"}
+        assert anchor["source_name"]
+        assert anchor["quoted_claim"]
+        if anchor["source_url_or_doi"] != "N/A":
+            assert anchor["source_url_or_doi"] in bib_text
+
+    assert isinstance(case("PGX30").guideline_anchor, str)
+    assert monitor_case(case("PGX31")).actual_action == "DENY_UNVERIFIABLE_SOURCE"
+    assert monitor_case(case("PGX32")).actual_action == "ABSTAIN_POPULATION_FIT"
+    assert monitor_case(case("PGX33")).actual_action == "ABSTAIN_SOURCE_SUPPORT"
+
+
+def test_llm_payloads_do_not_leak_author_only_annotation_notes() -> None:
+    arm_a_text = json.dumps(_case_payload(ARM_A))
+    arm_b_text = json.dumps(_case_payload(ARM_B))
+
+    assert "annotation_note" not in arm_a_text
+    assert "annotation_note" not in arm_b_text
+    assert "citation_support" not in arm_b_text
+    assert "guideline_anchor" not in arm_b_text
+    assert "fabricated guideline" not in arm_b_text
+    assert "hallucinated" not in arm_b_text
+    assert "structured_citation" in arm_b_text
+    assert [row["case_id"] for row in _case_payload(ARM_B)] == ["PGX31", "PGX32", "PGX33"]
+
+
 def test_summary_metrics_are_specification_conformance_not_clinical_claims() -> None:
     _, summary = evaluate()
     assert summary["designed_overclaim_archetype_blocked_rate"] >= 0.95
@@ -131,12 +163,21 @@ def test_saved_llm_baseline_summary_is_a_synthetic_comparator() -> None:
     path = PROJECT_ROOT / "results" / "llm_self_eval_combined_summary.json"
     assert path.exists()
     summary = json.loads(path.read_text(encoding="utf-8"))
-    assert summary["baseline_count"] == 2
-    by_provider = {row["provider"]: row for row in summary["baselines"]}
-    assert by_provider["openai"]["model"] == "gpt-5.6-terra"
-    assert by_provider["xai"]["model"] == "grok-4.5"
-    for row in summary["baselines"]:
+    assert summary["baseline_row_count"] == 5
+    by_arm_provider = {
+        (row["arm"], row["provider"]): row
+        for row in summary["arm_a_full_bank"] + summary["arm_b_isolating_cases"] + [summary["synthetic_uniform_narrow"]]
+    }
+    assert by_arm_provider[("A_source_label_full_bank", "openai")]["model"] == "gpt-5.6-terra"
+    assert by_arm_provider[("A_source_label_full_bank", "xai")]["model"] == "grok-4.5"
+    assert by_arm_provider[("B_structured_citation_isolating_cases", "openai")]["model"] == "gpt-5.6-terra"
+    assert by_arm_provider[("B_structured_citation_isolating_cases", "xai")]["model"] == "grok-4.5"
+    assert by_arm_provider[("synthetic_uniform_narrow_full_bank", "synthetic")]["narrow_count"] == 33
+    assert by_arm_provider[("synthetic_uniform_narrow_full_bank", "synthetic")]["bounded_alert_preservation"] == "0/10"
+    for row in summary["arm_a_full_bank"] + [summary["synthetic_uniform_narrow"]]:
         assert row["llm_overclaim_allowed_unchanged_count"] == 0
         assert row["llm_overclaim_routed_count"] == 23
-        assert row["llm_bounded_alert_allowed_count"] == 10
         assert "synthetic structured annotations" in row["boundary"]
+    for row in summary["arm_b_isolating_cases"]:
+        assert row["case_count"] == 3
+        assert [case_row["case_id"] for case_row in row["per_case_results"]] == ["PGX31", "PGX32", "PGX33"]

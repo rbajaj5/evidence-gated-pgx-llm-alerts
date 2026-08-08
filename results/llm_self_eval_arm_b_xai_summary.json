@@ -1,0 +1,68 @@
+{
+  "arm": "B_structured_citation_isolating_cases",
+  "provider": "xai",
+  "model": "grok-4.5",
+  "method": {
+    "arm": "B_structured_citation_isolating_cases",
+    "prompt_mode": "zero-shot_json",
+    "few_shot_examples": 0,
+    "temperature_requested": 0.0,
+    "temperature_used": 0.0,
+    "temperature_note": "temperature=0 accepted by provider API.",
+    "action_vocabulary": [
+      "ABSTAIN_POPULATION_FIT",
+      "ABSTAIN_SOURCE_SUPPORT",
+      "ALLOW_BOUNDED_ALERT",
+      "DENY_UNSUPPORTED_ACTION",
+      "DENY_UNVERIFIABLE_SOURCE",
+      "NARROW_CLAIM"
+    ],
+    "primary_check_vocabulary": [
+      "claim_strength",
+      "none",
+      "population_fit",
+      "source_support"
+    ],
+    "model_selection": "Uses client.models.list(); available model sets may vary across API versions, and the exact selected model ID is recorded in this JSON output."
+  },
+  "run_utc": "2026-08-08T22:09:08.141969+00:00",
+  "case_count": 3,
+  "case_ids": [
+    "PGX31",
+    "PGX32",
+    "PGX33"
+  ],
+  "per_case_results": [
+    {
+      "case_id": "PGX31",
+      "deterministic_action": "DENY_UNVERIFIABLE_SOURCE",
+      "llm_action": "DENY_UNVERIFIABLE_SOURCE",
+      "action_match": true,
+      "deterministic_primary_check": "source_support",
+      "llm_primary_check": "source_support",
+      "primary_check_match": true,
+      "llm_reason": "Source URL is N/A and the 2026 addendum citation cannot be verified from supplied annotations."
+    },
+    {
+      "case_id": "PGX32",
+      "deterministic_action": "ABSTAIN_POPULATION_FIT",
+      "llm_action": "ABSTAIN_POPULATION_FIT",
+      "action_match": true,
+      "deterministic_primary_check": "population_fit",
+      "llm_primary_check": "population_fit",
+      "primary_check_match": true,
+      "llm_reason": "Annotations mark population_mismatch for underrepresented source-target transfer without recalibration."
+    },
+    {
+      "case_id": "PGX33",
+      "deterministic_action": "ABSTAIN_SOURCE_SUPPORT",
+      "llm_action": "ABSTAIN_SOURCE_SUPPORT",
+      "action_match": true,
+      "deterministic_primary_check": "source_support",
+      "llm_primary_check": "source_support",
+      "primary_check_match": true,
+      "llm_reason": "Cited IFNL3 guideline is retired and limited to peginterferon regimens, so support is stale and insufficient for modern selection."
+    }
+  ],
+  "boundary": "Arm B is scoped to the three isolating cases only; per-case agreement is reported instead of rates over n=3."
+}
