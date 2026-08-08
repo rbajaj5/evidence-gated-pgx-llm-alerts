@@ -1,0 +1,43 @@
+{
+  "case_count": 30,
+  "workflow": "pharmacogenomic/genomic medication-alert text",
+  "gate_count": 3,
+  "gates": [
+    "Endpoint/actionability",
+    "Population fit",
+    "Citation/guideline support"
+  ],
+  "ungated_overclaim_count": 20,
+  "ungated_overclaim_rate": 0.6666666666666666,
+  "gated_remaining_overclaim_count": 0,
+  "gated_remaining_overclaim_rate": 0.0,
+  "absolute_overclaim_reduction": 0.6666666666666666,
+  "true_positive": 20,
+  "false_positive": 0,
+  "true_negative": 10,
+  "false_negative": 0,
+  "sensitivity_overclaim_detection": 1.0,
+  "specificity_aligned_claim_allowance": 1.0,
+  "inappropriate_denial_count": 0,
+  "brier_overclaim_risk": 0.11152,
+  "matched_expected_count": 30,
+  "matched_expected_rate": 1.0,
+  "action_counts": {
+    "ALLOW_BOUNDED_ALERT": 10,
+    "NARROW_CLAIM": 5,
+    "DENY_UNSUPPORTED_ACTION": 7,
+    "ABSTAIN_POPULATION_FIT": 4,
+    "ABSTAIN_CITATION_SUPPORT": 3,
+    "DENY_CITATION": 1
+  },
+  "primary_gate_counts": {
+    "none": 10,
+    "endpoint_actionability": 6,
+    "population_fit": 4,
+    "citation_guideline_support": 10
+  },
+  "error_counts": {
+    "matched_expected": 30
+  },
+  "stage_boundary": "Stage 1 synthetic construct-validity scaffold; independent authored cases and blinded reviewer adjudication remain Stage 2."
+}
