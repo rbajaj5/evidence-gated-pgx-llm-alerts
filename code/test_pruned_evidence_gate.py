@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 from pruned_evidence_gate import CASES, evaluate, gate_case
 
 
@@ -46,14 +48,28 @@ def test_opioid_addiction_claim_is_denied_not_narrowed() -> None:
     result = gate_case(case("PGX12"))
     assert result.actual_action == "DENY_UNSUPPORTED_ACTION"
     assert result.detects_overclaim
-    assert "addiction" in result.rationale
 
 
-def test_summary_metrics_are_construct_validity_not_clinical_claims() -> None:
+def test_controller_does_not_read_expected_action_label() -> None:
+    original = case("PGX22")
+    flipped = replace(original, expected_action="DENY_UNSUPPORTED_ACTION")
+    assert gate_case(original).actual_action == gate_case(flipped).actual_action
+    assert gate_case(original).primary_gate == gate_case(flipped).primary_gate
+
+
+def test_summary_metrics_are_specification_conformance_not_clinical_claims() -> None:
     _, summary = evaluate()
     assert summary["designed_overclaim_archetype_blocked_rate"] >= 0.95
     assert summary["bounded_alert_allowed_rate"] >= 0.95
     assert summary["inappropriate_denial_count"] == 0
-    assert summary["gated_remaining_overclaim_count"] == 0
+    assert summary["overclaim_allowed_unchanged_count"] == 0
+    assert summary["action_conformance_count"] == 30
+    assert summary["gate_conformance_count"] == 28
+    assert {case["case_id"] for case in summary["gate_disagreement_cases"]} == {"PGX19", "PGX24"}
+    assert summary["gate_precedence_order"] == [
+        "citation_guideline_support",
+        "population_fit",
+        "endpoint_actionability",
+    ]
     assert "Stage 1 is specification conformance" in summary["stage_boundary"]
     assert "not a measured clinical base rate" in summary["case_mix_boundary"]

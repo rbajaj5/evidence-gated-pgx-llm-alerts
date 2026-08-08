@@ -14,6 +14,10 @@ This package is the pruned, reviewer-aligned version of the capstone. The prior 
 
 LLM-drafted pharmacogenomic or genomic medication-alert text.
 
+## Input Boundary
+
+Stage 1 does not call an LLM and does not parse free-text alert claims. The synthetic `draft_claim` field is retained as the candidate alert text, but the controller consumes only structured evidence annotations assigned in the case bank. Extracting those annotations from live LLM output, citations, or EHR context is the main Stage 2 dependency.
+
 ## Gates
 
 1. Endpoint/actionability.
@@ -25,9 +29,12 @@ LLM-drafted pharmacogenomic or genomic medication-alert text.
 - Synthetic cases: 30
 - Author-designed overclaim archetypes: 20
 - Author-designed bounded alerts: 10
-- Gated remaining overclaim rate: 0.00
+- Overclaim archetypes allowed unchanged: 0/20
 - Designed overclaim archetypes blocked: 20/20
 - Bounded alerts allowed: 10/10
+- Action conformance: 30/30
+- Primary-gate conformance: 28/30
+- Gate-precedence mismatches: PGX19 and PGX24
 - Inappropriate denial count: 0
 
 These are specification-conformance counts on author-designed synthetic archetypes. The 20/10 case split is a stress-test design choice, not a measured clinical base rate. These results do not prove clinical safety, accuracy, generalization, or patient benefit.

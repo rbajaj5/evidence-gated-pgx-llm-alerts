@@ -22,7 +22,7 @@ py -3.13 -m pytest 'code' -q
 Expected focused-test result:
 
 ```text
-6 passed
+7 passed
 ```
 
 Expected Stage 1 conformance snapshot:
@@ -33,11 +33,13 @@ workflow: pharmacogenomic/genomic medication-alert text
 author_designed_overclaim_cases: 20
 author_designed_bounded_alert_cases: 10
 case_mix_boundary: The 20/10 split is author-designed stress-test coverage, not a measured clinical base rate.
-gated_remaining_overclaim_count: 0
+overclaim_allowed_unchanged_count: 0
 designed_overclaim_archetype_blocked_rate: 1.0
 bounded_alert_allowed_rate: 1.0
 inappropriate_denial_count: 0
-spec_conformance_count: 30
+action_conformance_count: 30
+gate_conformance_count: 28
+gate_disagreement_cases: PGX19, PGX24
 ```
 
 ## Package Contents
@@ -46,4 +48,4 @@ The `package/` directory contains the submission ZIP. The unzipped repository al
 
 ## Scope Boundary
 
-The active experiment is a specification-conformance scaffold. It tests whether a deterministic three-gate controller follows an intended evidence grammar on author-designed synthetic archetypes. It does not prove independent safety, clinical accuracy, generalization, or patient benefit.
+The active experiment is a specification-conformance scaffold. It tests whether a deterministic three-gate controller follows an intended evidence grammar on author-designed synthetic archetypes. Stage 1 consumes structured evidence annotations only; it does not call an LLM, parse free text, verify citations, or extract population-fit features. It does not prove independent safety, clinical accuracy, generalization, or patient benefit.

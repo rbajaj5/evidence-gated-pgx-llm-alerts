@@ -54,7 +54,7 @@ class GateResult:
     risk_score: float
     detects_overclaim: bool
     ungated_overclaim: bool
-    gated_remaining_overclaim: bool
+    overclaim_allowed_unchanged: bool
     inappropriate_denial: bool
     error_category: str
     rationale: str
@@ -532,23 +532,29 @@ def _risk_score(case: AlertCase) -> float:
 
 
 def gate_case(case: AlertCase) -> GateResult:
+    """Apply the fixed precedence order without reading expected labels.
+
+    The controller consumes only structured evidence annotations. It does not
+    parse free text and it does not inspect expected_action or expected_gate.
+    Precedence is citation/guideline support, then population fit, then
+    endpoint/actionability.
+    """
     risk = _risk_score(case)
     if case.citation_support == "unverifiable":
         action = "DENY_CITATION"
         primary = "citation_guideline_support"
-        remaining = False
-    elif case.citation_support in {"unsupported_or_absent", "conflicting_or_uncertain", "outdated_or_context_shifted"}:
-        action = "ABSTAIN_CITATION_SUPPORT" if "ABSTAIN" in case.expected_action else "DENY_UNSUPPORTED_ACTION"
+    elif case.citation_support in {"conflicting_or_uncertain", "outdated_or_context_shifted"}:
+        action = "ABSTAIN_CITATION_SUPPORT"
         primary = "citation_guideline_support"
-        remaining = False
+    elif case.citation_support == "unsupported_or_absent":
+        action = "DENY_UNSUPPORTED_ACTION" if case.actionability_level == "not_actionable_for_claim" else "ABSTAIN_CITATION_SUPPORT"
+        primary = "citation_guideline_support"
     elif case.population_fit in {"population_mismatch", "unknown"}:
         action = "ABSTAIN_POPULATION_FIT"
         primary = "population_fit"
-        remaining = False
     elif case.actionability_level == "not_actionable_for_claim":
         action = "DENY_UNSUPPORTED_ACTION"
         primary = "endpoint_actionability"
-        remaining = False
     elif case.actionability_level == "context_dependent" or case.endpoint_level in {
         "association_or_pharmacology",
         "dose_algorithm_or_surrogate",
@@ -556,19 +562,22 @@ def gate_case(case: AlertCase) -> GateResult:
     }:
         action = "NARROW_CLAIM"
         primary = "endpoint_actionability"
-        remaining = False
     else:
         action = "ALLOW_BOUNDED_ALERT"
         primary = "none"
-        remaining = False
 
     detects = action != "ALLOW_BOUNDED_ALERT"
+    remaining = case.ground_truth_overclaim and action == "ALLOW_BOUNDED_ALERT"
     inappropriate_denial = (
         case.expected_action == "ALLOW_BOUNDED_ALERT"
         and action not in {"ALLOW_BOUNDED_ALERT", "NARROW_CLAIM"}
     )
-    if action == case.expected_action:
+    action_matches = action == case.expected_action
+    gate_matches = primary == case.expected_gate
+    if action_matches and gate_matches:
         category = "matched_expected"
+    elif action_matches:
+        category = "matched_action_gate_precedence_mismatch"
     elif case.expected_action == "NARROW_CLAIM" and action.startswith("ABSTAIN"):
         category = "conservative_disagreement"
     elif inappropriate_denial:
@@ -586,7 +595,7 @@ def gate_case(case: AlertCase) -> GateResult:
         risk_score=risk,
         detects_overclaim=detects,
         ungated_overclaim=case.ground_truth_overclaim,
-        gated_remaining_overclaim=remaining,
+        overclaim_allowed_unchanged=remaining,
         inappropriate_denial=inappropriate_denial,
         error_category=category,
         rationale=case.rationale,
@@ -601,7 +610,19 @@ def evaluate(cases: tuple[AlertCase, ...] = CASES) -> tuple[list[GateResult], di
     designed_bounded_count = len(cases) - designed_overclaim_count
     overclaim_blocked_count = sum(g and p for g, p in zip(gt, pred))
     bounded_allowed_count = sum((not g) and (not p) for g, p in zip(gt, pred))
-    spec_conformance_count = sum(r.actual_action == r.expected_action for r in results)
+    action_conformance_count = sum(r.actual_action == r.expected_action for r in results)
+    gate_conformance_count = sum(r.primary_gate == r.expected_gate for r in results)
+    gate_disagreement_cases = [
+        {
+            "case_id": r.case_id,
+            "drug_gene": r.drug_gene,
+            "expected_gate": r.expected_gate,
+            "actual_gate": r.primary_gate,
+            "actual_action": r.actual_action,
+        }
+        for r in results
+        if r.primary_gate != r.expected_gate
+    ]
     action_counts: dict[str, int] = {}
     gate_counts: dict[str, int] = {}
     error_counts: dict[str, int] = {}
@@ -615,20 +636,33 @@ def evaluate(cases: tuple[AlertCase, ...] = CASES) -> tuple[list[GateResult], di
         "workflow": "pharmacogenomic/genomic medication-alert text",
         "gate_count": 3,
         "gates": list(GATE_LABELS.values()),
+        "controller_input_boundary": (
+            "Stage 1 consumes structured evidence annotations from the case bank; "
+            "it does not parse draft_claim text, verify citations, call an LLM, "
+            "or extract EHR/population-fit features."
+        ),
         "author_designed_overclaim_cases": designed_overclaim_count,
         "author_designed_bounded_alert_cases": designed_bounded_count,
         "case_mix_boundary": "The 20/10 split is author-designed stress-test coverage, not a measured clinical base rate.",
         "ungated_overclaim_count": designed_overclaim_count,
         "ungated_overclaim_rate": designed_overclaim_count / len(cases),
-        "gated_remaining_overclaim_count": sum(r.gated_remaining_overclaim for r in results),
-        "gated_remaining_overclaim_rate": sum(r.gated_remaining_overclaim for r in results) / len(cases),
+        "overclaim_allowed_unchanged_count": sum(r.overclaim_allowed_unchanged for r in results),
+        "overclaim_allowed_unchanged_rate": sum(r.overclaim_allowed_unchanged for r in results) / designed_overclaim_count if designed_overclaim_count else 0.0,
         "designed_overclaim_archetype_blocked_count": overclaim_blocked_count,
         "designed_overclaim_archetype_blocked_rate": overclaim_blocked_count / designed_overclaim_count if designed_overclaim_count else 0.0,
         "bounded_alert_allowed_count": bounded_allowed_count,
         "bounded_alert_allowed_rate": bounded_allowed_count / designed_bounded_count if designed_bounded_count else 0.0,
         "inappropriate_denial_count": sum(r.inappropriate_denial for r in results),
-        "spec_conformance_count": spec_conformance_count,
-        "spec_conformance_rate": spec_conformance_count / len(results),
+        "action_conformance_count": action_conformance_count,
+        "action_conformance_rate": action_conformance_count / len(results),
+        "gate_conformance_count": gate_conformance_count,
+        "gate_conformance_rate": gate_conformance_count / len(results),
+        "gate_precedence_order": [
+            "citation_guideline_support",
+            "population_fit",
+            "endpoint_actionability",
+        ],
+        "gate_disagreement_cases": gate_disagreement_cases,
         "action_counts": action_counts,
         "primary_gate_counts": gate_counts,
         "error_counts": error_counts,
