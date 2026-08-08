@@ -1,0 +1,7 @@
+case_id,drug_gene,precedence_order,action,primary_check,surfaced_explanation
+PGX19,APOE-dementia risk,source_support > population_fit > claim_strength,DENY_UNSUPPORTED_ACTION,source_support,Source support is absent for the proposed medication action.
+PGX19,APOE-dementia risk,population_fit > source_support > claim_strength,DENY_UNSUPPORTED_ACTION,source_support,Source support is absent for the proposed medication action.
+PGX19,APOE-dementia risk,claim_strength > population_fit > source_support,DENY_UNSUPPORTED_ACTION,claim_strength,The evidence does not support the requested medication action.
+PGX24,Polygenic addiction liability,source_support > population_fit > claim_strength,DENY_UNSUPPORTED_ACTION,source_support,Source support is absent for the proposed medication action.
+PGX24,Polygenic addiction liability,population_fit > source_support > claim_strength,ABSTAIN_POPULATION_FIT,population_fit,The source-to-target population bridge is mismatched or unknown.
+PGX24,Polygenic addiction liability,claim_strength > population_fit > source_support,DENY_UNSUPPORTED_ACTION,claim_strength,The evidence does not support the requested medication action.

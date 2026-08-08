@@ -1,8 +1,18 @@
 from __future__ import annotations
 
+import json
 from dataclasses import replace
 
-from pruned_evidence_gate import CASES, ablation_summary, decide, evaluate, monitor_case
+from pruned_evidence_gate import (
+    CASES,
+    PROJECT_ROOT,
+    ablation_summary,
+    decide,
+    decide_with_precedence,
+    evaluate,
+    monitor_case,
+    precedence_sensitivity,
+)
 
 
 def case(case_id: str):
@@ -67,6 +77,25 @@ def test_decision_contract_is_separate_from_expected_labels() -> None:
     assert not hasattr(decision, "expected_check")
 
 
+def test_precedence_sensitivity_changes_surfaced_explanation_not_truth_labels() -> None:
+    pgx24 = case("PGX24")
+    source_first = decide_with_precedence(pgx24, ("source_support", "population_fit", "claim_strength"))
+    population_first = decide_with_precedence(pgx24, ("population_fit", "source_support", "claim_strength"))
+    claim_first = decide_with_precedence(pgx24, ("claim_strength", "population_fit", "source_support"))
+
+    assert source_first.primary_check == "source_support"
+    assert population_first.primary_check == "population_fit"
+    assert claim_first.primary_check == "claim_strength"
+    assert {source_first.action, population_first.action, claim_first.action} == {
+        "DENY_UNSUPPORTED_ACTION",
+        "ABSTAIN_POPULATION_FIT",
+    }
+
+    rows = precedence_sensitivity()
+    assert {row.case_id for row in rows} == {"PGX19", "PGX24"}
+    assert any(row.case_id == "PGX24" and row.primary_check == "population_fit" for row in rows)
+
+
 def test_check_ablation_reports_distinct_check_roles() -> None:
     rows = {row.disabled_check: row for row in ablation_summary()}
     assert rows["source_support"].overclaim_allowed_unchanged_count == 2
@@ -87,11 +116,27 @@ def test_summary_metrics_are_specification_conformance_not_clinical_claims() -> 
     assert summary["overclaim_allowed_unchanged_count"] == 0
     assert summary["action_conformance_count"] == 33
     assert summary["check_conformance_count"] == 31
-    assert {case["case_id"] for case in summary["check_disagreement_cases"]} == {"PGX19", "PGX24"}
+    assert {case["case_id"] for case in summary["precedence_sensitive_cases"]} == {"PGX19", "PGX24"}
     assert summary["check_precedence_order"] == [
         "source_support",
         "population_fit",
         "claim_strength",
     ]
+    assert summary["error_counts"]["matched_action_precedence_sensitive"] == 2
     assert "Stage 1 is specification conformance" in summary["stage_boundary"]
     assert "not a measured clinical base rate" in summary["case_mix_boundary"]
+
+
+def test_saved_llm_baseline_summary_is_a_synthetic_comparator() -> None:
+    path = PROJECT_ROOT / "results" / "llm_self_eval_combined_summary.json"
+    assert path.exists()
+    summary = json.loads(path.read_text(encoding="utf-8"))
+    assert summary["baseline_count"] == 2
+    by_provider = {row["provider"]: row for row in summary["baselines"]}
+    assert by_provider["openai"]["model"] == "gpt-5.6-terra"
+    assert by_provider["xai"]["model"] == "grok-4.5"
+    for row in summary["baselines"]:
+        assert row["llm_overclaim_allowed_unchanged_count"] == 0
+        assert row["llm_overclaim_routed_count"] == 23
+        assert row["llm_bounded_alert_allowed_count"] == 10
+        assert "synthetic structured annotations" in row["boundary"]

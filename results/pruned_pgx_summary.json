@@ -7,7 +7,7 @@
     "Population fit",
     "Claim strength"
   ],
-  "controller_input_boundary": "Stage 1 consumes structured evidence annotations from the case bank; it does not parse draft_claim text, verify citations, call an LLM, or extract EHR/population-fit features.",
+  "controller_input_boundary": "The deterministic Stage 1 controller consumes structured evidence annotations from the case bank; the controller itself does not parse draft_claim text, verify citations, call an LLM, or extract EHR/population-fit features. The optional LLM baseline is a separate comparator.",
   "author_designed_overclaim_cases": 23,
   "author_designed_bounded_alert_cases": 10,
   "case_mix_boundary": "The 23/10 split is author-designed stress-test coverage, not a measured clinical base rate.",
@@ -29,20 +29,72 @@
     "population_fit",
     "claim_strength"
   ],
-  "check_disagreement_cases": [
+  "precedence_sensitive_cases": [
     {
       "case_id": "PGX19",
       "drug_gene": "APOE-dementia risk",
       "expected_check": "claim_strength",
       "actual_check": "source_support",
-      "actual_action": "DENY_UNSUPPORTED_ACTION"
+      "actual_action": "DENY_UNSUPPORTED_ACTION",
+      "interpretation": "Action matched; surfaced explanation depends on check precedence."
     },
     {
       "case_id": "PGX24",
       "drug_gene": "Polygenic addiction liability",
       "expected_check": "population_fit",
       "actual_check": "source_support",
-      "actual_action": "DENY_UNSUPPORTED_ACTION"
+      "actual_action": "DENY_UNSUPPORTED_ACTION",
+      "interpretation": "Action matched; surfaced explanation depends on check precedence."
+    }
+  ],
+  "precedence_sensitivity": [
+    {
+      "case_id": "PGX19",
+      "drug_gene": "APOE-dementia risk",
+      "precedence_order": "source_support > population_fit > claim_strength",
+      "action": "DENY_UNSUPPORTED_ACTION",
+      "primary_check": "source_support",
+      "surfaced_explanation": "Source support is absent for the proposed medication action."
+    },
+    {
+      "case_id": "PGX19",
+      "drug_gene": "APOE-dementia risk",
+      "precedence_order": "population_fit > source_support > claim_strength",
+      "action": "DENY_UNSUPPORTED_ACTION",
+      "primary_check": "source_support",
+      "surfaced_explanation": "Source support is absent for the proposed medication action."
+    },
+    {
+      "case_id": "PGX19",
+      "drug_gene": "APOE-dementia risk",
+      "precedence_order": "claim_strength > population_fit > source_support",
+      "action": "DENY_UNSUPPORTED_ACTION",
+      "primary_check": "claim_strength",
+      "surfaced_explanation": "The evidence does not support the requested medication action."
+    },
+    {
+      "case_id": "PGX24",
+      "drug_gene": "Polygenic addiction liability",
+      "precedence_order": "source_support > population_fit > claim_strength",
+      "action": "DENY_UNSUPPORTED_ACTION",
+      "primary_check": "source_support",
+      "surfaced_explanation": "Source support is absent for the proposed medication action."
+    },
+    {
+      "case_id": "PGX24",
+      "drug_gene": "Polygenic addiction liability",
+      "precedence_order": "population_fit > source_support > claim_strength",
+      "action": "ABSTAIN_POPULATION_FIT",
+      "primary_check": "population_fit",
+      "surfaced_explanation": "The source-to-target population bridge is mismatched or unknown."
+    },
+    {
+      "case_id": "PGX24",
+      "drug_gene": "Polygenic addiction liability",
+      "precedence_order": "claim_strength > population_fit > source_support",
+      "action": "DENY_UNSUPPORTED_ACTION",
+      "primary_check": "claim_strength",
+      "surfaced_explanation": "The evidence does not support the requested medication action."
     }
   ],
   "check_ablation": [
@@ -93,7 +145,7 @@
   },
   "error_counts": {
     "matched_expected": 31,
-    "matched_action_check_precedence_mismatch": 2
+    "matched_action_precedence_sensitive": 2
   },
   "stage_boundary": "Stage 1 is specification conformance on author-designed synthetic archetypes; independent safety, accuracy, generalization, and clinical utility remain Stage 2."
 }

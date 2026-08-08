@@ -38,9 +38,10 @@ The final paper source of truth is the ML4H Findings-track LaTeX paper in `paper
 - Bounded alerts allowed: 10/10
 - Action conformance: 33/33
 - Primary-check conformance: 31/33
-- Check-precedence mismatches: PGX19 and PGX24
+- Precedence-sensitive cases: PGX19 and PGX24
 - Inappropriate denial count: 0
 - One-check ablation: disabling source support allows 2/23 designed overclaims through unchanged; disabling population fit allows 1/23 through; disabling claim strength allows 6/23 through.
+- LLM self-evaluation baselines on the same structured annotations: GPT-5.6-terra and Grok-4.5 each routed 23/23 designed overclaims and allowed 10/10 bounded alerts, while differing from the deterministic monitor on selected actions or surfaced rationales.
 
 These are specification-conformance counts on author-designed synthetic archetypes. The 23/10 case split is a stress-test design choice, not a measured clinical base rate. These results do not prove clinical safety, accuracy, generalization, or patient benefit.
 
@@ -53,8 +54,8 @@ Compare unchanged LLM alert drafts with monitored drafts on independently author
 - `paper/`: final ML4H-formatted paper as compiled PDF plus editable LaTeX/BibTeX source.
 - `summary/`: required 1-2 page summary sheet in DOCX and PDF.
 - `supplement/`: case matrix and reproducibility notes.
-- `code/`: pruned evaluator and tests only.
-- `results/`: CSV and JSON outputs, including one-check ablation counts.
+- `code/`: pruned evaluator, optional LLM self-evaluation baseline runner, and tests.
+- `results/`: CSV and JSON outputs, including one-check ablation counts, precedence sensitivity, and LLM self-evaluation baseline outputs.
 - `figures/`: four submission-facing figures.
 - `proposal/` and `progress/`: retained course provenance in the repository, not part of the final submission ZIP.
 
@@ -67,9 +68,12 @@ Use these links if an automated reader can see this README but cannot enumerate 
 - Technical supplement: [PDF](supplement/Module_14_Technical_Supplement_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](supplement/Module_14_Technical_Supplement_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
 - Complete submission ZIP: [submission package](package/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj.zip)
 - Executable evaluator: [code/pruned_evidence_gate.py](code/pruned_evidence_gate.py)
+- Optional LLM baseline runner: [code/llm_self_evaluation_baseline.py](code/llm_self_evaluation_baseline.py)
 - Unit tests: [code/test_pruned_evidence_gate.py](code/test_pruned_evidence_gate.py)
 - Summary results: [results/pruned_pgx_summary.json](results/pruned_pgx_summary.json)
 - Check ablation: [results/pruned_pgx_check_ablation.csv](results/pruned_pgx_check_ablation.csv)
+- Precedence sensitivity: [results/pruned_pgx_precedence_sensitivity.csv](results/pruned_pgx_precedence_sensitivity.csv)
+- LLM baseline summary: [results/llm_self_eval_combined_summary.json](results/llm_self_eval_combined_summary.json)
 - Case bank: [results/pruned_pgx_casebook.csv](results/pruned_pgx_casebook.csv)
 
 ## Rubric map

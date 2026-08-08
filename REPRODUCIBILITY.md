@@ -17,13 +17,14 @@ py -3.13 -m pip install -r requirements.txt
 $env:PYTHONPATH=(Resolve-Path 'code').Path
 py -3.13 'code\pruned_evidence_gate.py'
 py -3.13 -m pytest 'code' -q
+py -3.13 'code\llm_self_evaluation_baseline.py'
 py -3.13 'code\build_submission_package.py'
 ```
 
 Expected focused-test result:
 
 ```text
-9 passed
+11 passed
 ```
 
 Expected Stage 1 conformance snapshot:
@@ -40,11 +41,18 @@ bounded_alert_allowed_rate: 1.0
 inappropriate_denial_count: 0
 action_conformance_count: 33
 check_conformance_count: 31
-check_disagreement_cases: PGX19, PGX24
+precedence_sensitive_cases: PGX19, PGX24
 check_ablation:
   without_source_support: 2 overclaims allowed unchanged; 7 action changes; 12 primary-check changes
   without_population_fit: 1 overclaim allowed unchanged; 5 action changes; 5 primary-check changes
   without_claim_strength: 6 overclaims allowed unchanged; 6 action changes; 6 primary-check changes
+```
+
+Expected optional LLM self-evaluation baseline snapshot, if `OPENAI_API_KEY` and the local xAI key file or `XAI_API_KEY` are available:
+
+```text
+OpenAI gpt-5.6-terra: 23/23 designed overclaims routed, 10/10 bounded alerts allowed, 31/33 action matches, 25/33 primary-check matches.
+xAI grok-4.5: 23/23 designed overclaims routed, 10/10 bounded alerts allowed, 31/33 action matches, 32/33 primary-check matches.
 ```
 
 ## Package Contents
@@ -57,4 +65,4 @@ The manifest is generated from the repository-facing file set only by `code/buil
 
 ## Scope Boundary
 
-The active experiment is a specification-conformance scaffold. It tests whether a deterministic three-check controller follows an intended evidence grammar on author-designed synthetic archetypes. Stage 1 consumes structured evidence annotations only; it does not call an LLM, parse free text, verify citations, or extract population-fit features. It does not prove independent safety, clinical accuracy, generalization, or patient benefit.
+The active deterministic experiment is a specification-conformance scaffold. It tests whether a three-check controller follows an intended evidence grammar on author-designed synthetic archetypes. Stage 1 consumes structured evidence annotations only; it does not parse free text, verify citations, or extract population-fit features. The optional LLM self-evaluation baseline sends those same synthetic annotations to frontier models as a comparator. Neither experiment proves independent safety, clinical accuracy, generalization, or patient benefit.

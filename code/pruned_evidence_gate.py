@@ -25,6 +25,18 @@ CHECK_LABELS = {
     "claim_strength": "Claim strength",
 }
 
+CHECK_PRECEDENCE_ORDER = (
+    "source_support",
+    "population_fit",
+    "claim_strength",
+)
+
+PRECEDENCE_SENSITIVITY_ORDERS = (
+    CHECK_PRECEDENCE_ORDER,
+    ("population_fit", "source_support", "claim_strength"),
+    ("claim_strength", "population_fit", "source_support"),
+)
+
 
 @dataclass(frozen=True)
 class AlertCase:
@@ -77,6 +89,16 @@ class AblationResult:
     inappropriate_denial_count: int
     action_changed_count: int
     primary_check_changed_count: int
+
+
+@dataclass(frozen=True)
+class PrecedenceSensitivityResult:
+    case_id: str
+    drug_gene: str
+    precedence_order: str
+    action: str
+    primary_check: str
+    surfaced_explanation: str
 
 
 CASES: tuple[AlertCase, ...] = (
@@ -595,49 +617,81 @@ def _risk_score(case: AlertCase) -> float:
     return min(score, 0.99)
 
 
-def decide(case: AlertCase, disabled_checks: frozenset[str] = frozenset()) -> CheckDecision:
-    """Apply the fixed precedence order without reading expected labels.
+def _source_support_decision(case: AlertCase) -> tuple[str, str] | None:
+    if case.citation_support == "unverifiable":
+        return "DENY_UNVERIFIABLE_SOURCE", "source_support"
+    if case.citation_support in {"conflicting_or_uncertain", "outdated_or_context_shifted"}:
+        return "ABSTAIN_SOURCE_SUPPORT", "source_support"
+    if case.citation_support == "unsupported_or_absent":
+        action = "DENY_UNSUPPORTED_ACTION" if case.actionability_level == "not_actionable_for_claim" else "ABSTAIN_SOURCE_SUPPORT"
+        return action, "source_support"
+    return None
+
+
+def _population_fit_decision(case: AlertCase) -> tuple[str, str] | None:
+    if case.population_fit in {"population_mismatch", "unknown"}:
+        return "ABSTAIN_POPULATION_FIT", "population_fit"
+    return None
+
+
+def _claim_strength_decision(case: AlertCase) -> tuple[str, str] | None:
+    if case.actionability_level == "not_actionable_for_claim":
+        return "DENY_UNSUPPORTED_ACTION", "claim_strength"
+    if (
+        case.actionability_level == "context_dependent"
+        or case.endpoint_level in {
+            "association_or_pharmacology",
+            "dose_algorithm_or_surrogate",
+            "uncertain_variant",
+        }
+    ):
+        return "NARROW_CLAIM", "claim_strength"
+    return None
+
+
+CHECK_DECIDERS = {
+    "source_support": _source_support_decision,
+    "population_fit": _population_fit_decision,
+    "claim_strength": _claim_strength_decision,
+}
+
+
+def _validate_precedence(precedence_order: tuple[str, ...]) -> None:
+    if set(precedence_order) != set(CHECK_LABELS) or len(precedence_order) != len(CHECK_LABELS):
+        raise ValueError(f"precedence_order must be a permutation of {tuple(CHECK_LABELS)}")
+
+
+def decide_with_precedence(
+    case: AlertCase,
+    precedence_order: tuple[str, ...] = CHECK_PRECEDENCE_ORDER,
+    disabled_checks: frozenset[str] = frozenset(),
+) -> CheckDecision:
+    """Apply a named precedence order without reading expected labels.
 
     The controller consumes only structured evidence annotations. It does not
     parse free text and it does not inspect expected_action or expected_check.
-    Precedence is source support, then population fit, then
-    claim strength.
+    Precedence controls which explanation is surfaced when more than one check
+    could justify intervention.
     """
+    _validate_precedence(precedence_order)
     risk = _risk_score(case)
-    source_enabled = "source_support" not in disabled_checks
-    population_enabled = "population_fit" not in disabled_checks
-    claim_enabled = "claim_strength" not in disabled_checks
+    for check in precedence_order:
+        if check in disabled_checks:
+            continue
+        outcome = CHECK_DECIDERS[check](case)
+        if outcome is not None:
+            action, primary = outcome
+            return CheckDecision(action=action, primary_check=primary, risk_score=risk)
 
-    if source_enabled and case.citation_support == "unverifiable":
-        action = "DENY_UNVERIFIABLE_SOURCE"
-        primary = "source_support"
-    elif source_enabled and case.citation_support in {"conflicting_or_uncertain", "outdated_or_context_shifted"}:
-        action = "ABSTAIN_SOURCE_SUPPORT"
-        primary = "source_support"
-    elif source_enabled and case.citation_support == "unsupported_or_absent":
-        action = "DENY_UNSUPPORTED_ACTION" if case.actionability_level == "not_actionable_for_claim" else "ABSTAIN_SOURCE_SUPPORT"
-        primary = "source_support"
-    elif population_enabled and case.population_fit in {"population_mismatch", "unknown"}:
-        action = "ABSTAIN_POPULATION_FIT"
-        primary = "population_fit"
-    elif claim_enabled and case.actionability_level == "not_actionable_for_claim":
-        action = "DENY_UNSUPPORTED_ACTION"
-        primary = "claim_strength"
-    elif claim_enabled and (
-        case.actionability_level == "context_dependent"
-        or case.endpoint_level in {
-        "association_or_pharmacology",
-        "dose_algorithm_or_surrogate",
-        "uncertain_variant",
-        }
-    ):
-        action = "NARROW_CLAIM"
-        primary = "claim_strength"
-    else:
-        action = "ALLOW_BOUNDED_ALERT"
-        primary = "none"
+    action = "ALLOW_BOUNDED_ALERT"
+    primary = "none"
 
     return CheckDecision(action=action, primary_check=primary, risk_score=risk)
+
+
+def decide(case: AlertCase, disabled_checks: frozenset[str] = frozenset()) -> CheckDecision:
+    """Apply the source-first policy used for the main Stage 1 run."""
+    return decide_with_precedence(case, CHECK_PRECEDENCE_ORDER, disabled_checks)
 
 
 def score_case(case: AlertCase, decision: CheckDecision) -> CheckResult:
@@ -655,7 +709,7 @@ def score_case(case: AlertCase, decision: CheckDecision) -> CheckResult:
     if action_matches and check_matches:
         category = "matched_expected"
     elif action_matches:
-        category = "matched_action_check_precedence_mismatch"
+        category = "matched_action_precedence_sensitive"
     elif case.expected_action == "NARROW_CLAIM" and action.startswith("ABSTAIN"):
         category = "conservative_disagreement"
     elif inappropriate_denial:
@@ -717,6 +771,47 @@ def _check_display(name: str) -> str:
     return CHECK_LABELS.get(name, "None" if name == "none" else name.replace("_", " ").title())
 
 
+def _surfaced_explanation(case: AlertCase, decision: CheckDecision) -> str:
+    if decision.primary_check == "source_support":
+        if case.citation_support == "unverifiable":
+            return "Citation cannot be verified, so the alert is denied before clinical action is displayed."
+        if case.citation_support in {"conflicting_or_uncertain", "outdated_or_context_shifted"}:
+            return "The source is real but uncertain, conflicting, stale, or context-shifted, so the alert abstains."
+        return "Source support is absent for the proposed medication action."
+    if decision.primary_check == "population_fit":
+        return "The source-to-target population bridge is mismatched or unknown."
+    if decision.primary_check == "claim_strength":
+        if decision.action == "DENY_UNSUPPORTED_ACTION":
+            return "The evidence does not support the requested medication action."
+        return "The evidence supports only a narrower or more context-dependent claim."
+    return "No evidence-boundary predicate fires; the bounded alert is allowed."
+
+
+def precedence_sensitivity(
+    case_ids: tuple[str, ...] = ("PGX19", "PGX24"),
+    orders: tuple[tuple[str, ...], ...] = PRECEDENCE_SENSITIVITY_ORDERS,
+    cases: tuple[AlertCase, ...] = CASES,
+) -> list[PrecedenceSensitivityResult]:
+    """Show how governance precedence changes the surfaced explanation."""
+    by_id = {case.case_id: case for case in cases}
+    rows: list[PrecedenceSensitivityResult] = []
+    for case_id in case_ids:
+        case = by_id[case_id]
+        for order in orders:
+            decision = decide_with_precedence(case, order)
+            rows.append(
+                PrecedenceSensitivityResult(
+                    case_id=case.case_id,
+                    drug_gene=case.drug_gene,
+                    precedence_order=" > ".join(order),
+                    action=decision.action,
+                    primary_check=decision.primary_check,
+                    surfaced_explanation=_surfaced_explanation(case, decision),
+                )
+            )
+    return rows
+
+
 def evaluate(cases: tuple[AlertCase, ...] = CASES) -> tuple[list[CheckResult], dict[str, object]]:
     results = [monitor_case(case) for case in cases]
     gt = [case.ground_truth_overclaim for case in cases]
@@ -727,13 +822,14 @@ def evaluate(cases: tuple[AlertCase, ...] = CASES) -> tuple[list[CheckResult], d
     bounded_allowed_count = sum((not g) and (not p) for g, p in zip(gt, pred))
     action_conformance_count = sum(r.actual_action == r.expected_action for r in results)
     check_conformance_count = sum(r.primary_check == r.expected_check for r in results)
-    check_disagreement_cases = [
+    precedence_sensitive_cases = [
         {
             "case_id": r.case_id,
             "drug_gene": r.drug_gene,
             "expected_check": r.expected_check,
             "actual_check": r.primary_check,
             "actual_action": r.actual_action,
+            "interpretation": "Action matched; surfaced explanation depends on check precedence.",
         }
         for r in results
         if r.primary_check != r.expected_check
@@ -752,9 +848,9 @@ def evaluate(cases: tuple[AlertCase, ...] = CASES) -> tuple[list[CheckResult], d
         "check_count": 3,
         "checks": list(CHECK_LABELS.values()),
         "controller_input_boundary": (
-            "Stage 1 consumes structured evidence annotations from the case bank; "
-            "it does not parse draft_claim text, verify citations, call an LLM, "
-            "or extract EHR/population-fit features."
+            "The deterministic Stage 1 controller consumes structured evidence annotations from the case bank; "
+            "the controller itself does not parse draft_claim text, verify citations, call an LLM, "
+            "or extract EHR/population-fit features. The optional LLM baseline is a separate comparator."
         ),
         "author_designed_overclaim_cases": designed_overclaim_count,
         "author_designed_bounded_alert_cases": designed_bounded_count,
@@ -772,12 +868,9 @@ def evaluate(cases: tuple[AlertCase, ...] = CASES) -> tuple[list[CheckResult], d
         "action_conformance_rate": action_conformance_count / len(results),
         "check_conformance_count": check_conformance_count,
         "check_conformance_rate": check_conformance_count / len(results),
-        "check_precedence_order": [
-            "source_support",
-            "population_fit",
-            "claim_strength",
-        ],
-        "check_disagreement_cases": check_disagreement_cases,
+        "check_precedence_order": list(CHECK_PRECEDENCE_ORDER),
+        "precedence_sensitive_cases": precedence_sensitive_cases,
+        "precedence_sensitivity": [asdict(row) for row in precedence_sensitivity(cases=cases)],
         "check_ablation": [asdict(row) for row in ablation_summary(cases)],
         "action_counts": action_counts,
         "primary_check_counts": check_counts,
@@ -882,7 +975,7 @@ def write_figures(summary: dict[str, object], figures_dir: Path = FIGURES) -> No
     ax.text(
         0.5,
         -0.18,
-        "Check precedence creates two primary-check mismatches: PGX19 and PGX24.",
+        "PGX19 and PGX24 are precedence-sensitive: the action matches, but the surfaced rationale changes by policy.",
         ha="center",
         transform=ax.transAxes,
         fontsize=12,
@@ -920,6 +1013,14 @@ def write_outputs(results_dir: Path = RESULTS) -> dict[str, object]:
         writer = csv.DictWriter(handle, fieldnames=list(asdict(ablations[0]).keys()))
         writer.writeheader()
         for row in ablations:
+            writer.writerow(asdict(row))
+
+    precedence_path = results_dir / "pruned_pgx_precedence_sensitivity.csv"
+    precedence_rows = precedence_sensitivity()
+    with precedence_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(asdict(precedence_rows[0]).keys()))
+        writer.writeheader()
+        for row in precedence_rows:
             writer.writerow(asdict(row))
 
     write_figures(summary)

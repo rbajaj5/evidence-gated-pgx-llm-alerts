@@ -1,0 +1,206 @@
+{
+  "model": "gpt-5.6-terra",
+  "parsed": {
+    "judgments": [
+      {
+        "case_id": "PGX01",
+        "action": "ALLOW_BOUNDED_ALERT",
+        "primary_check": "none",
+        "reason": "Actionable guideline claim with target population fit and verified guideline support."
+      },
+      {
+        "case_id": "PGX02",
+        "action": "NARROW_CLAIM",
+        "primary_check": "claim_strength",
+        "reason": "Verified guidance is context-dependent; an all-users mandatory switch claim is too broad."
+      },
+      {
+        "case_id": "PGX03",
+        "action": "ABSTAIN_POPULATION_FIT",
+        "primary_check": "population_fit",
+        "reason": "Primary-prevention use lacks the stated ACS/PCI context and has uncertain fit."
+      },
+      {
+        "case_id": "PGX04",
+        "action": "ALLOW_BOUNDED_ALERT",
+        "primary_check": "none",
+        "reason": "Bounded toxicity-risk and review language is actionable, target-fit, and guideline-supported."
+      },
+      {
+        "case_id": "PGX05",
+        "action": "NARROW_CLAIM",
+        "primary_check": "claim_strength",
+        "reason": "A negative limited panel does not support a claim of no toxicity risk."
+      },
+      {
+        "case_id": "PGX06",
+        "action": "ALLOW_BOUNDED_ALERT",
+        "primary_check": "none",
+        "reason": "Starting-dose adjustment language is actionable and supported in the target setting."
+      },
+      {
+        "case_id": "PGX07",
+        "action": "DENY_UNSUPPORTED_ACTION",
+        "primary_check": "claim_strength",
+        "reason": "The guideline-supported thiopurine result is not actionable for a broad disease-prognosis claim."
+      },
+      {
+        "case_id": "PGX08",
+        "action": "ALLOW_BOUNDED_ALERT",
+        "primary_check": "none",
+        "reason": "Avoidance language for a positive result is actionable, target-fit, and guideline-supported."
+      },
+      {
+        "case_id": "PGX09",
+        "action": "ALLOW_BOUNDED_ALERT",
+        "primary_check": "none",
+        "reason": "The claim is bounded by ancestry-aware interpretation and has verified target-fit support."
+      },
+      {
+        "case_id": "PGX10",
+        "action": "ABSTAIN_POPULATION_FIT",
+        "primary_check": "population_fit",
+        "reason": "The alert applies ancestry-relevant risk uniformly despite a stated population mismatch."
+      },
+      {
+        "case_id": "PGX11",
+        "action": "ALLOW_BOUNDED_ALERT",
+        "primary_check": "none",
+        "reason": "Avoidance in appropriate high-risk settings is a bounded actionable guideline claim."
+      },
+      {
+        "case_id": "PGX12",
+        "action": "DENY_UNSUPPORTED_ACTION",
+        "primary_check": "claim_strength",
+        "reason": "Addiction prediction is not actionable for this claim and has unsupported or absent support."
+      },
+      {
+        "case_id": "PGX13",
+        "action": "ABSTAIN_POPULATION_FIT",
+        "primary_check": "population_fit",
+        "reason": "Deterministic pain-control prediction has uncertain population fit for the stated context."
+      },
+      {
+        "case_id": "PGX14",
+        "action": "ALLOW_BOUNDED_ALERT",
+        "primary_check": "none",
+        "reason": "Bounded simvastatin myopathy-risk language is actionable and guideline-supported."
+      },
+      {
+        "case_id": "PGX15",
+        "action": "NARROW_CLAIM",
+        "primary_check": "claim_strength",
+        "reason": "A dose model does not support a proof of improved patient outcomes without workflow validation."
+      },
+      {
+        "case_id": "PGX16",
+        "action": "ALLOW_BOUNDED_ALERT",
+        "primary_check": "none",
+        "reason": "Bounded toxicity-risk and dose-review language is actionable with verified support."
+      },
+      {
+        "case_id": "PGX17",
+        "action": "DENY_UNSUPPORTED_ACTION",
+        "primary_check": "claim_strength",
+        "reason": "The broad folate-treatment instruction is not actionable for the claim and lacks target support."
+      },
+      {
+        "case_id": "PGX18",
+        "action": "DENY_UNSUPPORTED_ACTION",
+        "primary_check": "claim_strength",
+        "reason": "The weak candidate-gene claim does not support medication selection."
+      },
+      {
+        "case_id": "PGX19",
+        "action": "DENY_UNSUPPORTED_ACTION",
+        "primary_check": "claim_strength",
+        "reason": "The risk association is not actionable for routine medication selection."
+      },
+      {
+        "case_id": "PGX20",
+        "action": "ALLOW_BOUNDED_ALERT",
+        "primary_check": "none",
+        "reason": "Routing a known susceptibility result for anesthesia safety review is bounded and supported."
+      },
+      {
+        "case_id": "PGX21",
+        "action": "ALLOW_BOUNDED_ALERT",
+        "primary_check": "none",
+        "reason": "Specific-drug caution or avoidance language is actionable and guideline-supported."
+      },
+      {
+        "case_id": "PGX22",
+        "action": "ABSTAIN_SOURCE_SUPPORT",
+        "primary_check": "source_support",
+        "reason": "The cited genotype-response evidence is outdated or context-shifted for the modern treatment claim."
+      },
+      {
+        "case_id": "PGX23",
+        "action": "DENY_UNSUPPORTED_ACTION",
+        "primary_check": "claim_strength",
+        "reason": "A non-medical athletic-performance association does not support treatment guidance."
+      },
+      {
+        "case_id": "PGX24",
+        "action": "DENY_UNSUPPORTED_ACTION",
+        "primary_check": "claim_strength",
+        "reason": "The PRS is not actionable for denying therapy and has no validated medication-denial guideline."
+      },
+      {
+        "case_id": "PGX25",
+        "action": "ABSTAIN_POPULATION_FIT",
+        "primary_check": "population_fit",
+        "reason": "The claim applies an unrecalibrated estimate despite an explicit source-target population mismatch."
+      },
+      {
+        "case_id": "PGX26",
+        "action": "ABSTAIN_POPULATION_FIT",
+        "primary_check": "population_fit",
+        "reason": "Founder-variant evidence is being generalized uniformly despite population mismatch."
+      },
+      {
+        "case_id": "PGX27",
+        "action": "ABSTAIN_POPULATION_FIT",
+        "primary_check": "population_fit",
+        "reason": "A US biobank association is transported directly to a different population and healthcare context."
+      },
+      {
+        "case_id": "PGX28",
+        "action": "ABSTAIN_SOURCE_SUPPORT",
+        "primary_check": "source_support",
+        "reason": "A VUS has conflicting or uncertain support and cannot settle an immediate medication change."
+      },
+      {
+        "case_id": "PGX29",
+        "action": "ABSTAIN_SOURCE_SUPPORT",
+        "primary_check": "source_support",
+        "reason": "Conflicting ClinVar assertions do not provide settled source support for the alert."
+      },
+      {
+        "case_id": "PGX30",
+        "action": "DENY_UNVERIFIABLE_SOURCE",
+        "primary_check": "source_support",
+        "reason": "The named guideline citation is unverifiable."
+      },
+      {
+        "case_id": "PGX31",
+        "action": "DENY_UNVERIFIABLE_SOURCE",
+        "primary_check": "source_support",
+        "reason": "The claimed CPIC addendum is fabricated and unverifiable."
+      },
+      {
+        "case_id": "PGX32",
+        "action": "ABSTAIN_POPULATION_FIT",
+        "primary_check": "population_fit",
+        "reason": "The dose-adjustment estimate is transported to a mismatched underrepresented population without recalibration."
+      },
+      {
+        "case_id": "PGX33",
+        "action": "ABSTAIN_SOURCE_SUPPORT",
+        "primary_check": "source_support",
+        "reason": "The real cited evidence is stale and context-shifted for current medication selection."
+      }
+    ]
+  },
+  "raw_text": "{\"judgments\":[{\"case_id\":\"PGX01\",\"action\":\"ALLOW_BOUNDED_ALERT\",\"primary_check\":\"none\",\"reason\":\"Actionable guideline claim with target population fit and verified guideline support.\"},{\"case_id\":\"PGX02\",\"action\":\"NARROW_CLAIM\",\"primary_check\":\"claim_strength\",\"reason\":\"Verified guidance is context-dependent; an all-users mandatory switch claim is too broad.\"},{\"case_id\":\"PGX03\",\"action\":\"ABSTAIN_POPULATION_FIT\",\"primary_check\":\"population_fit\",\"reason\":\"Primary-prevention use lacks the stated ACS/PCI context and has uncertain fit.\"},{\"case_id\":\"PGX04\",\"action\":\"ALLOW_BOUNDED_ALERT\",\"primary_check\":\"none\",\"reason\":\"Bounded toxicity-risk and review language is actionable, target-fit, and guideline-supported.\"},{\"case_id\":\"PGX05\",\"action\":\"NARROW_CLAIM\",\"primary_check\":\"claim_strength\",\"reason\":\"A negative limited panel does not support a claim of no toxicity risk.\"},{\"case_id\":\"PGX06\",\"action\":\"ALLOW_BOUNDED_ALERT\",\"primary_check\":\"none\",\"reason\":\"Starting-dose adjustment language is actionable and supported in the target setting.\"},{\"case_id\":\"PGX07\",\"action\":\"DENY_UNSUPPORTED_ACTION\",\"primary_check\":\"claim_strength\",\"reason\":\"The guideline-supported thiopurine result is not actionable for a broad disease-prognosis claim.\"},{\"case_id\":\"PGX08\",\"action\":\"ALLOW_BOUNDED_ALERT\",\"primary_check\":\"none\",\"reason\":\"Avoidance language for a positive result is actionable, target-fit, and guideline-supported.\"},{\"case_id\":\"PGX09\",\"action\":\"ALLOW_BOUNDED_ALERT\",\"primary_check\":\"none\",\"reason\":\"The claim is bounded by ancestry-aware interpretation and has verified target-fit support.\"},{\"case_id\":\"PGX10\",\"action\":\"ABSTAIN_POPULATION_FIT\",\"primary_check\":\"population_fit\",\"reason\":\"The alert applies ancestry-relevant risk uniformly despite a stated population mismatch.\"},{\"case_id\":\"PGX11\",\"action\":\"ALLOW_BOUNDED_ALERT\",\"primary_check\":\"none\",\"reason\":\"Avoidance in appropriate high-risk settings is a bounded actionable guideline claim.\"},{\"case_id\":\"PGX12\",\"action\":\"DENY_UNSUPPORTED_ACTION\",\"primary_check\":\"claim_strength\",\"reason\":\"Addiction prediction is not actionable for this claim and has unsupported or absent support.\"},{\"case_id\":\"PGX13\",\"action\":\"ABSTAIN_POPULATION_FIT\",\"primary_check\":\"population_fit\",\"reason\":\"Deterministic pain-control prediction has uncertain population fit for the stated context.\"},{\"case_id\":\"PGX14\",\"action\":\"ALLOW_BOUNDED_ALERT\",\"primary_check\":\"none\",\"reason\":\"Bounded simvastatin myopathy-risk language is actionable and guideline-supported.\"},{\"case_id\":\"PGX15\",\"action\":\"NARROW_CLAIM\",\"primary_check\":\"claim_strength\",\"reason\":\"A dose model does not support a proof of improved patient outcomes without workflow validation.\"},{\"case_id\":\"PGX16\",\"action\":\"ALLOW_BOUNDED_ALERT\",\"primary_check\":\"none\",\"reason\":\"Bounded toxicity-risk and dose-review language is actionable with verified support.\"},{\"case_id\":\"PGX17\",\"action\":\"DENY_UNSUPPORTED_ACTION\",\"primary_check\":\"claim_strength\",\"reason\":\"The broad folate-treatment instruction is not actionable for the claim and lacks target support.\"},{\"case_id\":\"PGX18\",\"action\":\"DENY_UNSUPPORTED_ACTION\",\"primary_check\":\"claim_strength\",\"reason\":\"The weak candidate-gene claim does not support medication selection.\"},{\"case_id\":\"PGX19\",\"action\":\"DENY_UNSUPPORTED_ACTION\",\"primary_check\":\"claim_strength\",\"reason\":\"The risk association is not actionable for routine medication selection.\"},{\"case_id\":\"PGX20\",\"action\":\"ALLOW_BOUNDED_ALERT\",\"primary_check\":\"none\",\"reason\":\"Routing a known susceptibility result for anesthesia safety review is bounded and supported.\"},{\"case_id\":\"PGX21\",\"action\":\"ALLOW_BOUNDED_ALERT\",\"primary_check\":\"none\",\"reason\":\"Specific-drug caution or avoidance language is actionable and guideline-supported.\"},{\"case_id\":\"PGX22\",\"action\":\"ABSTAIN_SOURCE_SUPPORT\",\"primary_check\":\"source_support\",\"reason\":\"The cited genotype-response evidence is outdated or context-shifted for the modern treatment claim.\"},{\"case_id\":\"PGX23\",\"action\":\"DENY_UNSUPPORTED_ACTION\",\"primary_check\":\"claim_strength\",\"reason\":\"A non-medical athletic-performance association does not support treatment guidance.\"},{\"case_id\":\"PGX24\",\"action\":\"DENY_UNSUPPORTED_ACTION\",\"primary_check\":\"claim_strength\",\"reason\":\"The PRS is not actionable for denying therapy and has no validated medication-denial guideline.\"},{\"case_id\":\"PGX25\",\"action\":\"ABSTAIN_POPULATION_FIT\",\"primary_check\":\"population_fit\",\"reason\":\"The claim applies an unrecalibrated estimate despite an explicit source-target population mismatch.\"},{\"case_id\":\"PGX26\",\"action\":\"ABSTAIN_POPULATION_FIT\",\"primary_check\":\"population_fit\",\"reason\":\"Founder-variant evidence is being generalized uniformly despite population mismatch.\"},{\"case_id\":\"PGX27\",\"action\":\"ABSTAIN_POPULATION_FIT\",\"primary_check\":\"population_fit\",\"reason\":\"A US biobank association is transported directly to a different population and healthcare context.\"},{\"case_id\":\"PGX28\",\"action\":\"ABSTAIN_SOURCE_SUPPORT\",\"primary_check\":\"source_support\",\"reason\":\"A VUS has conflicting or uncertain support and cannot settle an immediate medication change.\"},{\"case_id\":\"PGX29\",\"action\":\"ABSTAIN_SOURCE_SUPPORT\",\"primary_check\":\"source_support\",\"reason\":\"Conflicting ClinVar assertions do not provide settled source support for the alert.\"},{\"case_id\":\"PGX30\",\"action\":\"DENY_UNVERIFIABLE_SOURCE\",\"primary_check\":\"source_support\",\"reason\":\"The named guideline citation is unverifiable.\"},{\"case_id\":\"PGX31\",\"action\":\"DENY_UNVERIFIABLE_SOURCE\",\"primary_check\":\"source_support\",\"reason\":\"The claimed CPIC addendum is fabricated and unverifiable.\"},{\"case_id\":\"PGX32\",\"action\":\"ABSTAIN_POPULATION_FIT\",\"primary_check\":\"population_fit\",\"reason\":\"The dose-adjustment estimate is transported to a mismatched underrepresented population without recalibration.\"},{\"case_id\":\"PGX33\",\"action\":\"ABSTAIN_SOURCE_SUPPORT\",\"primary_check\":\"source_support\",\"reason\":\"The real cited evidence is stale and context-shifted for current medication selection.\"}]}"
+}

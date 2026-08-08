@@ -1,0 +1,22 @@
+{
+  "provider": "openai",
+  "model": "gpt-5.6-terra",
+  "run_utc": "2026-08-08T20:40:50.602982+00:00",
+  "case_count": 33,
+  "designed_overclaim_cases": 23,
+  "bounded_alert_cases": 10,
+  "llm_overclaim_allowed_unchanged_count": 0,
+  "llm_overclaim_routed_count": 23,
+  "llm_bounded_alert_allowed_count": 10,
+  "llm_inappropriate_denial_count": 0,
+  "action_matches_deterministic_count": 31,
+  "primary_check_matches_deterministic_count": 25,
+  "action_matches_expected_count": 31,
+  "primary_check_matches_expected_count": 26,
+  "transport_overclaim_allowed_unchanged_count": 0,
+  "source_overclaim_allowed_unchanged_count": 0,
+  "claim_overclaim_allowed_unchanged_count": 0,
+  "overclaim_allowed_case_ids": [],
+  "inappropriate_denial_case_ids": [],
+  "boundary": "This is an LLM self-evaluation baseline on synthetic structured annotations, not independent clinical adjudication."
+}

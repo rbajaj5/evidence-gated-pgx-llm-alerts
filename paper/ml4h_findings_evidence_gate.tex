@@ -28,6 +28,8 @@
 \usepackage{array}
 \usepackage[switch]{lineno}
 \urlstyle{same}
+\setlength{\bibsep}{0pt}
+\renewcommand{\bibfont}{\footnotesize}
 \linenumbers
 
 \title[Evidence-Gated PGx LLM Alerts]{Evidence-Gated Medical LLM Alerts for Pharmacogenomic Claims}
@@ -41,10 +43,11 @@
 LLM-generated medication alerts can sound more certain than their evidence permits.
 We built a deterministic pre-display monitor for one workflow: pharmacogenomic and genomic medication-alert text.
 The monitor checks source support, population fit, and claim strength, then returns allow, narrow, abstain, or deny.
-Stage 1 is a synthetic specification test: the case bank supplies the structured annotations that a future live system would need to extract, and ablation tests whether any check is dispensable.
-Disabling source support let 2 of 23 designed overclaims pass unchanged; disabling population fit let 1 pass; disabling claim strength let 6 pass.
-With all checks active, all 23 designed overclaim archetypes were blocked or narrowed, and all 10 bounded alerts passed unchanged.
-The first-triggering check matched the author-assigned check label in 31 of 33 cases.
+Stage 1 is a synthetic specification test: the case bank supplies the structured annotations a future live system would need to extract, and ablation tests whether any check is dispensable.
+Disabling source support, population fit, or claim strength let 2, 1, and 6 of 23 designed overclaims pass unchanged, respectively.
+With all checks active, 23/23 designed overclaim archetypes were routed and 10/10 bounded alerts passed unchanged.
+GPT-5.6-terra and Grok-4.5 self-evaluation baselines also routed 23/23 overclaims, but differed from the deterministic monitor on selected actions or surfaced rationales.
+The first-triggering check matched the author-assigned label in 31/33 cases; we interpret the two nonmatches as precedence sensitivity rather than action failure.
 These are specification-conformance results, not clinical safety, generalization, or patient-benefit evidence.
 \end{abstract}
 
@@ -65,19 +68,20 @@ Healthcare LLMs can make evidentiary overreach look syntactically clean.
 A medication alert may cite a real guideline while turning a bounded pharmacogenomic recommendation into a universal instruction, a population-specific association into a claim for a different population, or a surrogate endpoint into patient-outcome benefit.
 Here, transportability means applying evidence from one source population as if it supported the same claim in a different target population.
 The gap matters because fluency can hide what evidence does, and does not, authorize.
-Pharmacogenomic medication alerts are a useful testbed because CPIC and ClinPGx already distinguish genotype, phenotype, evidence level, and prescribing recommendation \citep{cpicguidelines,clinpgx2026}.
+Pharmacogenomic medication alerts are a useful testbed because CPIC-style resources distinguish genotype, phenotype, evidence level, and prescribing recommendation \citep{cpicguidelines}.
 The thesis tested here is deliberately narrow and disputable: overclaim control in this workflow needs three separable checks--source support, population fit, and claim strength--rather than a single endpoint-evidence rule.
 
 \section{Evidence Boundary}
 Healthcare AI evaluation should distinguish implementation consistency from patient-outcome benefit.
 Byrne et al. emphasize that outcome claims require pragmatic clinical evaluation \citep{byrne2024ai}, while Stegenga motivates caution when evidentiary pipelines make interventions appear stronger than they are \citep{stegenga2018medical}.
 FDA--NIH BEST materials provide endpoint vocabulary: biomarkers, surrogate endpoints, validated surrogates, and clinical outcomes are not interchangeable \citep{bestresource}.
-Pharmacogenomics adds a positive control: CPIC-style resources can support bounded prescribing language, including CYP2C19--clopidogrel and DPYD--fluoropyrimidine examples \citep{lee2022cyp2c19,amstutz2018dpyd}, but do not automatically support claims that an LLM improves outcomes, that an association is causal, or that a result generalizes across populations without recalibration.
+The three checks used here instantiate a more general evidence-boundary framework for clinical LLM alerts: source support asks whether cited evidence exists and applies, population fit asks whether the evidence transports to the target patient or population, and claim strength asks whether the evidence supports the requested action.
+Pharmacogenomics supplies concrete examples rather than a one-off exception: CPIC-style resources can support bounded prescribing language, including CYP2C19--clopidogrel and DPYD--fluoropyrimidine examples \citep{lee2022cyp2c19,amstutz2018dpyd}, but do not automatically support claims that an LLM improves outcomes, that an association is causal, or that a result generalizes across populations without recalibration.
 
 \section{Related Work}
 LLM factuality methods such as SelfCheckGPT test whether generated content is consistent across black-box samples \citep{manakul2023selfcheckgpt}.
 Selective classification supplies the decision vocabulary for abstention: a system may decline to answer when coverage is less important than risk control \citep{geifman2017selective}.
-Clinical alert-fatigue work explains why this choice matters in practice: repeated and low-information alerts can reduce clinician response \citep{ancker2017alertfatigue}.
+Clinical alert fatigue explains why this choice matters in practice: repeated and low-information alerts can reduce clinician response.
 This study tests a smaller executable claim.
 Given structured annotations about source support, target population, and claim strength, a pre-display monitor can separate designed pharmacogenomic overclaims from bounded alerts while showing which checks an endpoint-only rule would miss.
 
@@ -87,22 +91,19 @@ A Stage 1 case contains a candidate alert, source-status annotation, population-
 The monitor reads those annotations in a fixed order: source support, population fit, then claim strength.
 It returns one of five actions: allow, narrow, abstain (population fit), abstain (source support), or deny.
 The repository preserves the implementation identifiers for the three checks, but the paper uses their clinical names.
+Table~\ref{tab:gates} maps the general evidence-boundary pattern to the pharmacogenomic implementation; the code expands each boundary into exact predicates.
 
 \begin{table*}[tbp]
 \floatconts
   {tab:gates}
-  {\caption{Stage 1 decision predicates implemented by the controller.}}
-  {\footnotesize\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.53\textwidth}>{\raggedright\arraybackslash}p{0.20\textwidth}@{}}
+  {\caption{Evidence-boundary framework and pharmacogenomic instantiation.}}
+  {\footnotesize\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.16\textwidth}>{\raggedright\arraybackslash}p{0.28\textwidth}>{\raggedright\arraybackslash}p{0.24\textwidth}>{\raggedright\arraybackslash}p{0.22\textwidth}@{}}
   \toprule
-  Check & Predicate used in Stage 1 & Monitor action \\
+  Boundary & General question & Failure mode & PGx implementation \\
   \midrule
-  Source support & The cited source cannot be verified. & Deny the alert for unverifiable source support. \\
-  Source support & The source is real but conflicting, uncertain, outdated, or applied after the clinical context has changed. & Abstain for source support. \\
-  Source support & Source support is absent. If the medication action is also unsupported, deny; otherwise abstain. & Deny unsupported action or abstain. \\
-  Population fit & Target-population fit is mismatched or cannot be determined after source support passes. & Abstain (population fit). \\
-  Claim strength & The requested medication action is not supported by the evidence. & Deny unsupported action. \\
-  Claim strength & The evidence supports only a context-dependent, associative, mechanistic, algorithmic, surrogate, or uncertain-variant claim. & Narrow the alert. \\
-  None & Earlier predicates do not fire. & Allow bounded alert. \\
+  Source support & Does the cited evidence exist, remain current, and apply to the stated context? & Hallucinated, absent, conflicting, or outdated citation. & CPIC, ClinPGx, or ClinVar anchor is verified, stale, conflicting, unsupported, or unverifiable. \\
+  Population fit & Does the evidence transport to this target patient or population? & Source-target mismatch, ancestry/founder effect overreach, or unrepresented population. & HLA, DPYD, Genome India, Israel founder-variant, or All of Us/TOPMed transport flags. \\
+  Claim strength & Does the evidence support the displayed action? & Surrogate endpoint, association, uncertain variant, or polygenic score treated as treatment authority. & CYP2C19--clopidogrel and DPYD--fluoropyrimidine alerts may be bounded; unsupported medication actions are narrowed or denied. \\
   \bottomrule
   \end{tabular}}
 \end{table*}
@@ -116,29 +117,39 @@ Each case has expected labels, but the controller does not read them.
 The three checks are summarized in Table~\ref{tab:gates}.
 The decisive test is ablation, not action conformance: if a disabled check lets an overclaim pass unchanged, that check is doing work not captured by the remaining checks.
 
-\begin{table}[tbp]
-\floatconts
-  {tab:ablation}
-  {\caption{One-check ablation on the synthetic case bank.}}
-  {\resizebox{\linewidth}{!}{\begin{tabular}{@{}lrrr@{}}
-  \toprule
-  Disabled check & Allowed & Action $\Delta$ & Check $\Delta$ \\
-  \midrule
-  Source support & 2 & 7 & 12 \\
-  Population fit & 1 & 5 & 5 \\
-  Claim strength & 6 & 6 & 6 \\
-  \bottomrule
-  \end{tabular}}}
-\end{table}
-
 With all checks active, all 23 designed overclaim archetypes were blocked or narrowed and all 10 bounded alerts passed unchanged.
-Table~\ref{tab:ablation} shows that disabling each check allows at least one designed overclaim to pass unchanged, so source support and population fit are not reducible to claim strength.
+Table~\ref{tab:stage1results} shows that disabling each check allows at least one designed overclaim to pass unchanged, so source support and population fit are not reducible to claim strength.
 Removing source support allows 2/23 overclaims through unchanged; removing population fit allows 1/23 through; removing claim strength allows 6/23 through.
 No check is redundant in this synthetic case bank: each check blocks at least one designed overclaim that passes unchanged when that check is disabled.
 
+\paragraph{LLM self-evaluation baseline}
+Two frontier LLMs classified the same 33 structured annotations without seeing the deterministic rule table.
+This tests a natural objection: perhaps the model can police its own evidence boundary if prompted carefully.
+Both baselines routed all 23 designed overclaims and allowed all 10 bounded alerts, but they were not identical to the deterministic monitor.
+GPT-5.6-terra matched 31/33 actions and 25/33 primary checks; Grok-4.5 matched 31/33 actions and 32/33 primary checks.
+Thus, on this structured synthetic task, LLM self-review did not simply fail; the remaining issue is that stochastic reviewers can choose different rationales or stronger actions without an explicit governance policy.
+
+\begin{table*}[tbp]
+\floatconts
+  {tab:stage1results}
+  {\caption{Stage 1 ablation, LLM self-evaluation, and precedence-sensitivity results.}}
+  {\footnotesize\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\textwidth}>{\raggedright\arraybackslash}p{0.32\textwidth}>{\raggedright\arraybackslash}p{0.38\textwidth}@{}}
+  \toprule
+  Analysis & Result & Interpretation \\
+  \midrule
+  One-check ablation & Source, population, and claim removal let 2/23, 1/23, and 6/23 overclaims pass unchanged. & Each boundary catches at least one archetype that the others do not catch. \\
+  GPT-5.6-terra baseline & 23/23 overclaims routed; 10/10 bounded alerts allowed; 31/33 action agreement; 25/33 check agreement. & Frontier self-review was conservative, but rationale selection varied. \\
+  Grok-4.5 baseline & 23/23 overclaims routed; 10/10 bounded alerts allowed; 31/33 action agreement; 32/33 check agreement. & A second frontier self-review reproduced overclaim routing but not every action choice. \\
+  PGX24 precedence & Source-first: deny/source; population-first: abstain/population; claim-first: deny/claim. & The same case can surface different clinician-facing explanations under different governance orders. \\
+  \bottomrule
+  \end{tabular}}
+\end{table*}
+
+\paragraph{Precedence sensitivity as design}
 Primary-check conformance, defined as the first enabled check matching the author-assigned check label, was 31/33.
-In PGX19 and PGX24, the controller returned the expected action, but the triggering check differed from the author-assigned label because source support has precedence.
-These two disagreements are check-attribution errors.
+In PGX19 and PGX24, the controller returned the expected action, but the surfaced explanation differed because the current policy checks source support before population fit or claim strength.
+These cases are better understood as precedence-sensitive governance examples than as safety failures.
+For PGX24, Table~\ref{tab:stage1results} shows that the action may remain restrictive while the explanation changes from source support to population transport to unsupported medication action.
 
 \section{Evaluation Plan}
 Stage 2 turns the specification test into a held-out reader study.
@@ -156,7 +167,7 @@ Clinicians and reviewers can inspect the rule that changed, blocked, or preserve
 
 \paragraph{Fairness}
 Fairness and bias are central in pharmacogenomics.
-HLA-B*15:02 risk language depends on ancestry and tested population, founder-variant evidence may not generalize to the US population, and biobank results may be unrepresentative for underrepresented or recently admixed groups \citep{clinpgxhla,genomeindia}.
+HLA-B*15:02 risk language depends on ancestry and tested population, founder-variant evidence may not generalize to the US population, and biobank results may be unrepresentative for underrepresented or recently admixed groups.
 Cases PGX09, PGX10, PGX25, PGX26, and PGX27 treat population fit as an equity constraint.
 PGX24 represents the high-risk practice of using a polygenic score to deny opioid or stimulant therapy.
 
@@ -169,6 +180,7 @@ They show rule conformance, not generalization, and assume structured annotation
 The practical problem is annotation, not compute.
 Stage 1 shows that the monitor logic is auditable and that the three checks do different work on a synthetic pharmacogenomic case bank.
 Source support, population fit, and claim strength each block at least one designed overclaim that passes when that check is removed.
+The LLM baselines suggest that self-evaluation over structured annotations can be conservative, but action choice and explanation order still vary without explicit predicates.
 That result turns the next experiment into a concrete measurement problem: determine whether live LLM and EHR pipelines can populate the three annotations reliably enough to reduce overclaiming without increasing inappropriate denial.
 
 \bibliography{ml4h_findings_refs}
