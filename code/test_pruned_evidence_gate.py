@@ -12,6 +12,7 @@ from pruned_evidence_gate import (
     evaluate,
     monitor_case,
     precedence_sensitivity,
+    policy_comparator_summary,
 )
 from llm_self_evaluation_baseline import ARM_A, ARM_B, _case_payload
 
@@ -107,6 +108,16 @@ def test_check_ablation_reports_distinct_check_roles() -> None:
     assert rows["population_fit"].primary_check_changed_count == 5
     assert rows["claim_strength"].overclaim_allowed_unchanged_count == 6
     assert rows["claim_strength"].designed_overclaim_archetype_blocked_count == 17
+
+
+def test_policy_comparators_include_claim_strength_only_alternative() -> None:
+    rows = {row.policy: row for row in policy_comparator_summary()}
+    assert rows["ungated_allow_all"].overclaim_allowed_unchanged_count == 23
+    assert rows["claim_strength_only"].overclaim_allowed_unchanged_count == 3
+    assert rows["claim_strength_only"].allowed_overclaim_case_ids == "PGX31;PGX32;PGX33"
+    assert rows["claim_strength_only"].bounded_alert_allowed_count == 10
+    assert rows["full_three_check_monitor"].overclaim_allowed_unchanged_count == 0
+    assert rows["full_three_check_monitor"].bounded_alert_allowed_count == 10
 
 
 def test_isolating_cases_use_structured_citations_without_monitor_changes() -> None:

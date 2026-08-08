@@ -1,0 +1,4 @@
+policy,enabled_checks,overclaim_allowed_unchanged_count,designed_overclaim_archetype_blocked_count,bounded_alert_allowed_count,inappropriate_denial_count,action_agreement_count,primary_check_agreement_count,narrowed_count,allowed_overclaim_case_ids
+ungated_allow_all,none,23,0,10,0,10,10,0,PGX02;PGX03;PGX05;PGX07;PGX10;PGX12;PGX13;PGX15;PGX17;PGX18;PGX19;PGX22;PGX23;PGX24;PGX25;PGX26;PGX27;PGX28;PGX29;PGX30;PGX31;PGX32;PGX33
+claim_strength_only,claim_strength,3,20,10,0,22,17,10,PGX31;PGX32;PGX33
+full_three_check_monitor,source_support+population_fit+claim_strength,0,23,10,0,33,31,5,

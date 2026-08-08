@@ -1,14 +1,14 @@
-# Evidence-Gated PGx LLM Alerts
+# Executable Evidence-Gate Specification for PGx LLM Alerts
 
 [![tests](https://github.com/rbajaj5/evidence-gated-pgx-llm-alerts/actions/workflows/tests.yml/badge.svg)](https://github.com/rbajaj5/evidence-gated-pgx-llm-alerts/actions/workflows/tests.yml)
 
 ## Project
 
-Evidence-Gated Medical LLM Alerts for Pharmacogenomic Claims: Detecting Overclaiming Relative to Guideline-Supported Evidence.
+An Executable Evidence-Gate Specification for Pharmacogenomic LLM Alerts.
 
 ## Why this package exists
 
-This package studies one bounded question: whether a structured evidence monitor can detect when LLM-drafted pharmacogenomic medication-alert text overstates what cited evidence can support.
+This package studies one bounded question: given oracle structured annotations, can an executable evidence-gate specification route LLM-drafted pharmacogenomic medication-alert text when the draft overstates what cited evidence can support?
 
 ## Workflow
 
@@ -17,6 +17,8 @@ LLM-drafted pharmacogenomic or genomic medication-alert text.
 ## Input Boundary
 
 Each Stage 1 case contains candidate alert text plus structured annotations for source support, population fit, endpoint evidence, and medication actionability. The controller consumes those annotations and returns allow, narrow, abstain, or deny. PGX31, PGX32, and PGX33 additionally include structured citation objects with source name, source URL or DOI where available, a neutral source-claim summary, and an author-only annotation note. Extracting and independently validating those annotations from live LLM output, citations, or EHR context is the main Stage 2 dependency.
+
+This is an executable specification and preregistration scaffold, not an end-to-end extraction system. It does not claim clinical safety, annotation validity, generalization, or patient benefit.
 
 ## Venue Formatting and Anonymization
 
@@ -41,6 +43,7 @@ The final paper source of truth is the ML4H Findings-track LaTeX paper in `paper
 - Precedence-sensitive cases: PGX19 and PGX24
 - Inappropriate denial count: 0
 - One-check ablation: disabling source support allows 2/23 designed overclaims through unchanged; disabling population fit allows 1/23 through; disabling claim strength allows 6/23 through.
+- Simple policy comparators: ungated allow-all leaves 23/23 designed overclaims unchanged; claim-strength-only leaves 3/23 unchanged (PGX31, PGX32, PGX33); the full three-check monitor leaves 0/23 unchanged.
 - LLM self-evaluation Arm A, frozen full bank with source-support labels: GPT-5.6-terra routed 23/23 designed overclaims, allowed 10/10 bounded alerts, had 31/33 action agreement, had 25/33 primary-check agreement, and narrowed 3/33 cases.
 - LLM self-evaluation Arm A, frozen full bank with source-support labels: Grok-4.5 routed 23/23 designed overclaims, allowed 10/10 bounded alerts, had 31/33 action agreement, had 32/33 primary-check agreement, and narrowed 3/33 cases.
 - LLM self-evaluation Arm B, PGX31-PGX33 only with source-support labels withheld: after removing sentinel cues and replacing the IFNL3 link with the primary Muir 2014 DOI, GPT-5.6-terra matched all three deterministic actions and primary checks, while Grok-4.5 matched PGX31 and PGX32 but attributed PGX33 to claim strength.
@@ -58,7 +61,7 @@ Compare unchanged LLM alert drafts with monitored drafts on independently author
 - `summary/`: required 1-2 page summary sheet in DOCX and PDF.
 - `supplement/`: case matrix and reproducibility notes.
 - `code/`: pruned evaluator, optional LLM self-evaluation baseline runner, and tests.
-- `results/`: CSV and JSON outputs, including one-check ablation counts, precedence sensitivity, and LLM self-evaluation baseline outputs.
+- `results/`: CSV and JSON outputs, including one-check ablation counts, simple policy comparators, precedence sensitivity, and LLM self-evaluation baseline outputs.
 - `figures/`: four submission-facing figures.
 - `proposal/` and `progress/`: retained course provenance in the repository, not part of the final submission ZIP.
 
@@ -75,6 +78,7 @@ Use these links if an automated reader can see this README but cannot enumerate 
 - Unit tests: [code/test_pruned_evidence_gate.py](code/test_pruned_evidence_gate.py)
 - Summary results: [results/pruned_pgx_summary.json](results/pruned_pgx_summary.json)
 - Check ablation: [results/pruned_pgx_check_ablation.csv](results/pruned_pgx_check_ablation.csv)
+- Simple policy comparators: [results/pruned_pgx_policy_comparators.csv](results/pruned_pgx_policy_comparators.csv)
 - Precedence sensitivity: [results/pruned_pgx_precedence_sensitivity.csv](results/pruned_pgx_precedence_sensitivity.csv)
 - LLM baseline summary: [results/llm_self_eval_combined_summary.json](results/llm_self_eval_combined_summary.json)
 - Case bank: [results/pruned_pgx_casebook.csv](results/pruned_pgx_casebook.csv)

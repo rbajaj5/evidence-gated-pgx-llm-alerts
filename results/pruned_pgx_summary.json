@@ -134,6 +134,44 @@
       "primary_check_changed_count": 6
     }
   ],
+  "policy_comparators": [
+    {
+      "policy": "ungated_allow_all",
+      "enabled_checks": "none",
+      "overclaim_allowed_unchanged_count": 23,
+      "designed_overclaim_archetype_blocked_count": 0,
+      "bounded_alert_allowed_count": 10,
+      "inappropriate_denial_count": 0,
+      "action_agreement_count": 10,
+      "primary_check_agreement_count": 10,
+      "narrowed_count": 0,
+      "allowed_overclaim_case_ids": "PGX02;PGX03;PGX05;PGX07;PGX10;PGX12;PGX13;PGX15;PGX17;PGX18;PGX19;PGX22;PGX23;PGX24;PGX25;PGX26;PGX27;PGX28;PGX29;PGX30;PGX31;PGX32;PGX33"
+    },
+    {
+      "policy": "claim_strength_only",
+      "enabled_checks": "claim_strength",
+      "overclaim_allowed_unchanged_count": 3,
+      "designed_overclaim_archetype_blocked_count": 20,
+      "bounded_alert_allowed_count": 10,
+      "inappropriate_denial_count": 0,
+      "action_agreement_count": 22,
+      "primary_check_agreement_count": 17,
+      "narrowed_count": 10,
+      "allowed_overclaim_case_ids": "PGX31;PGX32;PGX33"
+    },
+    {
+      "policy": "full_three_check_monitor",
+      "enabled_checks": "source_support+population_fit+claim_strength",
+      "overclaim_allowed_unchanged_count": 0,
+      "designed_overclaim_archetype_blocked_count": 23,
+      "bounded_alert_allowed_count": 10,
+      "inappropriate_denial_count": 0,
+      "action_agreement_count": 33,
+      "primary_check_agreement_count": 31,
+      "narrowed_count": 5,
+      "allowed_overclaim_case_ids": ""
+    }
+  ],
   "action_counts": {
     "ALLOW_BOUNDED_ALERT": 10,
     "NARROW_CLAIM": 5,

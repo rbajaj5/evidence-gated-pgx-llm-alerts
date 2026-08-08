@@ -46,6 +46,10 @@ check_ablation:
   without_source_support: 2 overclaims allowed unchanged; 7 action changes; 12 primary-check changes
   without_population_fit: 1 overclaim allowed unchanged; 5 action changes; 5 primary-check changes
   without_claim_strength: 6 overclaims allowed unchanged; 6 action changes; 6 primary-check changes
+policy_comparators:
+  ungated_allow_all: 23/23 overclaims allowed unchanged
+  claim_strength_only: 3/23 overclaims allowed unchanged (PGX31, PGX32, PGX33)
+  full_three_check_monitor: 0/23 overclaims allowed unchanged
 ```
 
 Expected optional LLM self-evaluation snapshot, if `OPENAI_API_KEY` and `XAI_API_KEY` are available:
@@ -76,4 +80,4 @@ The manifest is generated from the repository-facing file set only by `code/buil
 
 ## Scope Boundary
 
-The active deterministic experiment is a specification-conformance scaffold. It tests whether a three-check controller follows an intended evidence grammar on author-designed synthetic archetypes. Stage 1 consumes structured evidence annotations only; it does not parse free text, verify citations, independently validate the annotation layer, or extract population-fit features. Arm A sends the full structured labels to frontier models as a label-to-action comparator. Arm B withholds the source-support label for PGX31-PGX33 and supplies structured citations instead. Neither experiment proves independent safety, clinical accuracy, generalization, annotation validity, or patient benefit.
+The active deterministic experiment is an executable specification-conformance scaffold. It tests whether a three-check controller follows an intended evidence grammar on author-designed synthetic archetypes and which cases are missed by simpler comparators. Stage 1 consumes structured evidence annotations only; it does not parse free text, verify citations, independently validate the annotation layer, or extract population-fit features. Arm A sends the full structured labels to frontier models as a label-to-action comparator. Arm B withholds the source-support label for PGX31-PGX33 and supplies structured citations instead. Neither experiment proves independent safety, clinical accuracy, generalization, annotation validity, or patient benefit.

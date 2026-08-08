@@ -30,7 +30,7 @@
 \urlstyle{same}
 \linenumbers
 
-\title[Evidence-Gated PGx LLM Alerts]{Evidence-Gated Medical LLM Alerts for Pharmacogenomic Claims}
+\title[PGx Alert Evidence Specification]{An Executable Evidence-Gate Specification for Pharmacogenomic LLM Alerts}
 \author{Anonymous Author(s)}
 \jmlrauthors{Anonymous Author(s)}
 
@@ -39,10 +39,11 @@
 
 \begin{abstract}
 LLM-generated medication alerts can sound more certain than their evidence permits.
-We built a deterministic pre-display monitor for one workflow: pharmacogenomic and genomic medication-alert text.
-The monitor checks source support, population fit, and claim strength, then returns allow, narrow, abstain, or deny.
-Stage 1 is a synthetic specification test: the case bank supplies the structured annotations a future live system would need to extract, and ablation tests whether any check is dispensable.
+We built an executable Stage 1 specification for one workflow: pharmacogenomic and genomic medication-alert text.
+Given structured annotations that a future live system would need to extract, the specification checks source support, population fit, and claim strength, then returns allow, narrow, abstain, or deny.
+Stage 1 is a synthetic conformance test: the case bank supplies oracle annotations, and ablation tests whether each check is non-redundant inside that specification.
 Disabling source support, population fit, or claim strength let 2, 1, and 6 of 23 designed overclaims pass unchanged, respectively.
+An ungated comparator allowed 23/23 overclaims through, while a claim-strength-only comparator allowed 3/23 through: PGX31, PGX32, and PGX33.
 With all checks active, 23/23 designed overclaim archetypes were routed and 10/10 bounded alerts passed unchanged.
 In a frozen full-bank LLM baseline that included the source-support label, GPT-5.6-terra and Grok-4.5 also routed 23/23 overclaims and preserved 10/10 bounded alerts.
 A second three-case baseline withheld the source-support label and supplied structured citations for PGX31--PGX33; GPT-5.6-terra matched all three deterministic actions and primary checks, while Grok-4.5 matched PGX31--PGX32 but treated PGX33 as an unsupported action rather than a source-support abstention.
@@ -64,7 +65,7 @@ Healthcare LLMs can make evidentiary overreach look syntactically clean.
 A medication alert may cite a real guideline while turning a bounded pharmacogenomic recommendation into a universal instruction, a population-specific association into a claim for another population, or a surrogate endpoint into patient-outcome benefit.
 Here, transportability means applying evidence from one source population as if it supported the same target-population claim.
 Pharmacogenomic medication alerts are a useful testbed because CPIC-style resources distinguish genotype, phenotype, evidence level, and prescribing recommendation \citep{cpicguidelines}.
-The thesis tested here is deliberately narrow and disputable: overclaim control in this workflow needs three separable checks---source support, population fit, and claim strength---rather than a single endpoint-evidence rule.
+The thesis tested here is deliberately narrow and disputable: under oracle structured annotations, source support, population fit, and claim strength are separable evidence-boundary predicates that a single endpoint/actionability rule can miss.
 
 \section{Evidence Boundary}
 Healthcare AI evaluation should distinguish implementation consistency from patient-outcome benefit.
@@ -78,7 +79,7 @@ LLM factuality methods such as SelfCheckGPT test whether generated content is co
 Selective classification supplies the decision vocabulary for abstention: a system may decline to answer when coverage is less important than risk control \citep{geifman2017selective}.
 Clinical alert fatigue explains why abstention matters: repeated low-information alerts can reduce clinician response \citep{ancker2017alertfatigue}.
 This study tests a smaller executable claim.
-Given structured annotations about source support, target population, and claim strength, a pre-display monitor can separate designed pharmacogenomic overclaims from bounded alerts while showing which checks an endpoint-only rule would miss.
+Given structured annotations about source support, target population, and claim strength, a pre-display specification can separate designed pharmacogenomic overclaims from bounded alerts while showing which cases a simpler endpoint/actionability rule misses.
 
 \section{Methods}
 The controller is a deterministic pre-display monitor, not an autonomous clinical agent.
@@ -111,12 +112,12 @@ PGX32 uses the 2017 DPYD--fluoropyrimidine CPIC guideline \citep{amstutz2018dpyd
 PGX31 uses a plausible-looking CPIC URL constructed to be non-resolving, because the test is whether a reviewer can handle a well-formed but false citation rather than a sentinel value.
 The 23/10 split is stress-test coverage, not a clinical base rate.
 Each case has expected labels, but the controller does not read them.
-The decisive test is ablation: if a disabled check lets an overclaim pass unchanged, that check is doing work not captured by the others.
+The internal consistency test is ablation: if a disabled check lets an overclaim pass unchanged, that check is doing work not captured by the others inside this case bank.
 
 With all checks active, all 23 designed overclaim archetypes were blocked or narrowed and all 10 bounded alerts passed unchanged.
-Table~\ref{tab:stage1results} shows that disabling each check allows at least one designed overclaim to pass unchanged, so source support and population fit are not reducible to claim strength.
+Table~\ref{tab:stage1results} shows that disabling each check allows at least one designed overclaim to pass unchanged, and that a claim-strength-only comparator misses PGX31--PGX33.
 Removing source support allows 2/23 overclaims through unchanged; removing population fit allows 1/23 through; removing claim strength allows 6/23 through.
-No check is redundant in this synthetic case bank.
+No check is redundant in this synthetic specification, but this does not establish real-world necessity.
 
 \paragraph{LLM self-evaluation baseline}
 Two LLM comparator arms were used.
@@ -131,11 +132,12 @@ The synthetic uniform-NARROW row is computed without an API call; bounded-alert 
 \floatconts
   {tab:stage1results}
   {\caption{Stage 1 ablation, LLM self-evaluation, and precedence-sensitivity results.}}
-  {\footnotesize\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}@{}}
+  {\scriptsize\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}@{}}
   \toprule
   Analysis & Result & Interpretation \\
   \midrule
   One-check ablation & Source, population, and claim removal let 2/23, 1/23, and 6/23 overclaims pass unchanged. & Each boundary catches at least one archetype that the others do not catch. \\
+  Simple policy comparators & Ungated allow-all left 23/23 overclaims unchanged; claim-strength-only left 3/23 unchanged; full monitor left 0/23 unchanged. & An endpoint/actionability-only rule misses the fabricated-source, population-transport, and stale-source isolating cases. \\
   Arm A, GPT-5.6-terra & 23/23 overclaims routed; 10/10 bounded alerts preserved; 0/10 inappropriate denials; 31/33 action agreement; 25/33 check agreement; 3/33 narrowed. & Full-bank label-to-action comparator; not an annotation-validation test. \\
   Arm A, Grok-4.5 & 23/23 overclaims routed; 10/10 bounded alerts preserved; 0/10 inappropriate denials; 31/33 action agreement; 32/33 check agreement; 3/33 narrowed. & Same source-label comparator with different rationale agreement. \\
   Arm B, PGX31--PGX33 & GPT-5.6-terra matched all three actions and primary checks; Grok-4.5 matched PGX31 and PGX32 but treated PGX33 as unsupported action/claim strength. & Structured-citation demonstration only; after removing sentinel cues, one model still shifted a stale-source case into claim-strength reasoning. \\
@@ -172,14 +174,10 @@ PGX24 represents the high-risk practice of using a polygenic score to deny opioi
 \paragraph{Governance and limitations}
 Stage 1 contains no PHI and makes no diagnosis or treatment recommendation; deployment would still need accountability for extraction, citation verification, thresholds, overrides, and audit logging.
 The key limitation is that results are synthetic and author-designed: they show rule conformance, not generalization, and assume structured annotations rather than extracting them from live LLM output or EHR context.
-Stage 1 tests decision logic conditional on author-assigned structured annotations.
+Stage 1 is best read as an executable specification and preregistration scaffold, not as an end-to-end machine-learning system.
+It tests decision logic conditional on author-assigned structured annotations.
 PGX31, PGX32, and PGX33 use structured citations drawn from primary sources where verifiable; the annotation layer itself was not independently validated against those sources in Stage 1.
-Validating annotations against primary literature is a Stage 2 prerequisite.
-
-\section{Conclusion}
-Stage 1 shows that the monitor is auditable and that source support, population fit, and claim strength each block at least one designed overclaim that passes when that check is removed.
-The LLM baselines show useful but policy-dependent self-evaluation over structured annotations.
-The practical problem is annotation: Stage 2 must test whether live LLM and EHR pipelines can populate those annotations and reduce overclaiming without increasing inappropriate denial.
+Validating annotations against primary literature is a Stage 2 prerequisite; the practical Stage 2 question is whether live LLM and EHR pipelines can populate those annotations and reduce overclaiming without increasing inappropriate denial.
 
 \bibliography{ml4h_findings_refs}
 

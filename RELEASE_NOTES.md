@@ -15,6 +15,7 @@ The submission-facing artifact keeps:
 - Stage 1 specification-conformance counts,
 - explicit structured-annotation input boundary,
 - one-check ablation counts,
+- simple policy-comparator counts,
 - precedence-sensitivity analysis for PGX19 and PGX24,
 - LLM self-evaluation Arm A using GPT-5.6-terra and Grok-4.5 on the full synthetic annotation bank with source-support labels,
 - LLM self-evaluation Arm B using GPT-5.6-terra and Grok-4.5 on PGX31-PGX33 with source-support labels withheld and structured citations supplied,
@@ -43,6 +44,7 @@ Full conformance accounting is retained in the supplement and machine-readable J
 2 precedence-sensitive cases: PGX19 and PGX24
 0 inappropriate denials
 Check ablation: disabling source support allows 2/23 overclaims through unchanged; disabling population fit allows 1/23 through; disabling claim strength allows 6/23 through.
+Simple policy comparators: ungated allow-all leaves 23/23 overclaims unchanged; claim-strength-only leaves 3/23 unchanged (PGX31, PGX32, PGX33); the full monitor leaves 0/23 unchanged.
 LLM self-evaluation Arm A: GPT-5.6-terra and Grok-4.5 each routed 23/23 designed overclaims and allowed 10/10 bounded alerts; action agreement with the deterministic monitor was 31/33 for both.
 LLM self-evaluation Arm B: after sentinel cues were removed and PGX33 was moved to the primary Muir 2014 DOI source, GPT-5.6-terra matched PGX31, PGX32, and PGX33, while Grok-4.5 matched PGX31 and PGX32 but attributed PGX33 to claim strength.
 Synthetic uniform-NARROW sanity row: 23/23 designed overclaims routed, 0/10 bounded alerts preserved, 0/10 inappropriate denials, and 33/33 narrowed.

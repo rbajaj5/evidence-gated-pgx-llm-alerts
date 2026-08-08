@@ -92,6 +92,20 @@ class AblationResult:
 
 
 @dataclass(frozen=True)
+class PolicyComparatorResult:
+    policy: str
+    enabled_checks: str
+    overclaim_allowed_unchanged_count: int
+    designed_overclaim_archetype_blocked_count: int
+    bounded_alert_allowed_count: int
+    inappropriate_denial_count: int
+    action_agreement_count: int
+    primary_check_agreement_count: int
+    narrowed_count: int
+    allowed_overclaim_case_ids: str
+
+
+@dataclass(frozen=True)
 class PrecedenceSensitivityResult:
     case_id: str
     drug_gene: str
@@ -782,6 +796,42 @@ def ablation_summary(cases: tuple[AlertCase, ...] = CASES) -> list[AblationResul
     return [_ablate(cases, check) for check in CHECK_LABELS]
 
 
+def _policy_comparator(
+    cases: tuple[AlertCase, ...],
+    policy: str,
+    enabled_checks: tuple[str, ...],
+) -> PolicyComparatorResult:
+    disabled_checks = frozenset(set(CHECK_LABELS) - set(enabled_checks))
+    scored = [score_case(case, decide(case, disabled_checks)) for case in cases]
+    designed_overclaim_count = sum(case.ground_truth_overclaim for case in cases)
+    overclaim_allowed_unchanged_count = sum(row.overclaim_allowed_unchanged for row in scored)
+    bounded_alert_allowed_count = sum(
+        (not case.ground_truth_overclaim) and row.actual_action == "ALLOW_BOUNDED_ALERT"
+        for case, row in zip(cases, scored)
+    )
+    return PolicyComparatorResult(
+        policy=policy,
+        enabled_checks="+".join(enabled_checks) if enabled_checks else "none",
+        overclaim_allowed_unchanged_count=overclaim_allowed_unchanged_count,
+        designed_overclaim_archetype_blocked_count=designed_overclaim_count - overclaim_allowed_unchanged_count,
+        bounded_alert_allowed_count=bounded_alert_allowed_count,
+        inappropriate_denial_count=sum(row.inappropriate_denial for row in scored),
+        action_agreement_count=sum(row.actual_action == case.expected_action for case, row in zip(cases, scored)),
+        primary_check_agreement_count=sum(row.primary_check == case.expected_check for case, row in zip(cases, scored)),
+        narrowed_count=sum(row.actual_action == "NARROW_CLAIM" for row in scored),
+        allowed_overclaim_case_ids=";".join(row.case_id for row in scored if row.overclaim_allowed_unchanged),
+    )
+
+
+def policy_comparator_summary(cases: tuple[AlertCase, ...] = CASES) -> list[PolicyComparatorResult]:
+    """Compare the full monitor to simpler policies inside the same synthetic specification."""
+    return [
+        _policy_comparator(cases, "ungated_allow_all", ()),
+        _policy_comparator(cases, "claim_strength_only", ("claim_strength",)),
+        _policy_comparator(cases, "full_three_check_monitor", CHECK_PRECEDENCE_ORDER),
+    ]
+
+
 def _check_display(name: str) -> str:
     return CHECK_LABELS.get(name, "None" if name == "none" else name.replace("_", " ").title())
 
@@ -888,6 +938,7 @@ def evaluate(cases: tuple[AlertCase, ...] = CASES) -> tuple[list[CheckResult], d
         "precedence_sensitive_cases": precedence_sensitive_cases,
         "precedence_sensitivity": [asdict(row) for row in precedence_sensitivity(cases=cases)],
         "check_ablation": [asdict(row) for row in ablation_summary(cases)],
+        "policy_comparators": [asdict(row) for row in policy_comparator_summary(cases)],
         "action_counts": action_counts,
         "primary_check_counts": check_counts,
         "error_counts": error_counts,
@@ -1037,6 +1088,14 @@ def write_outputs(results_dir: Path = RESULTS) -> dict[str, object]:
         writer = csv.DictWriter(handle, fieldnames=list(asdict(precedence_rows[0]).keys()))
         writer.writeheader()
         for row in precedence_rows:
+            writer.writerow(asdict(row))
+
+    comparator_path = results_dir / "pruned_pgx_policy_comparators.csv"
+    comparator_rows = policy_comparator_summary()
+    with comparator_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(asdict(comparator_rows[0]).keys()))
+        writer.writeheader()
+        for row in comparator_rows:
             writer.writerow(asdict(row))
 
     write_figures(summary)
