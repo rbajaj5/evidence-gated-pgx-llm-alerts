@@ -63,6 +63,7 @@ EXCLUDED_SUFFIXES = {
 }
 
 BINARY_SUFFIXES = {".docx", ".pdf", ".png", ".zip"}
+ZIP_TIMESTAMP = (2026, 8, 8, 0, 0, 0)
 
 
 def posix_rel(path: Path) -> str:
@@ -137,8 +138,14 @@ def build_zip(files: list[Path]) -> None:
     PACKAGE.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(PACKAGE, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for path in files:
-            archive.write(path, posix_rel(path))
-        archive.write(MANIFEST, MANIFEST.name)
+            info = zipfile.ZipInfo(posix_rel(path), ZIP_TIMESTAMP)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o644 << 16
+            archive.writestr(info, path.read_bytes())
+        manifest_info = zipfile.ZipInfo(MANIFEST.name, ZIP_TIMESTAMP)
+        manifest_info.compress_type = zipfile.ZIP_DEFLATED
+        manifest_info.external_attr = 0o644 << 16
+        archive.writestr(manifest_info, MANIFEST.read_bytes())
 
 
 def main() -> None:
