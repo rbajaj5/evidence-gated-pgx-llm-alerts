@@ -45,6 +45,38 @@
       "actual_action": "DENY_UNSUPPORTED_ACTION"
     }
   ],
+  "gate_ablation": [
+    {
+      "condition": "without_citation_guideline_support",
+      "disabled_gate": "citation_guideline_support",
+      "overclaim_allowed_unchanged_count": 0,
+      "designed_overclaim_archetype_blocked_count": 20,
+      "bounded_alert_allowed_count": 10,
+      "inappropriate_denial_count": 0,
+      "action_changed_count": 5,
+      "primary_gate_changed_count": 10
+    },
+    {
+      "condition": "without_population_fit",
+      "disabled_gate": "population_fit",
+      "overclaim_allowed_unchanged_count": 0,
+      "designed_overclaim_archetype_blocked_count": 20,
+      "bounded_alert_allowed_count": 10,
+      "inappropriate_denial_count": 0,
+      "action_changed_count": 4,
+      "primary_gate_changed_count": 4
+    },
+    {
+      "condition": "without_endpoint_actionability",
+      "disabled_gate": "endpoint_actionability",
+      "overclaim_allowed_unchanged_count": 6,
+      "designed_overclaim_archetype_blocked_count": 14,
+      "bounded_alert_allowed_count": 10,
+      "inappropriate_denial_count": 0,
+      "action_changed_count": 6,
+      "primary_gate_changed_count": 6
+    }
+  ],
   "action_counts": {
     "ALLOW_BOUNDED_ALERT": 10,
     "NARROW_CLAIM": 5,

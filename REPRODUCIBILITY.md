@@ -22,7 +22,7 @@ py -3.13 -m pytest 'code' -q
 Expected focused-test result:
 
 ```text
-7 passed
+9 passed
 ```
 
 Expected Stage 1 conformance snapshot:
@@ -40,11 +40,17 @@ inappropriate_denial_count: 0
 action_conformance_count: 30
 gate_conformance_count: 28
 gate_disagreement_cases: PGX19, PGX24
+gate_ablation:
+  without_citation_guideline_support: 0 overclaims allowed unchanged; 5 action changes; 10 primary-gate changes
+  without_population_fit: 0 overclaims allowed unchanged; 4 action changes; 4 primary-gate changes
+  without_endpoint_actionability: 6 overclaims allowed unchanged; 6 action changes; 6 primary-gate changes
 ```
 
 ## Package Contents
 
-The `package/` directory contains the submission ZIP. The unzipped repository also exposes the same main materials directly: DOCX and PDF versions of the proposal, progress report, paper draft, summary sheet, and technical supplement; the synthetic case bank; CSV/JSON results; figures; and a SHA256 manifest.
+The `package/` directory contains the submission ZIP. The unzipped repository also exposes the same main materials directly: DOCX and PDF versions of the proposal, progress report, paper draft, summary sheet, and technical supplement; an ML4H Findings-track LaTeX scaffold; the synthetic case bank; CSV/JSON results; figures; and a SHA256 manifest.
+
+The manifest is generated from the repository-facing file set only. It intentionally excludes ignored runtime artifacts such as `code/results/`, `__pycache__/`, `_pdf_qa/`, and `.pytest_cache/`. `.gitattributes` normalizes text files to LF so hashes are stable after a fresh clone.
 
 ## Scope Boundary
 

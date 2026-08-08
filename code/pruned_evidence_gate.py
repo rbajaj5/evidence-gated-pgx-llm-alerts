@@ -60,6 +60,25 @@ class GateResult:
     rationale: str
 
 
+@dataclass(frozen=True)
+class GateDecision:
+    action: str
+    primary_gate: str
+    risk_score: float
+
+
+@dataclass(frozen=True)
+class AblationResult:
+    condition: str
+    disabled_gate: str
+    overclaim_allowed_unchanged_count: int
+    designed_overclaim_archetype_blocked_count: int
+    bounded_alert_allowed_count: int
+    inappropriate_denial_count: int
+    action_changed_count: int
+    primary_gate_changed_count: int
+
+
 CASES: tuple[AlertCase, ...] = (
     AlertCase(
         "PGX01",
@@ -531,7 +550,7 @@ def _risk_score(case: AlertCase) -> float:
     return min(score, 0.99)
 
 
-def gate_case(case: AlertCase) -> GateResult:
+def decide(case: AlertCase, disabled_gates: frozenset[str] = frozenset()) -> GateDecision:
     """Apply the fixed precedence order without reading expected labels.
 
     The controller consumes only structured evidence annotations. It does not
@@ -540,32 +559,46 @@ def gate_case(case: AlertCase) -> GateResult:
     endpoint/actionability.
     """
     risk = _risk_score(case)
-    if case.citation_support == "unverifiable":
+    citation_enabled = "citation_guideline_support" not in disabled_gates
+    population_enabled = "population_fit" not in disabled_gates
+    endpoint_enabled = "endpoint_actionability" not in disabled_gates
+
+    if citation_enabled and case.citation_support == "unverifiable":
         action = "DENY_CITATION"
         primary = "citation_guideline_support"
-    elif case.citation_support in {"conflicting_or_uncertain", "outdated_or_context_shifted"}:
+    elif citation_enabled and case.citation_support in {"conflicting_or_uncertain", "outdated_or_context_shifted"}:
         action = "ABSTAIN_CITATION_SUPPORT"
         primary = "citation_guideline_support"
-    elif case.citation_support == "unsupported_or_absent":
+    elif citation_enabled and case.citation_support == "unsupported_or_absent":
         action = "DENY_UNSUPPORTED_ACTION" if case.actionability_level == "not_actionable_for_claim" else "ABSTAIN_CITATION_SUPPORT"
         primary = "citation_guideline_support"
-    elif case.population_fit in {"population_mismatch", "unknown"}:
+    elif population_enabled and case.population_fit in {"population_mismatch", "unknown"}:
         action = "ABSTAIN_POPULATION_FIT"
         primary = "population_fit"
-    elif case.actionability_level == "not_actionable_for_claim":
+    elif endpoint_enabled and case.actionability_level == "not_actionable_for_claim":
         action = "DENY_UNSUPPORTED_ACTION"
         primary = "endpoint_actionability"
-    elif case.actionability_level == "context_dependent" or case.endpoint_level in {
+    elif endpoint_enabled and (
+        case.actionability_level == "context_dependent"
+        or case.endpoint_level in {
         "association_or_pharmacology",
         "dose_algorithm_or_surrogate",
         "uncertain_variant",
-    }:
+        }
+    ):
         action = "NARROW_CLAIM"
         primary = "endpoint_actionability"
     else:
         action = "ALLOW_BOUNDED_ALERT"
         primary = "none"
 
+    return GateDecision(action=action, primary_gate=primary, risk_score=risk)
+
+
+def score_case(case: AlertCase, decision: GateDecision) -> GateResult:
+    """Score a fixed decision against expected labels and synthetic truth."""
+    action = decision.action
+    primary = decision.primary_gate
     detects = action != "ALLOW_BOUNDED_ALERT"
     remaining = case.ground_truth_overclaim and action == "ALLOW_BOUNDED_ALERT"
     inappropriate_denial = (
@@ -592,7 +625,7 @@ def gate_case(case: AlertCase) -> GateResult:
         actual_action=action,
         expected_gate=case.expected_gate,
         primary_gate=primary,
-        risk_score=risk,
+        risk_score=decision.risk_score,
         detects_overclaim=detects,
         ungated_overclaim=case.ground_truth_overclaim,
         overclaim_allowed_unchanged=remaining,
@@ -600,6 +633,39 @@ def gate_case(case: AlertCase) -> GateResult:
         error_category=category,
         rationale=case.rationale,
     )
+
+
+def gate_case(case: AlertCase) -> GateResult:
+    """Return the scored result for the full three-gate controller."""
+    return score_case(case, decide(case))
+
+
+def _ablate(cases: tuple[AlertCase, ...], disabled_gate: str) -> AblationResult:
+    baseline = [decide(case) for case in cases]
+    ablated = [decide(case, frozenset({disabled_gate})) for case in cases]
+    scored = [score_case(case, decision) for case, decision in zip(cases, ablated)]
+    designed_overclaim_count = sum(case.ground_truth_overclaim for case in cases)
+    overclaim_allowed_unchanged_count = sum(r.overclaim_allowed_unchanged for r in scored)
+    designed_overclaim_archetype_blocked_count = designed_overclaim_count - overclaim_allowed_unchanged_count
+    bounded_alert_allowed_count = sum(
+        (not case.ground_truth_overclaim) and result.actual_action == "ALLOW_BOUNDED_ALERT"
+        for case, result in zip(cases, scored)
+    )
+    return AblationResult(
+        condition=f"without_{disabled_gate}",
+        disabled_gate=disabled_gate,
+        overclaim_allowed_unchanged_count=overclaim_allowed_unchanged_count,
+        designed_overclaim_archetype_blocked_count=designed_overclaim_archetype_blocked_count,
+        bounded_alert_allowed_count=bounded_alert_allowed_count,
+        inappropriate_denial_count=sum(r.inappropriate_denial for r in scored),
+        action_changed_count=sum(a.action != b.action for a, b in zip(baseline, ablated)),
+        primary_gate_changed_count=sum(a.primary_gate != b.primary_gate for a, b in zip(baseline, ablated)),
+    )
+
+
+def ablation_summary(cases: tuple[AlertCase, ...] = CASES) -> list[AblationResult]:
+    """Disable one gate at a time and recount Stage 1 synthetic outcomes."""
+    return [_ablate(cases, gate) for gate in GATE_LABELS]
 
 
 def evaluate(cases: tuple[AlertCase, ...] = CASES) -> tuple[list[GateResult], dict[str, object]]:
@@ -663,6 +729,7 @@ def evaluate(cases: tuple[AlertCase, ...] = CASES) -> tuple[list[GateResult], di
             "endpoint_actionability",
         ],
         "gate_disagreement_cases": gate_disagreement_cases,
+        "gate_ablation": [asdict(row) for row in ablation_summary(cases)],
         "action_counts": action_counts,
         "primary_gate_counts": gate_counts,
         "error_counts": error_counts,
@@ -695,6 +762,14 @@ def write_outputs(results_dir: Path = RESULTS) -> dict[str, object]:
 
     summary_path = results_dir / "pruned_pgx_summary.json"
     summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+
+    ablation_path = results_dir / "pruned_pgx_gate_ablation.csv"
+    ablations = ablation_summary()
+    with ablation_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(asdict(ablations[0]).keys()))
+        writer.writeheader()
+        for row in ablations:
+            writer.writerow(asdict(row))
 
     return summary
 

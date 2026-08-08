@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 
-from pruned_evidence_gate import CASES, evaluate, gate_case
+from pruned_evidence_gate import CASES, ablation_summary, decide, evaluate, gate_case
 
 
 def case(case_id: str):
@@ -55,6 +55,24 @@ def test_controller_does_not_read_expected_action_label() -> None:
     flipped = replace(original, expected_action="DENY_UNSUPPORTED_ACTION")
     assert gate_case(original).actual_action == gate_case(flipped).actual_action
     assert gate_case(original).primary_gate == gate_case(flipped).primary_gate
+
+
+def test_decision_contract_is_separate_from_expected_labels() -> None:
+    decision = decide(case("PGX24"))
+    assert decision.action == "DENY_UNSUPPORTED_ACTION"
+    assert decision.primary_gate == "citation_guideline_support"
+    assert not hasattr(decision, "expected_action")
+    assert not hasattr(decision, "expected_gate")
+
+
+def test_gate_ablation_reports_distinct_gate_roles() -> None:
+    rows = {row.disabled_gate: row for row in ablation_summary()}
+    assert rows["citation_guideline_support"].action_changed_count == 5
+    assert rows["citation_guideline_support"].primary_gate_changed_count == 10
+    assert rows["population_fit"].action_changed_count == 4
+    assert rows["population_fit"].primary_gate_changed_count == 4
+    assert rows["endpoint_actionability"].overclaim_allowed_unchanged_count == 6
+    assert rows["endpoint_actionability"].designed_overclaim_archetype_blocked_count == 14
 
 
 def test_summary_metrics_are_specification_conformance_not_clinical_claims() -> None:

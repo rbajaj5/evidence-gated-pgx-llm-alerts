@@ -18,6 +18,10 @@ LLM-drafted pharmacogenomic or genomic medication-alert text.
 
 Stage 1 does not call an LLM and does not parse free-text alert claims. The synthetic `draft_claim` field is retained as the candidate alert text, but the controller consumes only structured evidence annotations assigned in the case bank. Extracting those annotations from live LLM output, citations, or EHR context is the main Stage 2 dependency.
 
+## Venue Formatting and Anonymization
+
+The DOCX/PDF files are course-facing deliverables. The repository also includes an ML4H Findings-track LaTeX scaffold using the official 2026 template structure. A real ML4H review submission should use the LaTeX source and an anonymized supplemental archive, because this public course repository and its filenames are de-anonymized.
+
 ## Gates
 
 1. Citation/guideline support.
@@ -36,6 +40,7 @@ Stage 1 does not call an LLM and does not parse free-text alert claims. The synt
 - Primary-gate conformance: 28/30
 - Gate-precedence mismatches: PGX19 and PGX24
 - Inappropriate denial count: 0
+- One-gate ablation: disabling endpoint/actionability allows 6/20 designed overclaims through unchanged; disabling citation/guideline support or population fit changes action/gate routing without allowing overclaims in this synthetic case bank.
 
 These are specification-conformance counts on author-designed synthetic archetypes. The 20/10 case split is a stress-test design choice, not a measured clinical base rate. These results do not prove clinical safety, accuracy, generalization, or patient benefit.
 
@@ -51,7 +56,7 @@ Compare ungated and gated LLM alert drafts on independently authored cases with 
 - `summary/`: required 1-2 page summary sheet in DOCX and PDF.
 - `supplement/`: case matrix and reproducibility notes.
 - `code/`: pruned evaluator and tests only.
-- `results/`: CSV and JSON outputs.
+- `results/`: CSV and JSON outputs, including one-gate ablation counts.
 - `figures/`: three submission-facing figures.
 
 ## Direct Files for Review
@@ -59,6 +64,7 @@ Compare ungated and gated LLM alert drafts on independently authored cases with 
 Use these links if an automated reader can see this README but cannot enumerate the GitHub file tree.
 
 - Final paper: [PDF](paper/Module_14_Final_Paper_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](paper/Module_14_Final_Paper_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
+- ML4H Findings LaTeX scaffold: [TEX](paper/ml4h_findings_evidence_gate.tex) | [BIB](paper/ml4h_findings_refs.bib)
 - Summary sheet: [PDF](summary/Module_14_Summary_Sheet_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](summary/Module_14_Summary_Sheet_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
 - Research proposal: [PDF](proposal/Module_14_Capstone_Proposal_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](proposal/Module_14_Capstone_Proposal_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
 - Outline and progress: [PDF](progress/Module_14_Capstone_Outline_Progress_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](progress/Module_14_Capstone_Outline_Progress_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
@@ -67,6 +73,7 @@ Use these links if an automated reader can see this README but cannot enumerate 
 - Executable evaluator: [code/pruned_evidence_gate.py](code/pruned_evidence_gate.py)
 - Unit tests: [code/test_pruned_evidence_gate.py](code/test_pruned_evidence_gate.py)
 - Summary results: [results/pruned_pgx_summary.json](results/pruned_pgx_summary.json)
+- Gate ablation: [results/pruned_pgx_gate_ablation.csv](results/pruned_pgx_gate_ablation.csv)
 - Case bank: [results/pruned_pgx_casebook.csv](results/pruned_pgx_casebook.csv)
 
 ## Rubric map

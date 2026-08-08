@@ -14,6 +14,7 @@ The submission-facing artifact keeps:
 - 30 synthetic pharmacogenomic/genomic alert cases,
 - Stage 1 specification-conformance counts,
 - explicit structured-annotation input boundary,
+- one-gate ablation counts,
 - gate-precedence error analysis for PGX19 and PGX24,
 - a Stage 2 plan for independently authored cases and blinded reviewer adjudication.
 
@@ -26,7 +27,7 @@ package/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj.zip
 ## Validation snapshot
 
 ```text
-7 focused tests passed
+9 focused tests passed
 30 synthetic cases
 20 ungated overclaims
 0 designed overclaim archetypes allowed unchanged
@@ -34,6 +35,7 @@ package/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj.zip
 28/30 primary-gate conformance
 2 gate-precedence mismatches: PGX19 and PGX24
 0 inappropriate denials
+Gate ablation: disabling endpoint/actionability allows 6/20 designed overclaims through unchanged; disabling citation/guideline support or population fit changes routing without allowing overclaims in this synthetic bank.
 ```
 
 These are synthetic specification-conformance results on author-designed archetypes. They do not establish clinical safety or patient benefit, and the 20/10 case split is not a measured clinical base rate. Stage 1 consumes structured evidence annotations only; free-text/citation extraction is deferred to Stage 2.
