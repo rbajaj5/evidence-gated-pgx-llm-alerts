@@ -49,7 +49,7 @@ gate_ablation:
 
 ## Package Contents
 
-The `package/` directory contains the submission ZIP. The unzipped repository also exposes the same main materials directly: DOCX and PDF versions of the proposal, progress report, paper draft, summary sheet, and technical supplement; an ML4H Findings-track LaTeX scaffold; the synthetic case bank; CSV/JSON results; figures; and a SHA256 manifest.
+The `package/` directory contains the submission ZIP. The unzipped repository also exposes the same main materials directly: DOCX and PDF versions of the proposal, progress report, summary sheet, and technical supplement; the final ML4H Findings-track paper as compiled PDF plus editable LaTeX/BibTeX source; the synthetic case bank; CSV/JSON results; figures; and a SHA256 manifest.
 
 The `progress/` directory preserves provenance explicitly: the original August 2 submitted progress report is retained as `*_v1_submitted_2026-08-02.*`, and the August 8 repo-facing narrowed revision is retained as `*_v2_updated_2026-08-08.*`.
 

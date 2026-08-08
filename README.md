@@ -20,7 +20,7 @@ Stage 1 does not call an LLM and does not parse free-text alert claims. The synt
 
 ## Venue Formatting and Anonymization
 
-The DOCX/PDF files are course-facing deliverables. The repository also includes an ML4H Findings-track LaTeX scaffold using the official 2026 template structure, with citations in BibTeX and full-width tables where needed for the two-column format. A real ML4H review submission should use the LaTeX source and an anonymized supplemental archive, because this public course repository and its filenames are de-anonymized.
+The final paper source of truth is the ML4H Findings-track LaTeX paper in `paper/ml4h_findings_evidence_gate.tex`, with references in `paper/ml4h_findings_refs.bib` and the compiled PDF in `paper/ml4h_findings_evidence_gate.pdf`. A real ML4H review submission should use an anonymized Overleaf/LaTeX source and anonymized supplemental archive, because this public course repository and its filenames are de-anonymized.
 
 ## Gates
 
@@ -52,7 +52,7 @@ Compare ungated and gated LLM alert drafts on independently authored cases with 
 
 - `proposal/`: research proposal in DOCX and PDF.
 - `progress/`: Week 13 outline and progress report in DOCX and PDF, with explicit v1/v2 provenance.
-- `paper/`: paper draft in DOCX and PDF.
+- `paper/`: final ML4H-formatted paper as compiled PDF plus editable LaTeX/BibTeX source.
 - `summary/`: required 1-2 page summary sheet in DOCX and PDF.
 - `supplement/`: case matrix and reproducibility notes.
 - `code/`: pruned evaluator and tests only.
@@ -63,8 +63,7 @@ Compare ungated and gated LLM alert drafts on independently authored cases with 
 
 Use these links if an automated reader can see this README but cannot enumerate the GitHub file tree.
 
-- Final paper: [PDF](paper/Module_14_Final_Paper_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](paper/Module_14_Final_Paper_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
-- ML4H Findings LaTeX scaffold: [compiled PDF](paper/ml4h_findings_evidence_gate.pdf) | [TEX](paper/ml4h_findings_evidence_gate.tex) | [BIB](paper/ml4h_findings_refs.bib)
+- Final paper: [compiled PDF](paper/ml4h_findings_evidence_gate.pdf) | [editable TEX](paper/ml4h_findings_evidence_gate.tex) | [BIB](paper/ml4h_findings_refs.bib)
 - Summary sheet: [PDF](summary/Module_14_Summary_Sheet_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](summary/Module_14_Summary_Sheet_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
 - Research proposal: [PDF](proposal/Module_14_Capstone_Proposal_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](proposal/Module_14_Capstone_Proposal_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
 - Outline and progress: [PDF](progress/Module_14_Capstone_Outline_Progress_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](progress/Module_14_Capstone_Outline_Progress_Pruned_Evidence_Gate_Ravi_Bajaj.docx)

@@ -33,8 +33,8 @@ package/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj.zip
 33 synthetic cases
 23 ungated overclaims
 0 designed overclaim archetypes allowed unchanged
-33/33 action conformance
-31/33 primary-gate conformance
+Full conformance accounting is retained in the supplement and machine-readable JSON.
+31/33 primary-gate conformance, reported as error analysis rather than a headline result
 2 gate-precedence mismatches: PGX19 and PGX24
 0 inappropriate denials
 Gate ablation: disabling citation/guideline support allows 2/23 overclaims through unchanged; disabling population fit allows 1/23 through; disabling endpoint/actionability allows 6/23 through.
