@@ -1,12 +1,12 @@
 # Reproducibility
 
-This repository is the standalone pruned submission-facing package. The active executable artifact is:
+This repository is a standalone submission-facing package. The active executable artifact is:
 
 ```text
 code/pruned_evidence_gate.py
 ```
 
-The repository intentionally excludes the earlier exploratory components that made the prior capstone package too broad.
+The repository intentionally includes only the pharmacogenomic alert gate, synthetic case bank, reproducibility artifacts, and submission documents.
 
 ## Environment
 

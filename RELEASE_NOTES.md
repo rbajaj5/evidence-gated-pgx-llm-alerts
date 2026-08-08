@@ -4,13 +4,13 @@ Date: August 8, 2026
 
 ## What changed
 
-This release adds a reviewer-aligned capstone package focused on a single workflow: LLM-drafted pharmacogenomic or genomic medication-alert text.
+This release packages a single workflow: LLM-drafted pharmacogenomic or genomic medication-alert text.
 
-The pruned package removes unrelated exploratory components from the submission-facing artifact and keeps only:
+The submission-facing artifact keeps:
 
-- endpoint/actionability gate,
-- population-fit gate,
 - citation/guideline-support gate,
+- population-fit gate,
+- endpoint/actionability gate,
 - 30 synthetic pharmacogenomic/genomic alert cases,
 - Stage 1 specification-conformance counts,
 - explicit structured-annotation input boundary,
@@ -20,14 +20,13 @@ The pruned package removes unrelated exploratory components from the submission-
 ## Main outputs
 
 ```text
-outputs/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj/
-outputs/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj.zip
+package/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj.zip
 ```
 
 ## Validation snapshot
 
 ```text
-6 focused tests passed
+7 focused tests passed
 30 synthetic cases
 20 ungated overclaims
 0 designed overclaim archetypes allowed unchanged

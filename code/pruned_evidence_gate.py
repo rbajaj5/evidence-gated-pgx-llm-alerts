@@ -2,8 +2,8 @@
 
 This module is synthetic and non-clinical. It evaluates whether a drafted
 LLM alert overstates what guideline-supported pharmacogenomic or genomic
-evidence can carry. It is intentionally narrower than the earlier exploratory
-capstone harness: one workflow, three gates, and auditable error categories.
+evidence can carry. It is intentionally narrow: one workflow, three gates, and
+auditable error categories.
 """
 
 from __future__ import annotations
@@ -20,9 +20,9 @@ FIGURES = PROJECT_ROOT / "figures"
 
 
 GATE_LABELS = {
-    "endpoint_actionability": "Endpoint/actionability",
-    "population_fit": "Population fit",
     "citation_guideline_support": "Citation/guideline support",
+    "population_fit": "Population fit",
+    "endpoint_actionability": "Endpoint/actionability",
 }
 
 

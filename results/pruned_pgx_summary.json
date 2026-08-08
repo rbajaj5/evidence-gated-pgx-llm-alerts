@@ -3,9 +3,9 @@
   "workflow": "pharmacogenomic/genomic medication-alert text",
   "gate_count": 3,
   "gates": [
-    "Endpoint/actionability",
+    "Citation/guideline support",
     "Population fit",
-    "Citation/guideline support"
+    "Endpoint/actionability"
   ],
   "controller_input_boundary": "Stage 1 consumes structured evidence annotations from the case bank; it does not parse draft_claim text, verify citations, call an LLM, or extract EHR/population-fit features.",
   "author_designed_overclaim_cases": 20,

@@ -1,4 +1,4 @@
-# Evidence-Gated PGx LLM Alerts Capstone
+# Evidence-Gated PGx LLM Alerts
 
 [![tests](https://github.com/rbajaj5/evidence-gated-pgx-llm-alerts/actions/workflows/tests.yml/badge.svg)](https://github.com/rbajaj5/evidence-gated-pgx-llm-alerts/actions/workflows/tests.yml)
 
@@ -8,7 +8,7 @@ Evidence-Gated Medical LLM Alerts for Pharmacogenomic Claims: Detecting Overclai
 
 ## Why this package exists
 
-This package is the pruned, reviewer-aligned version of the capstone. The prior implementation explored many assurance analogies; this submission-facing version narrows to one workflow, three gates, and one measurable failure mode.
+This package studies one bounded question: whether a structured evidence gate can detect when LLM-drafted pharmacogenomic medication-alert text overstates what cited evidence can support.
 
 ## Workflow
 
@@ -20,9 +20,9 @@ Stage 1 does not call an LLM and does not parse free-text alert claims. The synt
 
 ## Gates
 
-1. Endpoint/actionability.
+1. Citation/guideline support.
 2. Population fit.
-3. Citation/guideline support.
+3. Endpoint/actionability.
 
 ## Stage 1 conformance snapshot
 
@@ -63,7 +63,7 @@ Use these links if an automated reader can see this README but cannot enumerate 
 - Research proposal: [PDF](proposal/Module_14_Capstone_Proposal_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](proposal/Module_14_Capstone_Proposal_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
 - Outline and progress: [PDF](progress/Module_14_Capstone_Outline_Progress_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](progress/Module_14_Capstone_Outline_Progress_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
 - Technical supplement: [PDF](supplement/Module_14_Technical_Supplement_Pruned_Evidence_Gate_Ravi_Bajaj.pdf) | [DOCX](supplement/Module_14_Technical_Supplement_Pruned_Evidence_Gate_Ravi_Bajaj.docx)
-- Complete submission ZIP: [Module 14 capstone package](package/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj.zip)
+- Complete submission ZIP: [submission package](package/Module_14_Capstone_Pruned_Evidence_Gate_Package_Ravi_Bajaj.zip)
 - Executable evaluator: [code/pruned_evidence_gate.py](code/pruned_evidence_gate.py)
 - Unit tests: [code/test_pruned_evidence_gate.py](code/test_pruned_evidence_gate.py)
 - Summary results: [results/pruned_pgx_summary.json](results/pruned_pgx_summary.json)
