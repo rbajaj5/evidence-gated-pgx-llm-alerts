@@ -25,12 +25,14 @@
 \jmlrworkshop{Machine Learning for Health (ML4H) 2026}
 
 \usepackage{booktabs}
+\usepackage{array}
 \usepackage[switch]{lineno}
 \urlstyle{same}
 \linenumbers
 
 \title[Evidence-Gated PGx LLM Alerts]{Evidence-Gated Medical LLM Alerts for Pharmacogenomic Claims}
 \author{Anonymous Author(s)}
+\jmlrauthors{Anonymous Author(s)}
 
 \begin{document}
 \maketitle
@@ -40,7 +42,7 @@ Large language models can draft medication alerts whose fluency exceeds the evid
 This paper studies one workflow: pharmacogenomic and genomic medication-alert text.
 I implement a synthetic pre-display evidence gate with three checks: citation/guideline support, population fit, and endpoint/actionability.
 Stage 1 does not call an LLM or parse free text; it tests a deterministic controller over structured annotations.
-In one-gate ablations, disabling citation/guideline support, population fit, or endpoint/actionability allowed 2/23, 1/23, and 6/23 designed overclaims through unchanged, respectively.
+The main Stage 1 result is the one-gate ablation: disabling citation/guideline support let 2 of 23 designed overclaims pass unchanged; disabling population fit let 1 pass; disabling endpoint/actionability let 6 pass.
 With all gates active, all 23 designed overclaim archetypes were blocked or narrowed and all 10 bounded alerts passed unchanged.
 Primary-gate conformance was 31/33, with two gate-precedence disagreements reported as negative results.
 These are specification-conformance results, not clinical safety, generalization, or patient-benefit evidence.
@@ -61,6 +63,7 @@ Any Stage 2 use of clinical cases or expert adjudication would require appropria
 \section{Introduction}
 Healthcare LLMs can make evidentiary overreach look syntactically clean.
 A medication alert may cite a real guideline while turning a bounded pharmacogenomic recommendation into a universal instruction, a population-specific association into a transported claim, or a surrogate endpoint into patient-outcome benefit.
+Here, transport means using evidence from one source population as if it supported the same claim in a different target population.
 The gap matters because fluency can hide what evidence does, and does not, authorize.
 Pharmacogenomic medication alerts are a useful testbed because CPIC and ClinPGx already distinguish genotype, phenotype, evidence level, and prescribing recommendation \citep{cpicguidelines,clinpgx2026}.
 
@@ -70,29 +73,37 @@ Byrne et al. emphasize that outcome claims require pragmatic clinical evaluation
 FDA--NIH BEST materials provide endpoint vocabulary: biomarkers, surrogate endpoints, validated surrogates, and clinical outcomes are not interchangeable \citep{bestresource}.
 Pharmacogenomics adds a positive control: CPIC-style resources can support bounded prescribing language, including CYP2C19--clopidogrel and DPYD--fluoropyrimidine examples \citep{lee2022cyp2c19,amstutz2018dpyd}, but do not automatically support claims that an LLM improves outcomes, that an association is causal, or that a result transports across populations without recalibration.
 
+\section{Related Work}
+This work sits between hallucination detection, selective prediction, and clinical decision support validation.
+SelfCheckGPT treats hallucination as a black-box factual-consistency problem for generated text, while this study assumes structured evidence annotations and asks whether downstream alert actions should be allowed, narrowed, or withheld \citep{manakul2023selfcheckgpt}.
+Selective classification formalizes abstention as a coverage-risk tradeoff, which motivates treating abstain as a reportable action rather than a model failure \citep{geifman2017selective}.
+Clinical alert-fatigue studies show why narrowing and withholding low-support alerts matters: repeated or low-information alerts can reduce clinician response \citep{ancker2017alertfatigue}.
+The contribution here is narrower than those literatures: a synthetic Stage 1 audit of whether three explicit pharmacogenomic evidence gates are redundant.
+
 \section{Methods}
 The controller is a deterministic pre-display gate, not an autonomous clinical agent.
 It receives a synthetic candidate alert plus structured evidence annotations assigned in the case bank; it does not parse draft text, call an LLM, verify citations, or extract EHR/population features.
 The fixed precedence order is citation/guideline support, population fit, then endpoint/actionability.
-It returns one of five permissions: allow, narrow, abstain for population fit, abstain for citation support, or deny unsupported action.
+It returns one of five actions: allow, narrow, abstain (population fit), abstain (citation support), or deny.
 
 \begin{table*}[tbp]
 \floatconts
   {tab:gates}
-  {\caption{Evidence-gate roles.}}
-  {\begin{tabular}{@{}p{0.17\textwidth}p{0.37\textwidth}p{0.35\textwidth}@{}}
+  {\caption{Stage 1 decision predicates implemented by the controller.}}
+  {\small\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.49\textwidth}>{\raggedright\arraybackslash}p{0.21\textwidth}@{}}
   \toprule
-  Gate & Question & Permitted effect \\
+  Gate & Predicate used in Stage 1 & Action \\
   \midrule
-  Citation & Is the cited source real, current, relevant, and strong enough? & Deny fabricated citations; abstain on uncertain support. \\
-  Population & Does source evidence plausibly fit the target patient or population? & Abstain from transport. \\
-  Endpoint & Does evidence support medication action, not only association? & Allow bounded alerts; narrow overstrong claims. \\
+  citation/guideline support & Citation support is unverifiable, conflicting/uncertain, outdated/context-shifted, or unsupported/absent. & Deny unverifiable or unsupported action; otherwise abstain (citation support). \\
+  population fit & Population fit is a mismatch or unknown after citation/guideline support passes. & Abstain (population fit). \\
+  endpoint/actionability & The claim is not actionable, context-dependent, association/pharmacology-only, dose-algorithm/surrogate-only, or variant-uncertain after earlier gates pass. & Deny unsupported action or narrow. \\
   \bottomrule
   \end{tabular}}
 \end{table*}
 
 \section{Stage 1 Scaffold}
-The case bank contains 33 author-designed synthetic cases: 10 bounded aligned alerts and 23 overclaim archetypes involving universal action language, unsupported genetics, population mismatch, citation weakness, variant uncertainty, obsolete/context-shifted evidence, and three isolating cases.
+The case bank contains 33 author-designed synthetic cases: 10 bounded aligned alerts and 23 overclaim archetypes involving universal action language, unsupported genetics, population mismatch, citation weakness, variant uncertainty, and obsolete/context-shifted evidence.
+Within the 23 overclaim archetypes, three are isolating cases: a fabricated CPIC addendum attached to an otherwise actionable claim, a real guideline-supported claim transported to a mismatched population, and a stale but real guideline used as current evidence.
 The 23/10 split is stress-test coverage, not a clinical base rate.
 Each case has expected labels, but the controller does not read them.
 The three checks are summarized in Table~\ref{tab:gates}.
@@ -113,33 +124,38 @@ The three checks are summarized in Table~\ref{tab:gates}.
 \end{table}
 
 All 23 designed overclaim archetypes were blocked or narrowed and all 10 bounded alerts passed unchanged, so the controller is not a blanket denial rule.
-The ablation now includes three isolating cases: a fabricated CPIC addendum attached to an otherwise actionable claim, a real guideline-supported claim transported to a mismatched population, and a stale but real guideline used as current evidence.
 Table~\ref{tab:ablation} shows that disabling each gate allows at least one designed overclaim to pass unchanged, so the gates are not merely duplicating endpoint/actionability.
 Removing citation/guideline support allows 2/23 overclaims through unchanged; removing population fit allows 1/23 through; removing endpoint/actionability allows 6/23 through.
-The result supports a necessity chain for the three gates in this synthetic case bank.
+No gate is redundant in this synthetic case bank: each is the sole catcher for at least one overclaim archetype.
 
 Primary-gate conformance was 31/33.
-PGX19 and PGX24 remain negative results: both are action-level successes but primary-gate mismatches because citation/guideline support fires before the gate that motivated the case design.
-This exposes controller precedence rather than hiding it inside a perfect conformance score.
+In PGX19 and PGX24, the controller reached the expected action but the triggering gate differed from the case-design label because citation/guideline support has precedence.
+These two disagreements are reported as negative results for gate attribution, not as clinical failures.
 
 \section{Evaluation Plan}
 The independent Stage 2 evaluation should compare ungated LLM drafts with gated drafts on independently authored cases.
 Reviewers should be blinded to arm when feasible and classify overclaiming, inappropriate denial, preserved clinician authority, population-fit concerns, citation support, and error category.
 
 \section{Ethics and Limitations}
+\paragraph{Transparency}
 The governance value of the gate is transparency.
 The controller is deterministic, auditable, and intentionally non-agentic: each alert can show which evidence feature triggered allow, narrow, abstain, or deny.
+
+\paragraph{Fairness}
 Fairness and bias are central in pharmacogenomics.
-HLA-B*15:02 risk language is ancestry-conditional, founder-variant evidence may not transport to general US populations, and biobank results can misfit underrepresented or recently admixed groups \citep{clinpgxhla,clinvar,gnomad,allofus,genomeindia,psifas}.
+HLA-B*15:02 risk language is ancestry-conditional, founder-variant evidence may not transport to general US populations, and biobank results can misfit underrepresented or recently admixed groups \citep{clinpgxhla,genomeindia}.
 Cases PGX09, PGX10, PGX25, PGX26, and PGX27 treat population fit as an equity constraint.
-PGX24 marks a high-risk boundary: a polygenic score should not be used to deny opioid or stimulant therapy without stronger evidence and governance.
+The practice PGX24 represents--using a polygenic score to deny opioid or stimulant therapy--is a high-risk boundary.
+
+\paragraph{Governance and limitations}
 Stage 1 contains no PHI and makes no diagnosis or treatment recommendation; deployed clinical decision support would still need accountability for extraction, citation verification, thresholds, overrides, and audit logging.
 The key limitation is that results are synthetic and author-designed.
 They show rule conformance, not generalization, and assume structured annotations rather than extracting them from live LLM output or EHR context.
 
 \section{Conclusion}
-This small deterministic evidence gate separates bounded guideline support from unsupported action, population transport, and citation overreach.
-It is a Findings-track design and evaluation-plan artifact with a reference implementation.
+This deterministic gate is cheap to run, auditable, and narrow enough to inspect case by case.
+On the synthetic Stage 1 case bank, citation/guideline support, population fit, and endpoint/actionability each catch at least one overclaim archetype that the other gates miss.
+The open technical question is whether structured evidence annotations can be extracted reliably from live LLM output and EHR context without creating new alert burden.
 
 \bibliography{ml4h_findings_refs}
 

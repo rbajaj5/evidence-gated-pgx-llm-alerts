@@ -129,7 +129,7 @@ def build_manifest(files: list[Path]) -> None:
             }
         )
     with MANIFEST.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["path", "bytes", "sha256"])
+        writer = csv.DictWriter(handle, fieldnames=["path", "bytes", "sha256"], lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
