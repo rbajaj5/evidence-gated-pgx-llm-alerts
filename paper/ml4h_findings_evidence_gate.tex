@@ -40,11 +40,11 @@
 \begin{abstract}
 LLM-generated medication alerts can sound more certain than their evidence permits.
 We built a deterministic pre-display monitor for one workflow: pharmacogenomic and genomic medication-alert text.
-The monitor consumes structured annotations for citation/guideline support, population fit, and endpoint/actionability, then returns allow, narrow, abstain, or deny.
-Stage 1 does not call an LLM or parse free text; it tests whether the three-part decision boundary is internally necessary before live extraction is attempted.
-Disabling citation/guideline support let 2 of 23 designed overclaims pass unchanged; disabling population fit let 1 pass; disabling endpoint/actionability let 6 pass.
-With all gates active, all 23 designed overclaim archetypes were blocked or narrowed, and all 10 bounded alerts passed unchanged.
-The first-triggering gate matched the author-assigned gate label in 31 of 33 cases.
+The monitor checks source support, population fit, and claim strength, then returns allow, narrow, abstain, or deny.
+Stage 1 is a synthetic specification test: the case bank supplies the structured annotations that a future live system would need to extract, and ablation tests whether any check is dispensable.
+Disabling source support let 2 of 23 designed overclaims pass unchanged; disabling population fit let 1 pass; disabling claim strength let 6 pass.
+With all checks active, all 23 designed overclaim archetypes were blocked or narrowed, and all 10 bounded alerts passed unchanged.
+The first-triggering check matched the author-assigned check label in 31 of 33 cases.
 These are specification-conformance results, not clinical safety, generalization, or patient-benefit evidence.
 \end{abstract}
 
@@ -66,6 +66,7 @@ A medication alert may cite a real guideline while turning a bounded pharmacogen
 Here, transportability means applying evidence from one source population as if it supported the same claim in a different target population.
 The gap matters because fluency can hide what evidence does, and does not, authorize.
 Pharmacogenomic medication alerts are a useful testbed because CPIC and ClinPGx already distinguish genotype, phenotype, evidence level, and prescribing recommendation \citep{cpicguidelines,clinpgx2026}.
+The thesis tested here is deliberately narrow and disputable: overclaim control in this workflow needs three separable checks--source support, population fit, and claim strength--rather than a single endpoint-evidence rule.
 
 \section{Evidence Boundary}
 Healthcare AI evaluation should distinguish implementation consistency from patient-outcome benefit.
@@ -78,78 +79,80 @@ LLM factuality methods such as SelfCheckGPT test whether generated content is co
 Selective classification supplies the decision vocabulary for abstention: a system may decline to answer when coverage is less important than risk control \citep{geifman2017selective}.
 Clinical alert-fatigue work explains why this choice matters in practice: repeated and low-information alerts can reduce clinician response \citep{ancker2017alertfatigue}.
 This study tests a smaller executable claim.
-Given structured annotations about source support, target population, and endpoint strength, a pre-display monitor can prevent designed pharmacogenomic overclaims without suppressing bounded alerts.
+Given structured annotations about source support, target population, and claim strength, a pre-display monitor can separate designed pharmacogenomic overclaims from bounded alerts while showing which checks an endpoint-only rule would miss.
 
 \section{Methods}
 The controller is a deterministic pre-display monitor, not an autonomous clinical agent.
-It receives a synthetic candidate alert plus structured evidence annotations assigned in the case bank; it does not parse draft text, call an LLM, verify citations, or extract EHR fields or population descriptors.
-The fixed precedence order is citation/guideline support, population fit, then endpoint/actionability.
-It returns one of five actions: allow, narrow, abstain (population fit), abstain (citation support), or deny.
+A Stage 1 case contains a candidate alert, source-status annotation, population-fit annotation, endpoint annotation, actionability annotation, and expected review label.
+The monitor reads those annotations in a fixed order: source support, population fit, then claim strength.
+It returns one of five actions: allow, narrow, abstain (population fit), abstain (source support), or deny.
+The repository preserves the implementation identifiers for the three checks, but the paper uses their clinical names.
 
 \begin{table*}[tbp]
 \floatconts
   {tab:gates}
   {\caption{Stage 1 decision predicates implemented by the controller.}}
-  {\footnotesize\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.21\textwidth}>{\raggedright\arraybackslash}p{0.50\textwidth}>{\raggedright\arraybackslash}p{0.20\textwidth}@{}}
+  {\footnotesize\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.18\textwidth}>{\raggedright\arraybackslash}p{0.53\textwidth}>{\raggedright\arraybackslash}p{0.20\textwidth}@{}}
   \toprule
-  Gate & Predicate used in Stage 1 & Action \\
+  Check & Predicate used in Stage 1 & Monitor action \\
   \midrule
-  citation/guideline support & Source cannot be verified. & Deny citation. \\
-  citation/guideline support & Source is conflicting, uncertain, outdated, or applied after the clinical context has changed. & Abstain (citation support). \\
-  citation/guideline support & Source support is absent. If the requested medication action is also not supported, deny; otherwise abstain. & Deny unsupported action or abstain (citation support). \\
-  population fit & Target-population fit is mismatched or cannot be determined after citation/guideline support passes. & Abstain (population fit). \\
-  endpoint/actionability & The requested action is not supported for the claim. & Deny unsupported action. \\
-  endpoint/actionability & The claim depends on context, association evidence, pharmacology alone, a dose algorithm, a surrogate endpoint, or an uncertain variant. & Narrow. \\
-  none & Earlier predicates do not fire. & Allow bounded alert. \\
+  Source support & The cited source cannot be verified. & Deny the alert for unverifiable source support. \\
+  Source support & The source is real but conflicting, uncertain, outdated, or applied after the clinical context has changed. & Abstain for source support. \\
+  Source support & Source support is absent. If the medication action is also unsupported, deny; otherwise abstain. & Deny unsupported action or abstain. \\
+  Population fit & Target-population fit is mismatched or cannot be determined after source support passes. & Abstain (population fit). \\
+  Claim strength & The requested medication action is not supported by the evidence. & Deny unsupported action. \\
+  Claim strength & The evidence supports only a context-dependent, associative, mechanistic, algorithmic, surrogate, or uncertain-variant claim. & Narrow the alert. \\
+  None & Earlier predicates do not fire. & Allow bounded alert. \\
   \bottomrule
   \end{tabular}}
 \end{table*}
 
 \section{Stage 1 Scaffold}
 The case bank contains 33 author-designed synthetic cases: 10 bounded aligned alerts and 23 overclaim archetypes involving universal action language, unsupported genetics, population mismatch, citation weakness, variant uncertainty, obsolete evidence, and changed clinical context.
-An isolating case is designed so that one gate is responsible for blocking the overclaim while the other two gates would not independently block it.
+An isolating case is designed so that only one check changes the action; with that check disabled, the overclaim passes unchanged.
 Within the 23 overclaim archetypes, three cases isolate a fabricated CPIC addendum attached to an otherwise actionable claim, a real guideline-supported claim applied to a mismatched population, and a stale but real guideline used as current evidence.
 The 23/10 split is stress-test coverage, not a clinical base rate.
 Each case has expected labels, but the controller does not read them.
 The three checks are summarized in Table~\ref{tab:gates}.
+The decisive test is ablation, not action conformance: if a disabled check lets an overclaim pass unchanged, that check is doing work not captured by the remaining checks.
 
 \begin{table}[tbp]
 \floatconts
   {tab:ablation}
-  {\caption{One-gate ablation on the synthetic case bank.}}
+  {\caption{One-check ablation on the synthetic case bank.}}
   {\resizebox{\linewidth}{!}{\begin{tabular}{@{}lrrr@{}}
   \toprule
-  Disabled gate & Allowed & Action $\Delta$ & Gate $\Delta$ \\
+  Disabled check & Allowed & Action $\Delta$ & Check $\Delta$ \\
   \midrule
-  Citation/guideline support & 2 & 7 & 12 \\
+  Source support & 2 & 7 & 12 \\
   Population fit & 1 & 5 & 5 \\
-  Endpoint/actionability & 6 & 6 & 6 \\
+  Claim strength & 6 & 6 & 6 \\
   \bottomrule
   \end{tabular}}}
 \end{table}
 
-All 23 designed overclaim archetypes were blocked or narrowed and all 10 bounded alerts passed unchanged, so the controller is not a blanket denial rule.
-Table~\ref{tab:ablation} shows that disabling each gate allows at least one designed overclaim to pass unchanged, so the gates are not merely duplicating endpoint/actionability.
-Removing citation/guideline support allows 2/23 overclaims through unchanged; removing population fit allows 1/23 through; removing endpoint/actionability allows 6/23 through.
-No gate is redundant in this synthetic case bank: each gate blocks at least one designed overclaim that passes unchanged when that gate is disabled.
+With all checks active, all 23 designed overclaim archetypes were blocked or narrowed and all 10 bounded alerts passed unchanged.
+Table~\ref{tab:ablation} shows that disabling each check allows at least one designed overclaim to pass unchanged, so source support and population fit are not reducible to claim strength.
+Removing source support allows 2/23 overclaims through unchanged; removing population fit allows 1/23 through; removing claim strength allows 6/23 through.
+No check is redundant in this synthetic case bank: each check blocks at least one designed overclaim that passes unchanged when that check is disabled.
 
-Primary-gate conformance means that the first enabled gate named by the controller matches the author-assigned gate label.
-It was 31/33.
-In PGX19 and PGX24, the controller returned the expected action, but the triggering gate differed from the author-assigned gate label because citation/guideline support has precedence.
-These two disagreements are gate-attribution errors.
+Primary-check conformance, defined as the first enabled check matching the author-assigned check label, was 31/33.
+In PGX19 and PGX24, the controller returned the expected action, but the triggering check differed from the author-assigned label because source support has precedence.
+These two disagreements are check-attribution errors.
 
 \section{Evaluation Plan}
-Stage 2 is a held-out comparison, not a patient-benefit claim.
+Stage 2 turns the specification test into a held-out reader study.
 Independent case authors write pharmacogenomic alert scenarios without seeing the decision table.
 The ungated arm shows the LLM draft unchanged; the gated arm shows the same draft after structured annotations pass through the monitor.
-Two clinical reviewers score overclaiming, inappropriate denial, preserved clinician authority, population fit, citation support, and error category.
-The primary analysis estimates overclaim reduction with a prespecified upper bound on inappropriate denial.
+Two clinical reviewers assign binary labels for overclaim present, denial appropriate, clinician authority preserved, population fit adequate, and source support adequate; they also select one error class from a fixed taxonomy.
+The primary endpoint is the difference in reviewer-labeled overclaim rate between arms.
+The safety endpoint is the difference in inappropriate-denial rate; the monitor is useful only if overclaiming falls without a compensating rise in inappropriate denial.
 
 \section{Ethics and Limitations}
 \paragraph{Transparency}
-The gate produces a decision trace.
+The monitor produces a decision trace.
 For each alert, the trace names the structured evidence feature that triggered allow, narrow, abstain, or deny.
-That trace is the governance object: clinicians and reviewers can inspect the rule that changed the displayed alert.
+Clinicians and reviewers can inspect the rule that changed, blocked, or preserved the displayed alert.
 
 \paragraph{Fairness}
 Fairness and bias are central in pharmacogenomics.
@@ -164,8 +167,9 @@ They show rule conformance, not generalization, and assume structured annotation
 
 \section{Conclusion}
 The practical problem is annotation, not compute.
-If evidence support, target population, and endpoint strength can be extracted reliably from live LLM output and EHR context, a deterministic pre-display monitor gives reviewers an auditable place to stop overclaiming before it reaches the clinician.
-On the synthetic Stage 1 case bank, citation/guideline support, population fit, and endpoint/actionability each block at least one designed overclaim that passes when that gate is removed.
+Stage 1 shows that the monitor logic is auditable and that the three checks do different work on a synthetic pharmacogenomic case bank.
+Source support, population fit, and claim strength each block at least one designed overclaim that passes when that check is removed.
+That result turns the next experiment into a concrete measurement problem: determine whether live LLM and EHR pipelines can populate the three annotations reliably enough to reduce overclaiming without increasing inappropriate denial.
 
 \bibliography{ml4h_findings_refs}
 

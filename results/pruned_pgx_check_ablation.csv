@@ -1,0 +1,4 @@
+condition,disabled_check,overclaim_allowed_unchanged_count,designed_overclaim_archetype_blocked_count,bounded_alert_allowed_count,inappropriate_denial_count,action_changed_count,primary_check_changed_count
+without_source_support,source_support,2,21,10,0,7,12
+without_population_fit,population_fit,1,22,10,0,5,5
+without_claim_strength,claim_strength,6,17,10,0,6,6

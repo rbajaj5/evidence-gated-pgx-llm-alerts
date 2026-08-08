@@ -1,8 +1,9 @@
 """Build the capstone submission ZIP and stable SHA256 manifest.
 
-The manifest is generated from the repository-facing submission file set. It
-excludes ignored runtime artifacts such as code/results/, render scratch
-folders, Python caches, LaTeX build products, the manifest itself, and the ZIP.
+The manifest is generated from the final submission file set. It excludes
+historical proposal/progress provenance, ignored runtime artifacts such as
+code/results/, render scratch folders, Python caches, LaTeX build products, the
+manifest itself, and the ZIP.
 Text files are normalized to LF before hashing so a fresh clone on another
 platform verifies cleanly.
 """
@@ -33,8 +34,6 @@ INCLUDED_DIRS = {
     "code",
     "figures",
     "paper",
-    "progress",
-    "proposal",
     "results",
     "summary",
     "supplement",

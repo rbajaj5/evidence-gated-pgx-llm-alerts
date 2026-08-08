@@ -1,11 +1,11 @@
 {
   "case_count": 33,
   "workflow": "pharmacogenomic/genomic medication-alert text",
-  "gate_count": 3,
-  "gates": [
-    "Citation/guideline support",
+  "check_count": 3,
+  "checks": [
+    "Source support",
     "Population fit",
-    "Endpoint/actionability"
+    "Claim strength"
   ],
   "controller_input_boundary": "Stage 1 consumes structured evidence annotations from the case bank; it does not parse draft_claim text, verify citations, call an LLM, or extract EHR/population-fit features.",
   "author_designed_overclaim_cases": 23,
@@ -22,59 +22,59 @@
   "inappropriate_denial_count": 0,
   "action_conformance_count": 33,
   "action_conformance_rate": 1.0,
-  "gate_conformance_count": 31,
-  "gate_conformance_rate": 0.9393939393939394,
-  "gate_precedence_order": [
-    "citation_guideline_support",
+  "check_conformance_count": 31,
+  "check_conformance_rate": 0.9393939393939394,
+  "check_precedence_order": [
+    "source_support",
     "population_fit",
-    "endpoint_actionability"
+    "claim_strength"
   ],
-  "gate_disagreement_cases": [
+  "check_disagreement_cases": [
     {
       "case_id": "PGX19",
       "drug_gene": "APOE-dementia risk",
-      "expected_gate": "endpoint_actionability",
-      "actual_gate": "citation_guideline_support",
+      "expected_check": "claim_strength",
+      "actual_check": "source_support",
       "actual_action": "DENY_UNSUPPORTED_ACTION"
     },
     {
       "case_id": "PGX24",
       "drug_gene": "Polygenic addiction liability",
-      "expected_gate": "population_fit",
-      "actual_gate": "citation_guideline_support",
+      "expected_check": "population_fit",
+      "actual_check": "source_support",
       "actual_action": "DENY_UNSUPPORTED_ACTION"
     }
   ],
-  "gate_ablation": [
+  "check_ablation": [
     {
-      "condition": "without_citation_guideline_support",
-      "disabled_gate": "citation_guideline_support",
+      "condition": "without_source_support",
+      "disabled_check": "source_support",
       "overclaim_allowed_unchanged_count": 2,
       "designed_overclaim_archetype_blocked_count": 21,
       "bounded_alert_allowed_count": 10,
       "inappropriate_denial_count": 0,
       "action_changed_count": 7,
-      "primary_gate_changed_count": 12
+      "primary_check_changed_count": 12
     },
     {
       "condition": "without_population_fit",
-      "disabled_gate": "population_fit",
+      "disabled_check": "population_fit",
       "overclaim_allowed_unchanged_count": 1,
       "designed_overclaim_archetype_blocked_count": 22,
       "bounded_alert_allowed_count": 10,
       "inappropriate_denial_count": 0,
       "action_changed_count": 5,
-      "primary_gate_changed_count": 5
+      "primary_check_changed_count": 5
     },
     {
-      "condition": "without_endpoint_actionability",
-      "disabled_gate": "endpoint_actionability",
+      "condition": "without_claim_strength",
+      "disabled_check": "claim_strength",
       "overclaim_allowed_unchanged_count": 6,
       "designed_overclaim_archetype_blocked_count": 17,
       "bounded_alert_allowed_count": 10,
       "inappropriate_denial_count": 0,
       "action_changed_count": 6,
-      "primary_gate_changed_count": 6
+      "primary_check_changed_count": 6
     }
   ],
   "action_counts": {
@@ -82,18 +82,18 @@
     "NARROW_CLAIM": 5,
     "DENY_UNSUPPORTED_ACTION": 7,
     "ABSTAIN_POPULATION_FIT": 5,
-    "ABSTAIN_CITATION_SUPPORT": 4,
-    "DENY_CITATION": 2
+    "ABSTAIN_SOURCE_SUPPORT": 4,
+    "DENY_UNVERIFIABLE_SOURCE": 2
   },
-  "primary_gate_counts": {
+  "primary_check_counts": {
     "none": 10,
-    "endpoint_actionability": 6,
+    "claim_strength": 6,
     "population_fit": 5,
-    "citation_guideline_support": 12
+    "source_support": 12
   },
   "error_counts": {
     "matched_expected": 31,
-    "matched_action_gate_precedence_mismatch": 2
+    "matched_action_check_precedence_mismatch": 2
   },
   "stage_boundary": "Stage 1 is specification conformance on author-designed synthetic archetypes; independent safety, accuracy, generalization, and clinical utility remain Stage 2."
 }
