@@ -1,4 +1,4 @@
-# Pruned Evidence Monitor Release
+# Deterministic Evidence Gate Release
 
 Date: August 8, 2026
 
@@ -20,7 +20,9 @@ The submission-facing artifact keeps:
 - LLM self-evaluation Arm A using GPT-5.6-terra and Grok-4.5 on the full synthetic annotation bank with source-support labels,
 - LLM self-evaluation Arm B using GPT-5.6-terra and Grok-4.5 on PGX31-PGX33 with source-support labels withheld and structured citations supplied,
 - a synthetic uniform-NARROW sanity check,
-- a Stage 2 plan for independently authored cases and blinded reviewer adjudication,
+- a text-only annotation extraction experiment that tests the Stage 2 bottleneck directly,
+- 12 model-authored held-out cases with blank author-labeling worksheet columns and no reported accuracy,
+- a paper-number trace mapping reported counts to generated `results/` files,
 - progress-report provenance preserving the August 2 submitted version and the August 8 pruned revision,
 - a repaired ML4H Findings LaTeX scaffold with explicit citations and two-column-safe tables.
 
@@ -35,7 +37,7 @@ The ZIP is limited to final submission materials. The repository keeps earlier p
 ## Validation snapshot
 
 ```text
-13 focused tests passed
+17 focused tests passed
 33 synthetic cases
 23 ungated overclaims
 0 designed overclaim archetypes allowed unchanged
@@ -46,8 +48,11 @@ Full conformance accounting is retained in the supplement and machine-readable J
 Check ablation: disabling source support allows 2/23 overclaims through unchanged; disabling population fit allows 1/23 through; disabling claim strength allows 6/23 through.
 Simple policy comparators: ungated allow-all leaves 23/23 overclaims unchanged; claim-strength-only leaves 3/23 unchanged (PGX31, PGX32, PGX33); the full monitor leaves 0/23 unchanged.
 LLM self-evaluation Arm A: GPT-5.6-terra and Grok-4.5 each routed 23/23 designed overclaims and allowed 10/10 bounded alerts; action agreement with the deterministic monitor was 31/33 for both.
-LLM self-evaluation Arm B: after sentinel cues were removed and PGX33 was moved to the primary Muir 2014 DOI source, GPT-5.6-terra matched PGX31, PGX32, and PGX33, while Grok-4.5 matched PGX31 and PGX32 but attributed PGX33 to claim strength.
+LLM self-evaluation Arm B: after sentinel cues were removed and PGX33 was moved to the primary Muir 2014 DOI source, GPT-5.6-terra missed PGX31 and matched PGX32/PGX33, while Grok-4.5 matched PGX31/PGX32 but attributed PGX33 to claim strength.
 Synthetic uniform-NARROW sanity row: 23/23 designed overclaims routed, 0/10 bounded alerts preserved, 0/10 inappropriate denials, and 33/33 narrowed.
+Text-only extraction with citation fields: GPT-5.6-terra extracted 78/132 fields and matched 21/33 downstream actions; Grok-4.5 extracted 86/132 fields and matched 21/33 downstream actions.
+No-citation control: GPT-5.6-terra extracted 73/132 fields and matched 11/33 downstream actions; Grok-4.5 extracted 70/132 fields and matched 12/33 downstream actions.
+Held-out authoring: GPT-5.6-sol generated 12 unlabeled model-authored held-out cases and a blank labeling worksheet; no held-out accuracy is reported.
 ```
 
-These are synthetic specification-conformance results on author-designed archetypes. They do not establish clinical safety, annotation validity, or patient benefit, and the 23/10 case split is not a measured clinical base rate. Stage 1 consumes structured evidence annotations only; free-text/citation extraction and independent source validation are deferred to Stage 2.
+These are synthetic specification-conformance and extraction-bottleneck results on author-designed archetypes. They do not establish clinical safety, annotation validity, or patient benefit, and the 23/10 case split is not a measured clinical base rate. The deterministic monitor consumes structured evidence annotations only; text-only extraction is evaluated separately and remains below the oracle annotation ceiling.

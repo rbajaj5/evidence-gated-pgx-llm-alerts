@@ -15,6 +15,8 @@ from pruned_evidence_gate import (
     policy_comparator_summary,
 )
 from llm_self_evaluation_baseline import ARM_A, ARM_B, _case_payload
+from text_only_extraction import CONDITIONS, case_payload as extraction_case_payload, prompt as extraction_prompt
+from heldout_case_authoring import LABEL_COLUMNS, _bib_allowed_sources, authoring_prompt
 
 
 def case(case_id: str):
@@ -155,6 +157,57 @@ def test_llm_payloads_do_not_leak_author_only_annotation_notes() -> None:
     assert "retired" not in arm_b_text
     assert "structured_citation" in arm_b_text
     assert [row["case_id"] for row in _case_payload(ARM_B)] == ["PGX31", "PGX32", "PGX33"]
+
+
+def test_text_only_extraction_payloads_exclude_author_annotations_and_labels() -> None:
+    forbidden = {
+        "annotation_note",
+        "expected_action",
+        "expected_check",
+        "ground_truth_overclaim",
+        '"citation_support"',
+        '"population_fit"',
+        '"endpoint_level"',
+        '"actionability_level"',
+    }
+    for condition in CONDITIONS:
+        payload = extraction_case_payload(condition)
+        text = json.dumps(payload)
+        assert "draft_claim" in text
+        assert "clinical_context" in text
+        assert "drug_gene" in text
+        for token in forbidden:
+            assert token not in text
+        if condition == "with_citation":
+            assert "structured_citation" in text
+        else:
+            assert "structured_citation" not in text
+
+        full_prompt_text = json.dumps(extraction_prompt(condition))
+        assert "annotation_note" not in full_prompt_text
+        assert "expected_action" not in full_prompt_text
+        assert "expected_check" not in full_prompt_text
+        assert "ground_truth_overclaim" not in full_prompt_text
+        assert '"case_id": "PGX01"' not in full_prompt_text
+        assert "same case_id from input" in full_prompt_text
+
+
+def test_heldout_authoring_prompt_and_worksheet_labels_are_unfilled_by_design() -> None:
+    prompt_text = json.dumps(authoring_prompt(_bib_allowed_sources()))
+    assert "annotation_note" not in prompt_text
+    assert "expected_action" not in prompt_text
+    assert "ground_truth_overclaim" not in prompt_text
+    for column in LABEL_COLUMNS:
+        assert column not in prompt_text
+    assert "Do not assign expected actions" in prompt_text
+
+
+def test_saved_model_raw_payloads_do_not_contain_annotation_note_field_name() -> None:
+    raw_files = sorted((PROJECT_ROOT / "results").glob("*raw.json"))
+    assert raw_files
+    for path in raw_files:
+        if path.name.startswith(("llm_self_eval", "text_only_extraction", "heldout_cases_unlabeled")):
+            assert "annotation_note" not in path.read_text(encoding="utf-8")
 
 
 def test_summary_metrics_are_specification_conformance_not_clinical_claims() -> None:

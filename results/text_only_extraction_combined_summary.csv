@@ -1,0 +1,5 @@
+provider,model,condition,field_accuracy_overall,field_correct_total,field_total,downstream_action_agreement,downstream_primary_check_agreement,overclaim_allowed_gap_vs_oracle,bounded_alert_preservation_drop_vs_oracle,inappropriate_denial_increase_vs_oracle
+openai,gpt-5.6-terra,with_citation,0.5909,78,132,21/33,24/33,0,6,0
+xai,grok-4.5,with_citation,0.6515,86,132,21/33,23/33,0,1,0
+openai,gpt-5.6-terra,no_citation,0.5530,73,132,11/33,12/33,0,10,10
+xai,grok-4.5,no_citation,0.5303,70,132,12/33,14/33,0,8,8

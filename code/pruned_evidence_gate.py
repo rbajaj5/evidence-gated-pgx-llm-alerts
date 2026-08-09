@@ -616,9 +616,9 @@ CASES: tuple[AlertCase, ...] = (
         "target_fit",
         "outdated_or_context_shifted",
         {
-            "source_name": "Muir et al. 2014 CPIC Guideline for IFNL3 (IL28B) Genotype and PEG Interferon-alpha-Based Regimens",
+            "source_name": "Clinical Pharmacogenetics Implementation Consortium (CPIC) Guidelines for IFNL3 (IL28B) Genotype and PEG Interferon-alpha-Based Regimens",
             "source_url_or_doi": "10.1038/clpt.2013.203",
-            "quoted_claim": "The 2014 CPIC guideline concerns IFNL3 (IL28B) genotype and PEG interferon-alpha- and ribavirin-containing regimens for hepatitis C.",
+            "quoted_claim": "The guideline concerns IFNL3 (IL28B) genotype and PEG interferon-alpha-based regimens.",
             "annotation_note": "Author annotation: the source is real and listed as retired; it is stale/context-shifted for modern hepatitis C medication selection.",
         },
         "ABSTAIN_SOURCE_SUPPORT",

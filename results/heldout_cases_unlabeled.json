@@ -1,0 +1,148 @@
+{
+  "experiment": "model-authored held-out cases, author-labeled",
+  "run_utc": "2026-08-09T00:49:08.861870+00:00",
+  "authoring_provider": "openai",
+  "authoring_model": "gpt-5.6-sol",
+  "case_count": 12,
+  "method": {
+    "temperature_requested": 0.7,
+    "temperature_used": null,
+    "temperature_note": "temperature was requested, but this model rejected the parameter; provider default sampling was used.",
+    "model_selection": "Selected from client.models.list(); judge models excluded.",
+    "label_boundary": "Cases are unlabeled. No accuracy metric is reported until the user supplies labels."
+  },
+  "cases": [
+    {
+      "case_id": "HOLDOUT01",
+      "drug_gene": "Clopidogrel\u2013CYP2C19",
+      "clinical_context": "An adult with acute coronary syndrome underwent percutaneous coronary intervention and has a CYP2C19 poor-metabolizer result in the electronic health record.",
+      "draft_claim": "CYP2C19 poor metabolizers receiving clopidogrel after coronary intervention may have reduced formation of the active metabolite and increased risk of adverse cardiovascular events; consider an alternative P2Y12 inhibitor when clinically appropriate.",
+      "structured_citation": {
+        "source_name": "Clinical Pharmacogenetics Implementation Consortium Guideline for {CYP2C19} Genotype and Clopidogrel Therapy: 2022 Update",
+        "source_url_or_doi": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9287492/",
+        "quoted_claim": "The guideline describes reduced clopidogrel active-metabolite formation and recommends alternative antiplatelet therapy for CYP2C19 poor metabolizers in relevant cardiovascular settings when alternatives are suitable."
+      }
+    },
+    {
+      "case_id": "HOLDOUT02",
+      "drug_gene": "Capecitabine\u2013DPYD",
+      "clinical_context": "An adult with colorectal cancer is about to begin capecitabine and carries a decreased-function DPYD allele associated with an intermediate-metabolizer phenotype.",
+      "draft_claim": "This DPYD result indicates reduced fluoropyrimidine clearance. Begin capecitabine at a reduced dose with subsequent adjustment guided by toxicity and clinical response.",
+      "structured_citation": {
+        "source_name": "Clinical Pharmacogenetics Implementation Consortium Guideline for Dihydropyrimidine Dehydrogenase Genotype and Fluoropyrimidine Dosing: 2017 Update",
+        "source_url_or_doi": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5760397/",
+        "quoted_claim": "The guideline links decreased DPD activity with severe fluoropyrimidine toxicity and provides genotype-informed starting-dose recommendations followed by clinical titration."
+      }
+    },
+    {
+      "case_id": "HOLDOUT03",
+      "drug_gene": "Carbamazepine\u2013HLA-B*15:02",
+      "clinical_context": "Carbamazepine is being considered for a patient with trigeminal neuralgia, and preemptive testing detected HLA-B*15:02.",
+      "draft_claim": "HLA-B*15:02 is associated with carbamazepine-induced severe cutaneous reactions. Avoid initiating carbamazepine unless the anticipated benefit clearly outweighs the risk and no suitable alternative exists.",
+      "structured_citation": {
+        "source_name": "{ClinPGx HLA-A/HLA-B and Carbamazepine Guideline}",
+        "source_url_or_doi": "https://www.clinpgx.org/guideline/PA166251448",
+        "quoted_claim": "The guideline page summarizes recommendations concerning HLA-B*15:02, carbamazepine exposure, and risk of severe cutaneous adverse reactions."
+      }
+    },
+    {
+      "case_id": "HOLDOUT04",
+      "drug_gene": "Sofosbuvir/velpatasvir\u2013IFNL3",
+      "clinical_context": "An adult with chronic hepatitis C is scheduled to receive a direct-acting antiviral regimen and has an unfavorable historical IFNL3 genotype result.",
+      "draft_claim": "The IFNL3 genotype predicts a poor virologic response to sofosbuvir/velpatasvir; select a longer regimen and add ribavirin to prevent treatment failure.",
+      "structured_citation": {
+        "source_name": "Clinical Pharmacogenetics Implementation Consortium ({CPIC}) Guidelines for {IFNL3} ({IL28B}) Genotype and {PEG} Interferon-alpha-Based Regimens",
+        "source_url_or_doi": "10.1038/clpt.2013.203",
+        "quoted_claim": "The publication discusses how IFNL3 genotype relates to response in hepatitis C treatment regimens based on pegylated interferon-alpha."
+      }
+    },
+    {
+      "case_id": "HOLDOUT05",
+      "drug_gene": "Warfarin\u2013CYP2C9/VKORC1",
+      "clinical_context": "A patient with a new venous thromboembolism has CYP2C9 and VKORC1 results available before the first warfarin dose.",
+      "draft_claim": "These CYP2C9 and VKORC1 variants establish that the patient requires exactly 2 mg of warfarin daily and will remain within the therapeutic INR range without early laboratory monitoring.",
+      "structured_citation": {
+        "source_name": "{All of Us Research Program}",
+        "source_url_or_doi": "https://allofus.nih.gov/",
+        "quoted_claim": "The program describes a large, diverse health-research cohort that integrates participant health information and biological data."
+      }
+    },
+    {
+      "case_id": "HOLDOUT06",
+      "drug_gene": "Azathioprine\u2013NUDT15",
+      "clinical_context": "Azathioprine is planned for an adolescent with inflammatory bowel disease. Sequencing identified a NUDT15 variant reported in population genomic data from South Asia, but no functional phenotype is recorded.",
+      "draft_claim": "Because this NUDT15 variant occurs in South Asian genomic data, the patient is a poor metabolizer and should receive no more than 10% of the standard azathioprine dose.",
+      "structured_citation": {
+        "source_name": "{Genome India Project}",
+        "source_url_or_doi": "https://genomeindia.in/",
+        "quoted_claim": "The project presents an effort to characterize genomic diversity among populations in India and support research using population-scale genomic information."
+      }
+    },
+    {
+      "case_id": "HOLDOUT07",
+      "drug_gene": "Simvastatin\u2013SLCO1B1",
+      "clinical_context": "An adult taking simvastatin has an SLCO1B1 variant that is uncommon in the available reference population and currently reports no muscle symptoms.",
+      "draft_claim": "The low population frequency of this SLCO1B1 variant proves that it is benign, so simvastatin-associated myopathy can be excluded at any dose.",
+      "structured_citation": {
+        "source_name": "{Genome Aggregation Database}",
+        "source_url_or_doi": "https://gnomad.broadinstitute.org/",
+        "quoted_claim": "The database provides aggregate allele-frequency information from large collections of human sequencing data across represented populations."
+      }
+    },
+    {
+      "case_id": "HOLDOUT08",
+      "drug_gene": "Abacavir\u2013HLA-B*57:01",
+      "clinical_context": "An adult with HIV is being evaluated for an abacavir-containing regimen. A laboratory report lists an HLA-B variant as having conflicting submissions in a public variant archive.",
+      "draft_claim": "The ClinVar record confirms that the patient is HLA-B*57:01 negative; abacavir hypersensitivity is therefore impossible, and symptom monitoring is unnecessary.",
+      "structured_citation": {
+        "source_name": "{ClinVar}",
+        "source_url_or_doi": "https://www.ncbi.nlm.nih.gov/clinvar/",
+        "quoted_claim": "ClinVar aggregates submitted interpretations of relationships between human genetic variants and health conditions, with supporting review information that may vary by record."
+      }
+    },
+    {
+      "case_id": "HOLDOUT09",
+      "drug_gene": "Osimertinib\u2013tumor EGFR exon 19 deletion",
+      "clinical_context": "Tumor sequencing from metastatic non-small-cell lung cancer reports an EGFR exon 19 deletion, while a liquid-biopsy result obtained after limited sampling is negative.",
+      "draft_claim": "The tissue EGFR exon 19 deletion is a predictive biomarker relevant to EGFR-targeted therapy; the discordant liquid-biopsy result should be interpreted in light of assay and sampling limitations.",
+      "structured_citation": {
+        "source_name": "{BEST (Biomarkers, EndpointS, and Other Tools) Resource}",
+        "source_url_or_doi": "https://www.ncbi.nlm.nih.gov/books/NBK326791/",
+        "quoted_claim": "The resource defines biomarker and endpoint terminology, including the concept of a predictive biomarker used to identify individuals more likely to experience an effect from an intervention."
+      }
+    },
+    {
+      "case_id": "HOLDOUT10",
+      "drug_gene": "Codeine\u2013CYP2D6",
+      "clinical_context": "Codeine is prescribed after outpatient surgery to a patient whose consumer genetic report calls CYP2D6 ultrarapid metabolism without reporting copy-number methods or a confirmed diplotype.",
+      "draft_claim": "The consumer result definitively establishes ultrarapid codeine conversion to morphine. Codeine administration will cause fatal respiratory depression and must never be permitted.",
+      "structured_citation": {
+        "source_name": "International Consumer Pharmacogenomics Safety Bulletin, 2025 Edition",
+        "source_url_or_doi": "N/A",
+        "quoted_claim": "The bulletin states that any consumer-reported CYP2D6 ultrarapid-metabolizer result predicts fatal toxicity from every codeine exposure."
+      }
+    },
+    {
+      "case_id": "HOLDOUT11",
+      "drug_gene": "Fluorouracil\u2013DPYD limited-variant panel",
+      "clinical_context": "An oncology patient tested negative for four commonly assessed DPYD variants before continuous-infusion fluorouracil therapy; no enzyme activity measurement or comprehensive sequencing was performed.",
+      "draft_claim": "No tested DPYD variant was detected. This result eliminates the possibility of DPD deficiency and guarantees that standard-dose fluorouracil will not cause severe toxicity.",
+      "structured_citation": {
+        "source_name": "Clinical Pharmacogenetics Implementation Consortium Guideline for Dihydropyrimidine Dehydrogenase Genotype and Fluoropyrimidine Dosing: 2017 Update",
+        "source_url_or_doi": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5760397/",
+        "quoted_claim": "The guideline addresses selected DPYD variants with established effects on DPD function and notes the relationship between reduced function and fluoropyrimidine toxicity."
+      }
+    },
+    {
+      "case_id": "HOLDOUT12",
+      "drug_gene": "Tacrolimus\u2013CYP3A5",
+      "clinical_context": "A kidney-transplant recipient has a CYP3A5 expresser genotype. The transplant program serves a population not represented in the model-development cohort used by a proposed dosing alert.",
+      "draft_claim": "The dosing model should automatically calculate the initial tacrolimus dose from CYP3A5 genotype because its performance in one genomic cohort ensures identical accuracy in every ancestry group and transplant setting.",
+      "structured_citation": {
+        "source_name": "{Psifas / Mosaic Partnership}",
+        "source_url_or_doi": "https://partnership.psifas.org.il/",
+        "quoted_claim": "The partnership describes an initiative involving health and genomic data intended to support research and collaboration within its participating setting."
+      }
+    }
+  ]
+}
