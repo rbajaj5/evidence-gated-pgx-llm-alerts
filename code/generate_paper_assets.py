@@ -35,6 +35,11 @@ def _display_enum(value: str) -> str:
     return value.replace("_", " ")
 
 
+def _read_csv(path: Path) -> list[dict[str, str]]:
+    with path.open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
 def _appendix_rows() -> list[str]:
     rows = []
     for case in CASES:
@@ -89,6 +94,12 @@ def write_trace() -> None:
     extraction = json.loads((RESULTS / "text_only_extraction_combined_summary.json").read_text(encoding="utf-8"))
     llm_self_eval = json.loads((RESULTS / "llm_self_eval_combined_summary.json").read_text(encoding="utf-8"))
     heldout = json.loads((RESULTS / "heldout_cases_unlabeled.json").read_text(encoding="utf-8"))
+    direction_rows = _read_csv(RESULTS / "text_only_extraction_error_direction.csv")
+    prf_rows = _read_csv(RESULTS / "text_only_extraction_field_prf.csv")
+    extraction_case_rows = {
+        path.stem.replace("text_only_extraction_", "").replace("_case_results", ""): _read_csv(path)
+        for path in RESULTS.glob("text_only_extraction_*_*_case_results.csv")
+    }
     rows = [
         ("case_count_33", summary["case_count"], "results/pruned_pgx_summary.json", "case_count"),
         (
@@ -218,6 +229,36 @@ def write_trace() -> None:
         )
     for item in extraction["summaries"]:
         prefix = f'text_extraction_{item["provider"]}_{item["condition"]}'
+        case_key = f'{item["provider"]}_{item["condition"]}'
+        case_rows = extraction_case_rows[case_key]
+        bounded_preserved_count = sum(
+            row["ground_truth_overclaim"] == "False" and row["bounded_alert_preserved"] == "True"
+            for row in case_rows
+        )
+        lost_bounded_narrow_count = sum(
+            row["ground_truth_overclaim"] == "False"
+            and row["bounded_alert_preserved"] == "False"
+            and row["extracted_action"] == "NARROW_CLAIM"
+            for row in case_rows
+        )
+        lost_bounded_abstain_source_count = sum(
+            row["ground_truth_overclaim"] == "False"
+            and row["bounded_alert_preserved"] == "False"
+            and row["extracted_action"] == "ABSTAIN_SOURCE_SUPPORT"
+            for row in case_rows
+        )
+        inappropriate_denial_count = sum(
+            row["ground_truth_overclaim"] == "False" and row["inappropriate_denial"] == "True"
+            for row in case_rows
+        )
+        overclaim_routed_count = sum(
+            row["ground_truth_overclaim"] == "True" and row["extracted_action"] != "ALLOW_BOUNDED_ALERT"
+            for row in case_rows
+        )
+        overclaim_allowed_unchanged_count = sum(
+            row["ground_truth_overclaim"] == "True" and row["overclaim_allowed_unchanged"] == "True"
+            for row in case_rows
+        )
         rows.extend(
             [
                 (
@@ -244,7 +285,77 @@ def write_trace() -> None:
                     "results/text_only_extraction_combined_summary.csv",
                     f"{item['provider']}.{item['condition']}.inappropriate_denial_increase_vs_oracle",
                 ),
+                (
+                    f"{prefix}_field_accuracy_overall",
+                    f'{item["field_accuracy_overall"]:.4f}',
+                    "results/text_only_extraction_combined_summary.csv",
+                    f"{item['provider']}.{item['condition']}.field_accuracy_overall",
+                ),
+                (
+                    f"{prefix}_bounded_preserved_count",
+                    bounded_preserved_count,
+                    f"results/text_only_extraction_{item['provider']}_{item['condition']}_case_results.csv",
+                    "bounded_alert_preserved_count",
+                ),
+                (
+                    f"{prefix}_lost_bounded_narrow_count",
+                    lost_bounded_narrow_count,
+                    f"results/text_only_extraction_{item['provider']}_{item['condition']}_case_results.csv",
+                    "lost_bounded_alerts_with_extracted_action_NARROW_CLAIM",
+                ),
+                (
+                    f"{prefix}_lost_bounded_abstain_source_count",
+                    lost_bounded_abstain_source_count,
+                    f"results/text_only_extraction_{item['provider']}_{item['condition']}_case_results.csv",
+                    "lost_bounded_alerts_with_extracted_action_ABSTAIN_SOURCE_SUPPORT",
+                ),
+                (
+                    f"{prefix}_inappropriate_denial_count",
+                    inappropriate_denial_count,
+                    f"results/text_only_extraction_{item['provider']}_{item['condition']}_case_results.csv",
+                    "bounded_alerts_with_inappropriate_denial_true",
+                ),
+                (
+                    f"{prefix}_overclaim_routed_count",
+                    overclaim_routed_count,
+                    f"results/text_only_extraction_{item['provider']}_{item['condition']}_case_results.csv",
+                    "overclaim_cases_with_extracted_action_not_ALLOW_BOUNDED_ALERT",
+                ),
+                (
+                    f"{prefix}_overclaim_allowed_unchanged_count",
+                    overclaim_allowed_unchanged_count,
+                    f"results/text_only_extraction_{item['provider']}_{item['condition']}_case_results.csv",
+                    "overclaim_allowed_unchanged_true",
+                ),
             ]
+        )
+    for row in direction_rows:
+        prefix = f"text_extraction_{row['provider']}_{row['condition']}_{row['field']}"
+        rows.extend(
+            [
+                (
+                    f"{prefix}_more_conservative_errors",
+                    row["more_conservative_errors"],
+                    "results/text_only_extraction_error_direction.csv",
+                    f"{row['provider']}.{row['condition']}.{row['field']}.more_conservative_errors",
+                ),
+                (
+                    f"{prefix}_more_permissive_errors",
+                    row["more_permissive_errors"],
+                    "results/text_only_extraction_error_direction.csv",
+                    f"{row['provider']}.{row['condition']}.{row['field']}.more_permissive_errors",
+                ),
+            ]
+        )
+    for row in prf_rows:
+        prefix = f"text_extraction_{row['provider']}_{row['condition']}_{row['field']}"
+        rows.append(
+            (
+                f"{prefix}_macro_f1",
+                row["macro_f1"],
+                "results/text_only_extraction_field_prf.csv",
+                f"{row['provider']}.{row['condition']}.{row['field']}.macro_f1",
+            )
         )
     with TRACE.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["claim_id", "value", "source_file", "source_key"], lineterminator="\n")

@@ -86,7 +86,7 @@ def authoring_prompt(allowed_sources: list[dict[str, str]]) -> list[dict[str, st
     )
     task = {
         "task": "Create 12 new pharmacogenomic or genomic medication-alert scenarios.",
-        "required_phrase": "model-authored held-out cases, author-labeled",
+        "required_phrase": "model-authored held-out cases for future author labeling",
         "workflow": (
             "Each scenario should contain a drug/gene or genomic-medication context, a brief clinical context, "
             "a draft alert claim, and a structured citation. Some scenarios should be bounded and supportable; "
@@ -253,7 +253,7 @@ def run(output_dir: Path = RESULTS) -> dict[str, Any]:
     payload, raw_text, method = _call_author_model(client, model, allowed_sources)
     cases = _validate_cases(payload, allowed_sources)
     result = {
-        "experiment": "model-authored held-out cases, author-labeled",
+        "experiment": "model-authored held-out cases for future author labeling",
         "run_utc": datetime.now(timezone.utc).isoformat(),
         "authoring_provider": "openai",
         "authoring_model": model,

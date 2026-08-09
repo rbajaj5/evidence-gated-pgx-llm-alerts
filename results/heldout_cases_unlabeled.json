@@ -1,5 +1,5 @@
 {
-  "experiment": "model-authored held-out cases, author-labeled",
+  "experiment": "model-authored held-out cases for future author labeling",
   "run_utc": "2026-08-09T00:49:08.861870+00:00",
   "authoring_provider": "openai",
   "authoring_model": "gpt-5.6-sol",
