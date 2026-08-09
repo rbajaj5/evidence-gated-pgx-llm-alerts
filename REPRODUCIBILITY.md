@@ -96,8 +96,8 @@ Expected derived text-only extraction analysis:
 
 ```text
 With citation fields:
-  Directional errors: GPT-5.6-terra 45 conservative / 9 permissive;
-    Grok-4.5 42 conservative / 4 permissive.
+  Directional errors: GPT-5.6-terra 44 conservative / 10 permissive;
+    Grok-4.5 41 conservative / 5 permissive.
   Bounded-alert losses: GPT-5.6-terra 6/6 narrowed; Grok-4.5 1/1 narrowed.
   Macro-F1 by citation/population/endpoint/actionability:
     GPT-5.6-terra 0.7479 / 0.4369 / 0.7008 / 0.3872.
@@ -107,6 +107,13 @@ No-citation control:
     Grok-4.5 56 conservative / 6 permissive.
   Bounded-alert losses: GPT-5.6-terra 10/10 abstained for source support;
     Grok-4.5 8/8 abstained for source support.
+Endpoint-level exception:
+  GPT-5.6-terra endpoint errors were more permissive than conservative in both
+    conditions: 4 conservative / 7 permissive with citations and
+    5 conservative / 8 permissive without citations.
+  Grok-4.5 endpoint errors were only mildly conservative:
+    8 conservative / 4 permissive with citations and
+    10 conservative / 4 permissive without citations.
 ```
 
 Expected held-out authoring snapshot, if `OPENAI_API_KEY` is available:

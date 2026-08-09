@@ -1,7 +1,7 @@
 __pycache__/
 .pytest_cache/
 _audit_text/
-_pdf_qa/
+_pdf_qa*/
 _rendered/
 _tools/
 code/results/

@@ -263,10 +263,14 @@ def test_text_only_directional_error_outputs_match_expected_spot_checks() -> Non
             key = (row["provider"], row["model"], row["condition"], row["field"])
             rows[key] = (int(row["more_conservative_errors"]), int(row["more_permissive_errors"]))
 
-    assert rows[("openai", "gpt-5.6-terra", "with_citation", "citation_support")] == (11, 0)
+    assert rows[("openai", "gpt-5.6-terra", "with_citation", "citation_support")] == (10, 1)
+    assert rows[("openai", "gpt-5.6-terra", "with_citation", "endpoint_level")] == (4, 7)
     assert rows[("openai", "gpt-5.6-terra", "with_citation", "actionability_level")] == (18, 0)
-    assert rows[("xai", "grok-4.5", "with_citation", "citation_support")] == (11, 0)
+    assert rows[("openai", "gpt-5.6-terra", "no_citation", "endpoint_level")] == (5, 8)
+    assert rows[("xai", "grok-4.5", "with_citation", "citation_support")] == (10, 1)
+    assert rows[("xai", "grok-4.5", "with_citation", "endpoint_level")] == (8, 4)
     assert rows[("xai", "grok-4.5", "with_citation", "actionability_level")] == (13, 0)
+    assert rows[("xai", "grok-4.5", "no_citation", "endpoint_level")] == (10, 4)
     assert sum(rows[("openai", "gpt-5.6-terra", "no_citation", field)][0] for field in (
         "citation_support",
         "population_fit",

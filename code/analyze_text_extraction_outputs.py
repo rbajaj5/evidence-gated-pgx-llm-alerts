@@ -13,8 +13,15 @@ pooled because they produce different downstream failure regimes.
 Conservatism ordering, lowest to highest:
 
 citation_support:
-  verified_guideline < conflicting_or_uncertain < verified_but_not_targeted
-  < outdated_or_context_shifted < unsupported_or_absent < unverifiable
+  verified_guideline < verified_but_not_targeted
+  < outdated_or_context_shifted / conflicting_or_uncertain
+  < unsupported_or_absent < unverifiable
+
+This citation-support order follows the monitor's gate severity. A verified
+but non-targeted source is less directly supportive than a verified target
+guideline but still passes source support. Conflicting/uncertain and outdated
+sources trigger abstention, so moving from either value to verified-but-not-
+targeted is counted as permissive, not conservative.
 
 population_fit:
   target_fit < uncertain_fit < unknown < population_mismatch
@@ -46,9 +53,9 @@ FIELD_NAMES = ("citation_support", "population_fit", "endpoint_level", "actionab
 CONSERVATISM_ORDER = {
     "citation_support": {
         "verified_guideline": 0,
-        "conflicting_or_uncertain": 1,
-        "verified_but_not_targeted": 2,
-        "outdated_or_context_shifted": 3,
+        "verified_but_not_targeted": 1,
+        "outdated_or_context_shifted": 2,
+        "conflicting_or_uncertain": 2,
         "unsupported_or_absent": 4,
         "unverifiable": 5,
     },

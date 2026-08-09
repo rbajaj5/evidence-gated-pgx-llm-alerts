@@ -323,10 +323,11 @@ def build_supplement() -> None:
         doc,
         ["Analysis", "Result"],
         [
-            ["Error direction, GPT with citation", "45 conservative errors vs. 9 permissive errors."],
-            ["Error direction, Grok with citation", "42 conservative errors vs. 4 permissive errors."],
+            ["Error direction, GPT with citation", "44 conservative errors vs. 10 permissive errors."],
+            ["Error direction, Grok with citation", "41 conservative errors vs. 5 permissive errors."],
             ["Error direction, GPT no citation", "43 conservative errors vs. 16 permissive errors."],
             ["Error direction, Grok no citation", "56 conservative errors vs. 6 permissive errors."],
+            ["Endpoint-level exception", "GPT endpoint errors were more permissive than conservative in both conditions; Grok was only mildly conservative."],
             ["Macro-F1, GPT with citation", "Citation 0.7479; population 0.4369; endpoint 0.7008; actionability 0.3872."],
             ["Macro-F1, Grok with citation", "Citation 0.6516; population 0.5974; endpoint 0.6590; actionability 0.4982."],
         ],
@@ -335,7 +336,9 @@ def build_supplement() -> None:
     doc.add_paragraph(
         "Full macro-precision, macro-recall, and macro-F1 for every field, model, and condition are written to "
         "results/text_only_extraction_field_prf.csv. Several enum cells contain one or two observations, so "
-        "macro-F1 is indicative rather than precise."
+        "macro-F1 is indicative rather than precise. Endpoint-level errors should be read separately from the "
+        "source, population, and actionability fields because endpoint classification requires judging what class "
+        "of scientific evidence supports the alert."
     )
 
     doc.add_heading("Held-Out Worksheet", level=1)
