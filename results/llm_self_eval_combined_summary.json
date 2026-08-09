@@ -32,7 +32,7 @@
       "narrowing_rate": 0.09090909090909091,
       "overclaim_allowed_case_ids": [],
       "inappropriate_denial_case_ids": [],
-      "boundary": "This is an LLM self-evaluation baseline on synthetic structured annotations, not independent clinical adjudication."
+      "boundary": "This is a structured-label translation baseline on synthetic structured annotations, not independent clinical adjudication."
     },
     {
       "arm": "A_source_label_full_bank",
@@ -64,7 +64,7 @@
       "narrowing_rate": 0.09090909090909091,
       "overclaim_allowed_case_ids": [],
       "inappropriate_denial_case_ids": [],
-      "boundary": "This is an LLM self-evaluation baseline on synthetic structured annotations, not independent clinical adjudication."
+      "boundary": "This is a structured-label translation baseline on synthetic structured annotations, not independent clinical adjudication."
     }
   ],
   "arm_b_isolating_cases": [
@@ -233,7 +233,7 @@
     "narrowing_rate": 1.0,
     "overclaim_allowed_case_ids": [],
     "inappropriate_denial_case_ids": [],
-    "boundary": "This is an LLM self-evaluation baseline on synthetic structured annotations, not independent clinical adjudication."
+    "boundary": "This is a structured-label translation baseline on synthetic structured annotations, not independent clinical adjudication."
   },
   "methodological_note": "Bounded-alert preservation is the metric that distinguishes a real reviewer from a uniformly cautious model that narrows every case.",
   "boundary": "Arm A is frozen from the prior source-label run. Arm B withholds source-support labels and author-facing notes, and is scoped only to PGX31-PGX33."

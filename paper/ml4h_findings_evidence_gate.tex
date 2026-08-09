@@ -40,9 +40,10 @@
 LLM-generated medication alerts can sound more certain than their evidence permits.
 We test a deterministic evidence gate for pharmacogenomic alert drafts using 33 author-designed synthetic cases: 23 overclaim archetypes and 10 bounded aligned alerts.
 The gate consumes structured annotations for source support, population fit, endpoint strength, and actionability, then returns allow, narrow, abstain, or deny.
-With oracle annotations, the full monitor routed 23/23 overclaims and preserved 10/10 bounded alerts; disabling source support, population fit, or claim strength let 2/23, 1/23, and 6/23 overclaims pass unchanged.
-An ungated comparator passed 23/23 overclaims and a claim-strength-only comparator passed 3/23.
-Text-only extraction exposed the bottleneck: with citations, GPT-5.6-terra extracted 78/132 fields and Grok-4.5 extracted 86/132; without citations, they extracted 73/132 and 70/132, while bounded-alert preservation dropped by 10 and 8 cases.
+With oracle annotations, the full monitor routed 23/23 overclaims and preserved 10/10 bounded alerts.
+With citation fields, GPT-5.6-terra and Grok-4.5 each matched 21/33 downstream actions, while preserving 4/10 and 9/10 bounded alerts.
+Without citation fields, downstream action agreement was 11/33 and 12/33, with 0/10 and 2/10 bounded alerts preserved.
+Disabling source support, population fit, or claim strength let 2/23, 1/23, and 6/23 overclaims pass unchanged.
 These are specification-conformance results, not clinical safety, generalization, or patient-benefit evidence.
 \end{abstract}
 
@@ -60,6 +61,7 @@ Healthcare LLMs can turn limited evidence into fluent medication advice.
 A pharmacogenomic alert may cite a real guideline while universalizing a bounded recommendation, transporting a population-specific association into another population, or treating a surrogate as patient-outcome benefit.
 We ask a narrow question: under structured annotations, are source support, population fit, and claim strength separable evidence-boundary predicates for pharmacogenomic LLM alerts?
 The 23/10 split is stress-test coverage, not a clinical base rate.
+The harder result is not the oracle monitor; it is the gap between oracle annotations and text-only extraction from synthetic alert text and citation fields.
 
 \section{Related Work}
 Healthcare AI evaluation should separate implementation consistency from patient benefit.
@@ -84,7 +86,7 @@ PGX31--PGX33 use structured citation objects; PGX32 cites the 2017 DPYD guidelin
 Oracle runs use author-assigned structured annotations.
 Ablations disable exactly one check.
 Simple comparators test ungated allow-all and claim-strength-only policies.
-LLM self-evaluation Arm A gives GPT-5.6-terra and Grok-4.5 the full structured labels; Arm B withholds source support for PGX31--PGX33 and supplies structured citations.
+Structured-label translation Arm A gives GPT-5.6-terra and Grok-4.5 the full structured labels; Arm B withholds source support for PGX31--PGX33 and supplies structured citations.
 The text-only extraction experiment gives only draft claim, clinical context, drug/gene, and optionally the structured citation object; models must extract citation support, population fit, endpoint level, and actionability level before the unmodified monitor runs.
 
 \section{Experiments}
@@ -92,7 +94,7 @@ The text-only extraction experiment gives only draft claim, clinical context, dr
 The primary specification test asks whether any check is redundant.
 If a disabled check lets a designed overclaim pass unchanged, that check is necessary inside the synthetic specification.
 
-\subsection{LLM Self-Evaluation Arms A and B}
+\subsection{Structured-Label Translation Arms A and B}
 Arm A tests label-to-action mapping, not annotation validity.
 Arm B is a three-case structured-citation demonstration and does not estimate full-bank accuracy.
 The synthetic uniform-NARROW row is computed without an API call to show why routing alone is insufficient.
@@ -102,10 +104,10 @@ Text-only extraction is the Stage 2 bottleneck test.
 Each model extracted four annotations for all 33 cases, first with citation fields and then with citations removed.
 Per-field confusion matrices are written to the corresponding \texttt{results/text\_only\_extraction\_*confusion.csv} files.
 
-\subsection{Held-Out Cases}
-A third model, GPT-5.6-sol, authored 12 new model-authored held-out cases, author-labeled, without seeing the decision table, enum values, or existing cases.
+\subsection{Held-Out Worksheet}
+A third model, GPT-5.6-sol, authored 12 draft scenarios for a future held-out worksheet.
 They are emitted as an unlabeled JSON file and a blank labeling worksheet.
-% TODO: author labels pending; do not report held-out accuracy until labels are returned.
+No labels, held-out accuracy, independence claim, or generalization result is reported here.
 
 \section{Results}
 Table~\ref{tab:results} summarizes the executable results.
@@ -122,11 +124,14 @@ Primary-check conformance was 31/33 because PGX19 and PGX24 are precedence-sensi
   \midrule
   One-check ablation & Removing source, population, and claim checks let 2/23, 1/23, and 6/23 overclaims pass unchanged. & Each boundary catches at least one archetype missed by the others. \\
   Simple comparators & Ungated allow-all left 23/23 overclaims unchanged; claim-strength-only left 3/23; full monitor left 0/23. & Endpoint/actionability alone misses fabricated-source, transport, and stale-source cases. \\
-  Arm A self-evaluation & GPT-5.6-terra and Grok-4.5 each routed 23/23 overclaims and preserved 10/10 bounded alerts; action agreement was 31/33 for both. & Full-bank label-to-action comparator, not annotation validation. \\
-  Arm B self-evaluation & GPT matched PGX32--PGX33 but not PGX31; Grok matched PGX31--PGX32 and the PGX33 check but not PGX33 action. & Structured-citation judgments remain policy-dependent. \\
-  Text extraction with citations & GPT: 78/132 fields, 21/33 actions, bounded preservation drop 6. Grok: 86/132 fields, 21/33 actions, bounded preservation drop 1. & Extracted annotations fall below the oracle ceiling even when citation fields are supplied. \\
-  No-citation control & GPT: 73/132 fields and 11/33 actions; Grok: 70/132 fields and 12/33 actions; bounded preservation dropped by 10 and 8 cases. & Without citation fields, both models over-abstain and deny many bounded alerts. \\
-  Held-out authoring & GPT-5.6-sol generated 12 unlabeled model-authored held-out cases, author-labeled. & No accuracy is reported until author labels are supplied. \\
+  Translation Arm A & GPT-5.6-terra and Grok-4.5 each routed 23/23 overclaims and preserved 10/10 bounded alerts; action agreement was 31/33 for both. & Full-bank label-to-action comparator, not annotation validation. \\
+  Translation Arm B & GPT matched PGX32--PGX33 but not PGX31; Grok matched PGX31--PGX32 and the PGX33 check but not PGX33 action. & Structured-citation judgments remain policy-dependent. \\
+  Extraction Regime 1: with citations & GPT: 78/132 fields, 21/33 actions, 4/10 bounded preserved; 6/10 bounded losses were NARROW\_CLAIM; inappropriate denials 0. Grok: 86/132 fields, 21/33 actions, 9/10 bounded preserved; 1/10 bounded loss was NARROW\_CLAIM; inappropriate denials 0. & Citation-supplied failures dilute bounded guidance through over-narrowing. \\
+  Extraction Regime 2: no citations & GPT: 73/132 fields, 11/33 actions, 0/10 bounded preserved; 10/10 bounded losses were ABSTAIN\_SOURCE\_SUPPORT; inappropriate denials 10. Grok: 70/132 fields, 12/33 actions, 2/10 bounded preserved; 8/10 bounded losses were ABSTAIN\_SOURCE\_SUPPORT; inappropriate denials 8. & With no citation to read, the gate withholds bounded alerts wholesale. \\
+  Extraction overclaim routing & In both extraction regimes, both models routed 23/23 overclaims and allowed 0 overclaims unchanged. & Routing alone cannot distinguish a working reviewer from a degenerate abstain-all policy; bounded-alert preservation separates them. \\
+  Directional errors & With citations, GPT errors were 45 conservative vs. 9 permissive; Grok errors were 42 conservative vs. 4 permissive. Without citations, GPT errors were 43 conservative vs. 16 permissive; Grok errors were 56 conservative vs. 6 permissive. & Directionality is condition-specific rather than a pooled degradation curve. \\
+  Macro-F1 & With citation, GPT field F1s were 0.748/0.437/0.701/0.387 and Grok 0.652/0.597/0.659/0.498 for citation/population/endpoint/actionability. & Indicative only: several enum cells contain one or two observations. \\
+  Held-out worksheet & GPT-5.6-sol generated 12 unlabeled draft scenarios and a blank labeling worksheet. & Future labeling artifact only; no held-out accuracy is reported. \\
   \bottomrule
   \end{tabular}}
 \end{table*}
@@ -134,8 +139,14 @@ Primary-check conformance was 31/33 because PGX19 and PGX24 are precedence-sensi
 \section{Discussion}
 The deterministic monitor is not better because it understands medicine; it is useful because its boundary is explicit.
 The ablation and simple-comparator results show that a claim-strength-only rule would miss PGX31, PGX32, and PGX33.
-The extraction experiment is the most important negative result: LLMs can map supplied labels into plausible actions, but extracting the labels from text and citations loses accuracy, and removing citation fields causes blanket denial of bounded alerts.
-This supports treating annotation extraction as the next experiment rather than assuming that LLM self-review solves evidence overclaiming.
+The extraction experiment is the most important negative result: LLMs can map supplied labels into plausible actions, but extracting the labels from text and citations loses accuracy.
+This supports treating annotation extraction as the next experiment rather than assuming that label translation solves evidence overclaiming.
+The failures are directional rather than random: with citation fields, most extraction errors move to more conservative enum values.
+Two extraction regimes emerged.
+When citations were supplied, bounded guidance still reached the clinician but arrived diluted: GPT-5.6-terra narrowed all 6 lost bounded alerts and Grok-4.5 narrowed its 1 lost bounded alert, leaving inappropriate-denial count at 0.
+This over-narrowing can still create alert burden \citep{ancker2017alertfatigue}; Grok lost 1 bounded alert versus GPT's 6 at comparable field accuracy (0.6515 vs. 0.5909), so field accuracy alone does not predict downstream utility.
+When citations were withheld, the failure mode changed to wholesale abstention: GPT preserved 0/10 bounded alerts and Grok preserved 2/10, with all lost bounded alerts mapped to ABSTAIN\_SOURCE\_SUPPORT.
+Both no-citation runs still routed 23/23 overclaims and allowed 0 overclaims unchanged, which is the degenerate-policy signature the uniform-NARROW sanity row was designed to expose: routing performance alone cannot distinguish useful review from abstaining on everything.
 
 \section{Ethics}
 The monitor produces a decision trace naming the structured evidence feature that triggered allow, narrow, abstain, or deny.
@@ -147,7 +158,7 @@ All Stage 1 cases are synthetic and author-designed.
 The system tests decision logic conditional on annotations; it does not prove annotation validity, clinical safety, generalization, or patient benefit.
 There are no clinician labels, no clinician reviewers, and no inter-rater statistics.
 LLM runs are model-version-specific, and Grok extraction required chunked calls because a full-bank request disconnected.
-The model-authored held-out cases are unlabeled; they are a worksheet for future author labeling, not evidence of accuracy.
+The model-authored held-out worksheet is unlabeled; it is a worksheet for future author labeling, not evidence of accuracy, independence, or generalization.
 
 \section{Conclusion}
 A deterministic evidence gate can make pharmacogenomic LLM-alert boundaries auditable under oracle annotations.

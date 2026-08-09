@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import json
 from dataclasses import replace
 
@@ -251,3 +252,94 @@ def test_saved_llm_baseline_summary_is_a_synthetic_comparator() -> None:
     for row in summary["arm_b_isolating_cases"]:
         assert row["case_count"] == 3
         assert [case_row["case_id"] for case_row in row["per_case_results"]] == ["PGX31", "PGX32", "PGX33"]
+
+
+def test_text_only_directional_error_outputs_match_expected_spot_checks() -> None:
+    path = PROJECT_ROOT / "results" / "text_only_extraction_error_direction.csv"
+    assert path.exists()
+    rows = {}
+    with path.open(newline="", encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            key = (row["provider"], row["model"], row["condition"], row["field"])
+            rows[key] = (int(row["more_conservative_errors"]), int(row["more_permissive_errors"]))
+
+    assert rows[("openai", "gpt-5.6-terra", "with_citation", "citation_support")] == (11, 0)
+    assert rows[("openai", "gpt-5.6-terra", "with_citation", "actionability_level")] == (18, 0)
+    assert rows[("xai", "grok-4.5", "with_citation", "citation_support")] == (11, 0)
+    assert rows[("xai", "grok-4.5", "with_citation", "actionability_level")] == (13, 0)
+    assert sum(rows[("openai", "gpt-5.6-terra", "no_citation", field)][0] for field in (
+        "citation_support",
+        "population_fit",
+        "endpoint_level",
+        "actionability_level",
+    )) == 43
+    assert sum(rows[("openai", "gpt-5.6-terra", "no_citation", field)][1] for field in (
+        "citation_support",
+        "population_fit",
+        "endpoint_level",
+        "actionability_level",
+    )) == 16
+    assert sum(rows[("xai", "grok-4.5", "no_citation", field)][0] for field in (
+        "citation_support",
+        "population_fit",
+        "endpoint_level",
+        "actionability_level",
+    )) == 56
+    assert sum(rows[("xai", "grok-4.5", "no_citation", field)][1] for field in (
+        "citation_support",
+        "population_fit",
+        "endpoint_level",
+        "actionability_level",
+    )) == 6
+
+
+def test_text_only_field_prf_outputs_exist_for_each_field_model_condition() -> None:
+    path = PROJECT_ROOT / "results" / "text_only_extraction_field_prf.csv"
+    assert path.exists()
+    rows = path.read_text(encoding="utf-8").splitlines()
+    assert len(rows) == 1 + 4 * 4
+    assert "macro_precision,macro_recall,macro_f1" in rows[0]
+
+
+def test_text_only_extraction_has_two_distinct_bounded_alert_failure_regimes() -> None:
+    expected = {
+        ("openai", "with_citation"): {
+            "preserved": 4,
+            "lost_action": "NARROW_CLAIM",
+            "lost_count": 6,
+            "inappropriate_denial": 0,
+        },
+        ("xai", "with_citation"): {
+            "preserved": 9,
+            "lost_action": "NARROW_CLAIM",
+            "lost_count": 1,
+            "inappropriate_denial": 0,
+        },
+        ("openai", "no_citation"): {
+            "preserved": 0,
+            "lost_action": "ABSTAIN_SOURCE_SUPPORT",
+            "lost_count": 10,
+            "inappropriate_denial": 10,
+        },
+        ("xai", "no_citation"): {
+            "preserved": 2,
+            "lost_action": "ABSTAIN_SOURCE_SUPPORT",
+            "lost_count": 8,
+            "inappropriate_denial": 8,
+        },
+    }
+    for (provider, condition), values in expected.items():
+        path = PROJECT_ROOT / "results" / f"text_only_extraction_{provider}_{condition}_case_results.csv"
+        with path.open(newline="", encoding="utf-8") as handle:
+            rows = list(csv.DictReader(handle))
+        bounded = [row for row in rows if row["ground_truth_overclaim"] == "False"]
+        lost = [row for row in bounded if row["bounded_alert_preserved"] == "False"]
+        assert sum(row["bounded_alert_preserved"] == "True" for row in bounded) == values["preserved"]
+        assert len(lost) == values["lost_count"]
+        assert {row["extracted_action"] for row in lost} == {values["lost_action"]}
+        assert sum(row["inappropriate_denial"] == "True" for row in bounded) == values["inappropriate_denial"]
+        assert sum(
+            row["ground_truth_overclaim"] == "True" and row["extracted_action"] != "ALLOW_BOUNDED_ALERT"
+            for row in rows
+        ) == 23
+        assert sum(row["overclaim_allowed_unchanged"] == "True" for row in rows) == 0

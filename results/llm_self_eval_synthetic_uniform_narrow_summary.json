@@ -26,5 +26,5 @@
   "narrowing_rate": 1.0,
   "overclaim_allowed_case_ids": [],
   "inappropriate_denial_case_ids": [],
-  "boundary": "This is an LLM self-evaluation baseline on synthetic structured annotations, not independent clinical adjudication."
+  "boundary": "This is a structured-label translation baseline on synthetic structured annotations, not independent clinical adjudication."
 }

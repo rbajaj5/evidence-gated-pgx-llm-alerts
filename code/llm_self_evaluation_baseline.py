@@ -1,9 +1,10 @@
-"""LLM-as-judge baselines for the synthetic pharmacogenomic alert case bank.
+"""Structured-label translation baselines for the synthetic PGx alert bank.
 
-Arm A is the frozen original baseline over all 33 cases: frontier LLMs saw the
-source-support label and the legacy guideline anchor. Arm B is a new isolating
-case baseline over PGX31-PGX33 only: frontier LLMs see structured citations and
-must infer source support without the source-support answer key.
+Arm A is the frozen original full-bank baseline: frontier LLMs saw the
+source-support label and the legacy guideline anchor, then mapped supplied
+labels into the action vocabulary. Arm B is the three-case isolating baseline:
+frontier LLMs see structured citations and must infer source support without
+the source-support answer key.
 
 Run with:
     PYTHONPATH=code python code/llm_self_evaluation_baseline.py
@@ -403,8 +404,8 @@ def _full_bank_summary(
             row["case_id"] for row in rows if _truthy(row["llm_inappropriate_denial"])
         ],
         "boundary": (
-            "This is an LLM self-evaluation baseline on synthetic structured annotations, "
-            "not independent clinical adjudication."
+                    "This is a structured-label translation baseline on synthetic structured annotations, "
+                    "not independent clinical adjudication."
         ),
     }
 

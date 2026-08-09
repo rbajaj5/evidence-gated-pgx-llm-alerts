@@ -29,14 +29,14 @@ ABSTRACT = (
     "This capstone tests a deterministic evidence gate for pharmacogenomic alert drafts using "
     "33 author-designed synthetic cases: 23 overclaim archetypes and 10 bounded aligned alerts. "
     "The gate consumes structured annotations for source support, population fit, endpoint strength, "
-    "and actionability, then returns allow, narrow, abstain, or deny. With oracle annotations, the "
-    "full monitor routed 23/23 overclaims and preserved 10/10 bounded alerts; disabling source support, "
-    "population fit, or claim strength let 2/23, 1/23, and 6/23 overclaims pass unchanged. Text-only "
-    "extraction exposed the bottleneck: with citation fields, GPT-5.6-terra extracted 78/132 annotation "
-    "fields and Grok-4.5 extracted 86/132; without citation fields, they extracted 73/132 and 70/132, "
-    "while bounded-alert preservation dropped by 10 and 8 cases. These are specification-conformance "
-    "and extraction-bottleneck results on synthetic cases, not clinical safety, generalization, or "
-    "patient-benefit evidence."
+    "and actionability, then returns allow, narrow, abstain, or deny. With oracle annotations, the full "
+    "monitor routed 23/23 overclaims and preserved 10/10 bounded alerts. With citation fields, "
+    "GPT-5.6-terra and Grok-4.5 each matched 21/33 downstream actions, while preserving 4/10 and "
+    "9/10 bounded alerts. Without citation fields, downstream action agreement was 11/33 and 12/33, "
+    "with 0/10 and 2/10 bounded alerts preserved. Disabling source support, population fit, or claim "
+    "strength let 2/23, 1/23, and 6/23 overclaims "
+    "pass unchanged. These are specification-conformance and extraction-bottleneck results on synthetic "
+    "cases, not clinical safety, generalization, or patient-benefit evidence."
 )
 
 
@@ -194,7 +194,7 @@ def build_summary() -> None:
     doc.add_heading("Generative AI Use Disclosure", level=1)
     doc.add_paragraph(
         "Generative AI tools were used for brainstorming, critique, code scaffolding, drafting, formatting, "
-        "and synthetic LLM experiments. GPT-5.6-terra and Grok-4.5 were used in LLM self-evaluation and "
+        "and synthetic LLM experiments. GPT-5.6-terra and Grok-4.5 were used in structured-label translation and "
         "text-only extraction experiments; GPT-5.6-sol generated unlabeled held-out scenarios for later "
         "author labeling. No real patient records, protected health information, or private genomic data were "
         "used or transmitted. The author selected the final scope, verified sources, ran the code, reviewed "
@@ -207,7 +207,7 @@ def build_summary() -> None:
         [
             "Synthetic 33-case pharmacogenomic/genomic medication-alert case bank.",
             "Deterministic three-check monitor with unit tests and replayable CSV/JSON outputs.",
-            "Ablation, policy-comparator, LLM self-evaluation, text-only extraction, and held-out authoring artifacts under code/ and results/.",
+            "Ablation, policy-comparator, structured-label translation, text-only extraction, derived directional-error/PRF, and held-out authoring artifacts under code/ and results/.",
             "Safety boundary: no diagnosis, no treatment recommendation, no real patient data, and no protected health information.",
         ],
     )
@@ -235,6 +235,7 @@ def build_supplement() -> None:
             r"py -3.13 code\pruned_evidence_gate.py",
             r"py -3.13 code\llm_self_evaluation_baseline.py",
             r"py -3.13 code\text_only_extraction.py",
+            r"py -3.13 code\analyze_text_extraction_outputs.py",
             r"py -3.13 code\heldout_case_authoring.py",
             r"py -3.13 code\generate_paper_assets.py",
             r"py -3.13 -m pytest code -q",
@@ -280,7 +281,7 @@ def build_supplement() -> None:
         [2.6, 4.4],
     )
 
-    doc.add_heading("LLM Self-Evaluation Arms", level=1)
+    doc.add_heading("Structured-Label Translation Arms", level=1)
     _matrix_table(
         doc,
         ["Arm", "Scope", "Result"],
@@ -300,24 +301,48 @@ def build_supplement() -> None:
         doc,
         ["Provider / condition", "Field accuracy", "Downstream action", "Oracle gap"],
         [
-            ["GPT-5.6-terra with citation", "78/132", "21/33", "Bounded preservation drop 6; inappropriate denial increase 0."],
-            ["Grok-4.5 with citation", "86/132", "21/33", "Bounded preservation drop 1; inappropriate denial increase 0."],
-            ["GPT-5.6-terra no citation", "73/132", "11/33", "Bounded preservation drop 10; inappropriate denial increase 10."],
-            ["Grok-4.5 no citation", "70/132", "12/33", "Bounded preservation drop 8; inappropriate denial increase 8."],
+            ["Regime 1: GPT-5.6-terra with citation", "78/132", "21/33", "4/10 bounded preserved; 6/10 bounded losses, all NARROW_CLAIM; inappropriate denials 0."],
+            ["Regime 1: Grok-4.5 with citation", "86/132", "21/33", "9/10 bounded preserved; 1/10 bounded loss, NARROW_CLAIM; inappropriate denials 0."],
+            ["Regime 2: GPT-5.6-terra no citation", "73/132", "11/33", "0/10 bounded preserved; 10/10 bounded losses, all ABSTAIN_SOURCE_SUPPORT; inappropriate denials 10."],
+            ["Regime 2: Grok-4.5 no citation", "70/132", "12/33", "2/10 bounded preserved; 8/10 bounded losses, all ABSTAIN_SOURCE_SUPPORT; inappropriate denials 8."],
         ],
         [2.15, 1.25, 1.5, 2.1],
     )
     doc.add_paragraph(
         "This is the main bottleneck result: the deterministic monitor performs as specified under oracle "
         "annotations, but LLM extraction from text and citation fields loses annotation accuracy and changes "
-        "downstream actions. The no-citation control shows that missing citation fields shift the system toward "
-        "over-denial of bounded alerts."
+        "downstream actions. With citation fields, every lost bounded alert was narrowed rather than denied or "
+        "abstained: 6/6 for GPT-5.6-terra and 1/1 for Grok-4.5. With citations withheld, every lost bounded "
+        "alert became ABSTAIN_SOURCE_SUPPORT: 10/10 for GPT-5.6-terra and 8/8 for Grok-4.5. Both conditions "
+        "routed 23/23 overclaims and allowed 0 overclaims unchanged, so bounded-alert preservation is the "
+        "metric that separates useful review from a degenerate abstention pattern."
+    )
+
+    doc.add_heading("Directional Error and Field PRF", level=1)
+    _matrix_table(
+        doc,
+        ["Analysis", "Result"],
+        [
+            ["Error direction, GPT with citation", "45 conservative errors vs. 9 permissive errors."],
+            ["Error direction, Grok with citation", "42 conservative errors vs. 4 permissive errors."],
+            ["Error direction, GPT no citation", "43 conservative errors vs. 16 permissive errors."],
+            ["Error direction, Grok no citation", "56 conservative errors vs. 6 permissive errors."],
+            ["Macro-F1, GPT with citation", "Citation 0.7479; population 0.4369; endpoint 0.7008; actionability 0.3872."],
+            ["Macro-F1, Grok with citation", "Citation 0.6516; population 0.5974; endpoint 0.6590; actionability 0.4982."],
+        ],
+        [2.55, 4.45],
+    )
+    doc.add_paragraph(
+        "Full macro-precision, macro-recall, and macro-F1 for every field, model, and condition are written to "
+        "results/text_only_extraction_field_prf.csv. Several enum cells contain one or two observations, so "
+        "macro-F1 is indicative rather than precise."
     )
 
     doc.add_heading("Held-Out Worksheet", level=1)
     doc.add_paragraph(
-        "GPT-5.6-sol generated 12 model-authored held-out cases, author-labeled. They remain unlabeled in this "
-        "package. The CSV worksheet has blank label columns, and no held-out accuracy is reported."
+        "GPT-5.6-sol generated 12 draft scenarios for a future held-out worksheet. They remain unlabeled in this "
+        "package. The CSV worksheet has blank label columns, and no held-out accuracy, independence claim, or "
+        "generalization result is reported."
     )
 
     doc.add_heading("Traceability", level=1)
