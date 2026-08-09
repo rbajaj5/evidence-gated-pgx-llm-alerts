@@ -1,0 +1,274 @@
+{
+  "run_utc": "2026-08-09T00:39:52.170738+00:00",
+  "experiment": "text_only_annotation_extraction",
+  "row_count": 4,
+  "summaries": [
+    {
+      "provider": "openai",
+      "model": "gpt-5.6-terra",
+      "condition": "with_citation",
+      "method": {
+        "provider": "openai",
+        "model": "gpt-5.6-terra",
+        "condition": "with_citation",
+        "prompt_mode": "zero-shot_json_annotation_extraction",
+        "temperature_requested": 0.0,
+        "temperature_used": null,
+        "temperature_note": "temperature=0 was requested, but this model rejected the parameter; provider default sampling was used.",
+        "model_selection": "Required model ID verified with client.models.list(); exact ID recorded here.",
+        "input_boundary": "No expected labels, ground-truth labels, structured annotation labels, or private author notes supplied."
+      },
+      "run_utc": "2026-08-09T00:32:57.012603+00:00",
+      "case_count": 33,
+      "field_accuracy": {
+        "citation_support": {
+          "correct": 22,
+          "total": 33,
+          "accuracy": 0.6666666666666666
+        },
+        "population_fit": {
+          "correct": 19,
+          "total": 33,
+          "accuracy": 0.5757575757575758
+        },
+        "endpoint_level": {
+          "correct": 22,
+          "total": 33,
+          "accuracy": 0.6666666666666666
+        },
+        "actionability_level": {
+          "correct": 15,
+          "total": 33,
+          "accuracy": 0.45454545454545453
+        }
+      },
+      "field_correct_total": 78,
+      "field_total": 132,
+      "field_accuracy_overall": 0.5909090909090909,
+      "downstream_action_agreement": "21/33",
+      "downstream_primary_check_agreement": "24/33",
+      "downstream_action_agreement_count": 21,
+      "downstream_primary_check_agreement_count": 24,
+      "designed_overclaim_cases": 23,
+      "bounded_alert_cases": 10,
+      "oracle_overclaim_allowed_unchanged_count": 0,
+      "extracted_overclaim_allowed_unchanged_count": 0,
+      "overclaim_allowed_gap_vs_oracle": 0,
+      "oracle_bounded_alert_preserved_count": 10,
+      "extracted_bounded_alert_preserved_count": 4,
+      "bounded_alert_preservation_drop_vs_oracle": 6,
+      "oracle_inappropriate_denial_count": 0,
+      "extracted_inappropriate_denial_count": 0,
+      "inappropriate_denial_increase_vs_oracle": 0,
+      "overclaim_allowed_case_ids": [],
+      "inappropriate_denial_case_ids": [],
+      "boundary": "Text-only extraction compares extracted annotations with author-assigned annotations on synthetic cases; it is not clinical validation or expert review."
+    },
+    {
+      "provider": "xai",
+      "model": "grok-4.5",
+      "condition": "with_citation",
+      "method": {
+        "provider": "xai",
+        "model": "grok-4.5",
+        "condition": "with_citation",
+        "prompt_mode": "zero-shot_json_annotation_extraction",
+        "temperature_requested": 0.0,
+        "temperature_used": 0.0,
+        "temperature_note": "temperature=0 accepted by provider API.",
+        "model_selection": "Required model ID verified with client.models.list(); exact ID recorded here.",
+        "input_boundary": "No expected labels, ground-truth labels, structured annotation labels, or private author notes supplied.",
+        "chunking": "xAI run split into chunks of at most 8 cases and recombined."
+      },
+      "run_utc": "2026-08-09T00:36:15.487754+00:00",
+      "case_count": 33,
+      "field_accuracy": {
+        "citation_support": {
+          "correct": 22,
+          "total": 33,
+          "accuracy": 0.6666666666666666
+        },
+        "population_fit": {
+          "correct": 23,
+          "total": 33,
+          "accuracy": 0.696969696969697
+        },
+        "endpoint_level": {
+          "correct": 21,
+          "total": 33,
+          "accuracy": 0.6363636363636364
+        },
+        "actionability_level": {
+          "correct": 20,
+          "total": 33,
+          "accuracy": 0.6060606060606061
+        }
+      },
+      "field_correct_total": 86,
+      "field_total": 132,
+      "field_accuracy_overall": 0.6515151515151515,
+      "downstream_action_agreement": "21/33",
+      "downstream_primary_check_agreement": "23/33",
+      "downstream_action_agreement_count": 21,
+      "downstream_primary_check_agreement_count": 23,
+      "designed_overclaim_cases": 23,
+      "bounded_alert_cases": 10,
+      "oracle_overclaim_allowed_unchanged_count": 0,
+      "extracted_overclaim_allowed_unchanged_count": 0,
+      "overclaim_allowed_gap_vs_oracle": 0,
+      "oracle_bounded_alert_preserved_count": 10,
+      "extracted_bounded_alert_preserved_count": 9,
+      "bounded_alert_preservation_drop_vs_oracle": 1,
+      "oracle_inappropriate_denial_count": 0,
+      "extracted_inappropriate_denial_count": 0,
+      "inappropriate_denial_increase_vs_oracle": 0,
+      "overclaim_allowed_case_ids": [],
+      "inappropriate_denial_case_ids": [],
+      "boundary": "Text-only extraction compares extracted annotations with author-assigned annotations on synthetic cases; it is not clinical validation or expert review."
+    },
+    {
+      "provider": "openai",
+      "model": "gpt-5.6-terra",
+      "condition": "no_citation",
+      "method": {
+        "provider": "openai",
+        "model": "gpt-5.6-terra",
+        "condition": "no_citation",
+        "prompt_mode": "zero-shot_json_annotation_extraction",
+        "temperature_requested": 0.0,
+        "temperature_used": null,
+        "temperature_note": "temperature=0 was requested, but this model rejected the parameter; provider default sampling was used.",
+        "model_selection": "Required model ID verified with client.models.list(); exact ID recorded here.",
+        "input_boundary": "No expected labels, ground-truth labels, structured annotation labels, or private author notes supplied."
+      },
+      "run_utc": "2026-08-09T00:36:37.590740+00:00",
+      "case_count": 33,
+      "field_accuracy": {
+        "citation_support": {
+          "correct": 10,
+          "total": 33,
+          "accuracy": 0.30303030303030304
+        },
+        "population_fit": {
+          "correct": 21,
+          "total": 33,
+          "accuracy": 0.6363636363636364
+        },
+        "endpoint_level": {
+          "correct": 20,
+          "total": 33,
+          "accuracy": 0.6060606060606061
+        },
+        "actionability_level": {
+          "correct": 22,
+          "total": 33,
+          "accuracy": 0.6666666666666666
+        }
+      },
+      "field_correct_total": 73,
+      "field_total": 132,
+      "field_accuracy_overall": 0.553030303030303,
+      "downstream_action_agreement": "11/33",
+      "downstream_primary_check_agreement": "12/33",
+      "downstream_action_agreement_count": 11,
+      "downstream_primary_check_agreement_count": 12,
+      "designed_overclaim_cases": 23,
+      "bounded_alert_cases": 10,
+      "oracle_overclaim_allowed_unchanged_count": 0,
+      "extracted_overclaim_allowed_unchanged_count": 0,
+      "overclaim_allowed_gap_vs_oracle": 0,
+      "oracle_bounded_alert_preserved_count": 10,
+      "extracted_bounded_alert_preserved_count": 0,
+      "bounded_alert_preservation_drop_vs_oracle": 10,
+      "oracle_inappropriate_denial_count": 0,
+      "extracted_inappropriate_denial_count": 10,
+      "inappropriate_denial_increase_vs_oracle": 10,
+      "overclaim_allowed_case_ids": [],
+      "inappropriate_denial_case_ids": [
+        "PGX01",
+        "PGX04",
+        "PGX06",
+        "PGX08",
+        "PGX09",
+        "PGX11",
+        "PGX14",
+        "PGX16",
+        "PGX20",
+        "PGX21"
+      ],
+      "boundary": "Text-only extraction compares extracted annotations with author-assigned annotations on synthetic cases; it is not clinical validation or expert review."
+    },
+    {
+      "provider": "xai",
+      "model": "grok-4.5",
+      "condition": "no_citation",
+      "method": {
+        "provider": "xai",
+        "model": "grok-4.5",
+        "condition": "no_citation",
+        "prompt_mode": "zero-shot_json_annotation_extraction",
+        "temperature_requested": 0.0,
+        "temperature_used": 0.0,
+        "temperature_note": "temperature=0 accepted by provider API.",
+        "model_selection": "Required model ID verified with client.models.list(); exact ID recorded here.",
+        "input_boundary": "No expected labels, ground-truth labels, structured annotation labels, or private author notes supplied.",
+        "chunking": "xAI run split into chunks of at most 8 cases and recombined."
+      },
+      "run_utc": "2026-08-09T00:39:52.168095+00:00",
+      "case_count": 33,
+      "field_accuracy": {
+        "citation_support": {
+          "correct": 11,
+          "total": 33,
+          "accuracy": 0.3333333333333333
+        },
+        "population_fit": {
+          "correct": 20,
+          "total": 33,
+          "accuracy": 0.6060606060606061
+        },
+        "endpoint_level": {
+          "correct": 19,
+          "total": 33,
+          "accuracy": 0.5757575757575758
+        },
+        "actionability_level": {
+          "correct": 20,
+          "total": 33,
+          "accuracy": 0.6060606060606061
+        }
+      },
+      "field_correct_total": 70,
+      "field_total": 132,
+      "field_accuracy_overall": 0.5303030303030303,
+      "downstream_action_agreement": "12/33",
+      "downstream_primary_check_agreement": "14/33",
+      "downstream_action_agreement_count": 12,
+      "downstream_primary_check_agreement_count": 14,
+      "designed_overclaim_cases": 23,
+      "bounded_alert_cases": 10,
+      "oracle_overclaim_allowed_unchanged_count": 0,
+      "extracted_overclaim_allowed_unchanged_count": 0,
+      "overclaim_allowed_gap_vs_oracle": 0,
+      "oracle_bounded_alert_preserved_count": 10,
+      "extracted_bounded_alert_preserved_count": 2,
+      "bounded_alert_preservation_drop_vs_oracle": 8,
+      "oracle_inappropriate_denial_count": 0,
+      "extracted_inappropriate_denial_count": 8,
+      "inappropriate_denial_increase_vs_oracle": 8,
+      "overclaim_allowed_case_ids": [],
+      "inappropriate_denial_case_ids": [
+        "PGX01",
+        "PGX04",
+        "PGX06",
+        "PGX08",
+        "PGX09",
+        "PGX11",
+        "PGX14",
+        "PGX16"
+      ],
+      "boundary": "Text-only extraction compares extracted annotations with author-assigned annotations on synthetic cases; it is not clinical validation or expert review."
+    }
+  ],
+  "boundary": "The extracted condition is expected to be worse than the oracle condition; that gap is the Stage 2 bottleneck."
+}

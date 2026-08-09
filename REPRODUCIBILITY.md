@@ -18,13 +18,17 @@ $env:PYTHONPATH=(Resolve-Path 'code').Path
 py -3.13 'code\pruned_evidence_gate.py'
 py -3.13 -m pytest 'code' -q
 py -3.13 'code\llm_self_evaluation_baseline.py'
+py -3.13 'code\text_only_extraction.py'
+py -3.13 'code\heldout_case_authoring.py'
+py -3.13 'code\generate_paper_assets.py'
+py -3.13 'code\update_course_docs.py'
 py -3.13 'code\build_submission_package.py'
 ```
 
 Expected focused-test result:
 
 ```text
-13 passed
+17 passed
 ```
 
 Expected Stage 1 conformance snapshot:
@@ -62,12 +66,35 @@ Arm A, xAI grok-4.5, full bank with source-support labels:
   23/23 designed overclaims routed, 10/10 bounded alerts preserved, 0/10 inappropriate denials,
   31/33 action matches, 32/33 primary-check matches, 3/33 narrowed.
 Arm B, OpenAI gpt-5.6-terra, PGX31-PGX33 structured citations with source-support label withheld:
-  matched PGX31, PGX32, and PGX33.
+  missed PGX31, matched PGX32, and matched PGX33.
 Arm B, xAI grok-4.5, PGX31-PGX33 structured citations with source-support label withheld:
   matched PGX31 and PGX32; treated PGX33 as unsupported action / claim strength.
 Synthetic uniform-NARROW sanity check:
   23/23 designed overclaims routed, 0/10 bounded alerts preserved, 0/10 inappropriate denials,
   5/33 action matches, 6/33 primary-check matches, 33/33 narrowed.
+```
+
+Expected text-only extraction snapshot, if `OPENAI_API_KEY` and `XAI_API_KEY` are available:
+
+```text
+With citation fields:
+  OpenAI gpt-5.6-terra: 78/132 annotation fields correct; 21/33 downstream action matches;
+    bounded-alert preservation drop 6; inappropriate-denial increase 0.
+  xAI grok-4.5: 86/132 annotation fields correct; 21/33 downstream action matches;
+    bounded-alert preservation drop 1; inappropriate-denial increase 0.
+No-citation control:
+  OpenAI gpt-5.6-terra: 73/132 annotation fields correct; 11/33 downstream action matches;
+    bounded-alert preservation drop 10; inappropriate-denial increase 10.
+  xAI grok-4.5: 70/132 annotation fields correct; 12/33 downstream action matches;
+    bounded-alert preservation drop 8; inappropriate-denial increase 8.
+```
+
+Expected held-out authoring snapshot, if `OPENAI_API_KEY` is available:
+
+```text
+authoring_model: gpt-5.6-sol
+case_count: 12
+accuracy: not reported; the worksheet label columns are intentionally blank.
 ```
 
 ## Package Contents
@@ -80,4 +107,4 @@ The manifest is generated from the repository-facing file set only by `code/buil
 
 ## Scope Boundary
 
-The active deterministic experiment is an executable specification-conformance scaffold. It tests whether a three-check controller follows an intended evidence grammar on author-designed synthetic archetypes and which cases are missed by simpler comparators. Stage 1 consumes structured evidence annotations only; it does not parse free text, verify citations, independently validate the annotation layer, or extract population-fit features. Arm A sends the full structured labels to frontier models as a label-to-action comparator. Arm B withholds the source-support label for PGX31-PGX33 and supplies structured citations instead. Neither experiment proves independent safety, clinical accuracy, generalization, annotation validity, or patient benefit.
+The active deterministic experiment is an executable specification-conformance scaffold. It tests whether a three-check controller follows an intended evidence grammar on author-designed synthetic archetypes and which cases are missed by simpler comparators. The deterministic monitor consumes structured evidence annotations only; it does not parse free text, verify citations, validate the annotation layer, or extract population-fit features. Arm A sends the full structured labels to frontier models as a label-to-action comparator. Arm B withholds the source-support label for PGX31-PGX33 and supplies structured citations instead. The text-only extraction experiment separately tests whether LLMs can extract the required annotation fields from synthetic draft text and citation fields before the unmodified monitor runs. None of these experiments prove clinical safety, generalization, annotation validity, or patient benefit.
