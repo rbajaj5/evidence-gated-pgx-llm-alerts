@@ -102,7 +102,7 @@ The synthetic uniform-NARROW row is computed without an API call to show why rou
 \subsection{Text-Only Extraction}
 Text-only extraction is the Stage 2 bottleneck test.
 Each model extracted four annotations for all 33 cases, first with citation fields and then with citations removed.
-Per-field confusion matrices are written to the corresponding \texttt{results/text\_only\_extraction\_*confusion.csv} files.
+Per-field confusion matrices are written to the corresponding CSV files under \texttt{results/}.
 
 \subsection{Held-Out Worksheet}
 A third model, GPT-5.6-sol, authored 12 draft scenarios for a future held-out worksheet.
@@ -129,7 +129,7 @@ Primary-check conformance was 31/33 because PGX19 and PGX24 are precedence-sensi
   Extraction Regime 1: with citations & GPT: 78/132 fields, 21/33 actions, 4/10 bounded preserved; 6/10 bounded losses were NARROW\_CLAIM; inappropriate denials 0. Grok: 86/132 fields, 21/33 actions, 9/10 bounded preserved; 1/10 bounded loss was NARROW\_CLAIM; inappropriate denials 0. & Citation-supplied failures dilute bounded guidance through over-narrowing. \\
   Extraction Regime 2: no citations & GPT: 73/132 fields, 11/33 actions, 0/10 bounded preserved; 10/10 bounded losses were ABSTAIN\_SOURCE\_SUPPORT; inappropriate denials 10. Grok: 70/132 fields, 12/33 actions, 2/10 bounded preserved; 8/10 bounded losses were ABSTAIN\_SOURCE\_SUPPORT; inappropriate denials 8. & With no citation to read, the gate withholds bounded alerts wholesale. \\
   Extraction overclaim routing & In both extraction regimes, both models routed 23/23 overclaims and allowed 0 overclaims unchanged. & Routing alone cannot distinguish a working reviewer from a degenerate abstain-all policy; bounded-alert preservation separates them. \\
-  Directional errors & With citations, GPT errors were 45 conservative vs. 9 permissive; Grok errors were 42 conservative vs. 4 permissive. Without citations, GPT errors were 43 conservative vs. 16 permissive; Grok errors were 56 conservative vs. 6 permissive. & Directionality is condition-specific rather than a pooled degradation curve. \\
+  Directional errors & With citations, GPT errors were 44 conservative vs. 10 permissive; Grok errors were 41 conservative vs. 5 permissive. Without citations, GPT errors were 43 conservative vs. 16 permissive; Grok errors were 56 conservative vs. 6 permissive. & Most citation, population, and actionability errors were conservative; endpoint errors were the exception. \\
   Macro-F1 & With citation, GPT field F1s were 0.748/0.437/0.701/0.387 and Grok 0.652/0.597/0.659/0.498 for citation/population/endpoint/actionability. & Indicative only: several enum cells contain one or two observations. \\
   Held-out worksheet & GPT-5.6-sol generated 12 unlabeled draft scenarios and a blank labeling worksheet. & Future labeling artifact only; no held-out accuracy is reported. \\
   \bottomrule
@@ -141,7 +141,10 @@ The deterministic monitor is not better because it understands medicine; it is u
 The ablation and simple-comparator results show that a claim-strength-only rule would miss PGX31, PGX32, and PGX33.
 The extraction experiment is the most important negative result: LLMs can map supplied labels into plausible actions, but extracting the labels from text and citations loses accuracy.
 This supports treating annotation extraction as the next experiment rather than assuming that label translation solves evidence overclaiming.
-The failures are directional rather than random: with citation fields, most extraction errors move to more conservative enum values.
+The failures are directional rather than random, but not uniformly conservative.
+Citation support, population fit, and actionability errors generally moved toward stricter values; endpoint-level errors were the exception.
+GPT was more permissive than conservative on endpoint level in both conditions (4/7 and 5/8 conservative/permissive), and Grok was only mildly conservative (8/4 and 10/4).
+This is plausible because endpoint level requires judging what class of scientific evidence supports a claim, not just checking whether a source or population field is present.
 Two extraction regimes emerged.
 When citations were supplied, bounded guidance still reached the clinician but arrived diluted: GPT-5.6-terra narrowed all 6 lost bounded alerts and Grok-4.5 narrowed its 1 lost bounded alert, leaving inappropriate-denial count at 0.
 This over-narrowing can still create alert burden \citep{ancker2017alertfatigue}; Grok lost 1 bounded alert versus GPT's 6 at comparable field accuracy (0.6515 vs. 0.5909), so field accuracy alone does not predict downstream utility.
